@@ -11,6 +11,7 @@ public class Keywords {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "response_id")
     private Response response;
 
 }

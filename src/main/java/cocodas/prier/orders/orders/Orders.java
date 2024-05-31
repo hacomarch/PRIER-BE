@@ -3,12 +3,14 @@ package cocodas.prier.orders.orders;
 import cocodas.prier.orders.orderproduct.OrderProduct;
 import cocodas.prier.user.Users;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 public class Orders {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,6 +18,7 @@ public class Orders {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private Users users;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
