@@ -2,8 +2,10 @@ package cocodas.prier.project.media;
 
 import cocodas.prier.project.project.Project;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class ProjectMedia {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,5 +16,6 @@ public class ProjectMedia {
     private MediaType mediaType;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     private Project project;
 }

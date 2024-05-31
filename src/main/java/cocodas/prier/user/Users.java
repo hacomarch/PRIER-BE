@@ -9,12 +9,14 @@ import cocodas.prier.project.project.Project;
 import cocodas.prier.project.comment.ProjectComment;
 import cocodas.prier.quest.Quest;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 public class Users {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,7 +47,7 @@ public class Users {
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Response> responses = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private PointTransaction pointTransaction;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
