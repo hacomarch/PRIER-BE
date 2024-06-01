@@ -1,5 +1,6 @@
 package cocodas.prier.product;
 
+import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -46,6 +48,16 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 정보 업데이트 실패");
         }
+    }
+
+    @GetMapping("/products")
+    public List<ProductResponseDto> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    @GetMapping("/products/{productId}")
+    public ProductResponseDto getProduct(@PathVariable Long productId) {
+        return productService.getProduct(productId);
     }
 }
 

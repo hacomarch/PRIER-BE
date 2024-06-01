@@ -1,18 +1,21 @@
 package cocodas.prier.product;
 
 import cocodas.prier.aws.AwsS3Service;
+import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
 import cocodas.prier.product.media.ProductMedia;
 import cocodas.prier.product.media.ProductMediaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,11 +23,18 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class ProductService {
 
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+
     private final ProductRepository productRepository;
     private final ProductMediaRepository productMediaRepository;
     private final AwsS3Service awsS3Service;
 
-    @Transactional()
+
+    @Transactional
     public String createProduct(ProductForm form, MultipartFile file) throws IOException {
         Product product = Product.builder()
                 .productName(form.getProductName())
@@ -112,5 +122,29 @@ public class ProductService {
 
         log.info("상품 정보 업데이트 완료");
         return "상품 정보 업데이트 완료";
+    }
+
+
+    public List<ProductResponseDto> getAllProducts() {
+        List<Product> products = productRepository.findAllWithMedia();
+        return products.stream()
+                .map(product -> convertToDto(product))
+                .collect(Collectors.toList());
+    }
+
+    public ProductResponseDto getProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 상품"));
+        return convertToDto(product);
+    }
+
+    private ProductResponseDto convertToDto(Product product) {
+        String imageUrl = String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, product.getProductMedia().getS3Key());
+        return new ProductResponseDto(product.getProductId(),
+                                    product.getProductName(),
+                                    product.getPrice(),
+                                    product.getDescription(),
+                                    product.getStock(),
+                                    imageUrl);
     }
 }
