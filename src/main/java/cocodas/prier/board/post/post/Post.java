@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
     private String title;
     private String content;
