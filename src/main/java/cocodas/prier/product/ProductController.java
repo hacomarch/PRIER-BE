@@ -1,6 +1,6 @@
 package cocodas.prier.product;
 
-import cocodas.prier.product.dto.CreateProductForm;
+import cocodas.prier.product.dto.ProductForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/products")
-    public ResponseEntity<String> createProduct(@RequestPart("product") CreateProductForm form,
+    public ResponseEntity<String> createProduct(@RequestPart("product") ProductForm form,
                                                 @RequestParam("file") MultipartFile file) {
         try {
             String result = productService.createProduct(form, file);
@@ -37,7 +37,16 @@ public class ProductController {
     }
 
     @PutMapping("/products/{productId}")
-    public ResponseEntity<String> updateProduct
+    public ResponseEntity<String> updateProduct(@PathVariable Long productId,
+                                                @RequestPart("product") ProductForm form,
+                                                @RequestParam(name = "file", required = false) MultipartFile file) {
+        try {
+            String result = productService.updateProduct(productId, form, file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 정보 업데이트 실패");
+        }
+    }
 }
 
 

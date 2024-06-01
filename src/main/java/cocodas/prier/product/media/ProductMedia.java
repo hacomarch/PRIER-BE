@@ -26,4 +26,12 @@ public class ProductMedia {
         this.s3Key = s3Key;
         this.product = product;
     }
+
+    public void changeMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public void changeS3Key(String s3Key) {
+        this.s3Key = s3Key;
+    }
 }

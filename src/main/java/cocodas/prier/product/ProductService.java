@@ -1,7 +1,7 @@
 package cocodas.prier.product;
 
 import cocodas.prier.aws.AwsS3Service;
-import cocodas.prier.product.dto.CreateProductForm;
+import cocodas.prier.product.dto.ProductForm;
 import cocodas.prier.product.media.ProductMedia;
 import cocodas.prier.product.media.ProductMediaRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,7 +25,7 @@ public class ProductService {
     private final AwsS3Service awsS3Service;
 
     @Transactional()
-    public String createProduct(CreateProductForm form, MultipartFile file) throws IOException {
+    public String createProduct(ProductForm form, MultipartFile file) throws IOException {
         Product product = Product.builder()
                 .productName(form.getProductName())
                 .price(form.getPrice())
@@ -73,13 +74,43 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
 
         // S3에서 관련 파일 삭제
-        productMediaRepository.findByProduct(product).forEach(media -> {
-            awsS3Service.deleteFile(media.getS3Key());
-            productMediaRepository.delete(media); // DB에서 미디어 정보 삭제
-        });
+//        productMediaRepository.findByProduct(product).forEach(media -> {
+//            awsS3Service.deleteFile(media.getS3Key());
+//            productMediaRepository.delete(media); // DB에서 미디어 정보 삭제
+//        });
+
+        ProductMedia productMedia = productMediaRepository.findByProduct(product)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 상품이미지"));
+        awsS3Service.deleteFile(productMedia.getS3Key());
+        productMediaRepository.delete(productMedia);
 
         productRepository.delete(product);
         log.info("상품 삭제 완료");
         return "상품 삭제 완료";
+    }
+
+    @Transactional
+    public String updateProduct(Long productId, ProductForm form, MultipartFile newFile) throws IOException {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 상품"));
+
+        product.changeProductName(form.getProductName());
+        product.changePrice(form.getPrice());
+        product.changeDescription(form.getDescription());
+        product.changeStock(form.getStock());
+
+        if (newFile != null && !newFile.isEmpty()) {
+            ProductMedia media = productMediaRepository.findByProduct(product)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 상품 이미지"));
+
+            awsS3Service.deleteFile(media.getS3Key());
+            String newKey = handleFileUpload(newFile);
+            media.changeMetadata(newFile.getOriginalFilename());
+            media.changeS3Key(newKey);
+        }
+
+        log.info("상품 정보 업데이트 완료");
+        return "상품 정보 업데이트 완료";
     }
 }
