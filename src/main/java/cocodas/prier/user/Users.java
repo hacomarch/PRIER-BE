@@ -19,13 +19,13 @@ import java.util.List;
 @Getter
 public class Users {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     private String email;
     private String nickname;
     private String intro;
     private String belonging;
-    private Rank rank;
+    private Rank tier;
     private String blogUrl;
     private String githubUrl;
     private String figmaUrl;

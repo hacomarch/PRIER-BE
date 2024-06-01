@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 public class Project {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectId;
 
     @Column(nullable = false)

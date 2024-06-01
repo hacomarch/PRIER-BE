@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PostMedia {
     
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postMediaId;
     private String metadata;
     private LocalDateTime createdAt;

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class Quest {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questId;
     private Integer sequence;
     private QuestStatus questStatus;
