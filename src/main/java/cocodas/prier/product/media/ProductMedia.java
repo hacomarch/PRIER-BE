@@ -16,7 +16,7 @@ public class ProductMedia {
     private String metadata;
     private String s3Key;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
