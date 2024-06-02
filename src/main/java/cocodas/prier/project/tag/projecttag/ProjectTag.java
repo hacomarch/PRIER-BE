@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class ProjectTag {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectTagId;
 
     @ManyToOne(fetch = FetchType.LAZY)

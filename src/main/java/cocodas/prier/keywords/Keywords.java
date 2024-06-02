@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 public class Keywords {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long keywordId;
     private String content;
 

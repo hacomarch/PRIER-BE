@@ -1,18 +1,21 @@
 package cocodas.prier.aws;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class AwsS3Service {
 
@@ -48,5 +51,15 @@ public class AwsS3Service {
 
         s3Client.putObject(putObjectRequest, file.toPath());
         return key;
+    }
+
+    public void deleteFile(String fileKey) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket("prier")
+                .key(fileKey)
+                .build();
+
+        s3Client.deleteObject(deleteObjectRequest);
+        log.info("File deleted from S3: " + fileKey);
     }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PointTransaction {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
     private Integer amount;
     private TransactionType transactionType;

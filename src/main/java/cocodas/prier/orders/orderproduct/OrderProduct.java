@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public class OrderProduct {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderProductId;
     private Integer count;
 

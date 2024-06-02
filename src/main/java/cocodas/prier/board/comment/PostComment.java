@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PostComment {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
     private String content;
     private LocalDateTime createdAt;
