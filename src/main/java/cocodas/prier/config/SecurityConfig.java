@@ -1,5 +1,8 @@
-package cocodas.prier.user.kakao.jwt;
+package cocodas.prier.config;
 
+import cocodas.prier.user.kakao.jwt.CustomAccessDeniedHandler;
+import cocodas.prier.user.kakao.jwt.CustomJwtAuthenticationEntryPoint;
+import cocodas.prier.user.kakao.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

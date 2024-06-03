@@ -4,10 +4,12 @@ import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.dto.response.KakaoTokenResponseDto;
 import cocodas.prier.user.dto.response.KakaoUserInfoResponseDto;
+import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
+import cocodas.prier.user.dto.response.LoginSuccessResponse;
+import cocodas.prier.user.kakao.jwt.UserAuthentication;
 import cocodas.prier.user.kakao.jwt.token.RefreshTokenService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class KakaoService {
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${kakao.client_id}")
     private String client_id;
@@ -30,6 +32,13 @@ public class KakaoService {
     private String client_secret;
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
+
+    public LoginSuccessResponse kakaoLogin(String code) {
+        String accessToken = getAccessToken(code);
+        KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
+        Long userId = getUserByEmail(userInfo.getKakaoAccount().email).getUserId();
+        return getTokenByUserId(userId);
+    }
 
     public String getAccessToken(String code) {
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
@@ -62,7 +71,7 @@ public class KakaoService {
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
 
-        if (isDuplicateEmail(userInfo.getKakaoAccount().email)) {
+        if (!isDuplicateEmail(userInfo.getKakaoAccount().email)) {
             Users user = Users.builder()
                     .email(userInfo.getKakaoAccount().email)
                     .nickname(userInfo.getKakaoAccount().getProfile().nickName)
@@ -78,12 +87,28 @@ public class KakaoService {
                 .orElseThrow(() -> new RuntimeException("이메일이 없습니다."));
     }
 
-    private boolean isDuplicateEmail(String email) {
-        Users users = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("이메일이 없습니다."));
+    public LoginSuccessResponse getTokenByUserId(Long userId) {
+        UserAuthentication userAuthentication = new UserAuthentication(userId, null, null);
 
-        return users == null;
+        String accessToken = jwtTokenProvider.generateToken(userAuthentication);
+        String refreshToken = jwtTokenProvider.issueRefreshToken(userAuthentication);
+        refreshTokenService.saveRefreshToken(userId, refreshToken);
+
+        Users user = getUserById(userId);
+        return new LoginSuccessResponse(
+                accessToken,
+                refreshToken,
+                userId,
+                user.getEmail(),
+                user.getNickname());
     }
 
+    private Users getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+    }
 
+    private boolean isDuplicateEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }
