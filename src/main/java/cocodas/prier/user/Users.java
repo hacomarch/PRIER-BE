@@ -9,7 +9,9 @@ import cocodas.prier.project.project.Project;
 import cocodas.prier.project.comment.ProjectComment;
 import cocodas.prier.quest.Quest;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Users {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +34,12 @@ public class Users {
     private String figmaUrl;
     private String notionUrl;
     private LocalDateTime lastLoginAt;
+
+    @Builder
+    public Users(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+    }
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
