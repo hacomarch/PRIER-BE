@@ -1,7 +1,10 @@
-package cocodas.prier.user;
+package cocodas.prier.user.kakao;
 
+import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.Users;
 import cocodas.prier.user.dto.response.KakaoTokenResponseDto;
 import cocodas.prier.user.dto.response.KakaoUserInfoResponseDto;
+import cocodas.prier.user.kakao.jwt.token.RefreshTokenService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class KakaoService {
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
+
     @Value("${kakao.client_id}")
     private String client_id;
 
@@ -68,10 +73,17 @@ public class KakaoService {
         return userInfo;
     }
 
+    public Users getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("이메일이 없습니다."));
+    }
+
     private boolean isDuplicateEmail(String email) {
         Users users = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("이메일이 없습니다."));
 
         return users == null;
     }
+
+
 }
