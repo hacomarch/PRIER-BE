@@ -13,13 +13,13 @@ import org.springframework.data.redis.core.RedisHash;
 public class Token {
 
     @Id
-    private Long id;
+    private Long userId;
 
     private String refreshToken;
 
     public static Token of(Long id, String refreshToken) {
         return Token.builder()
-                .id(id)
+                .userId(id)
                 .refreshToken(refreshToken)
                 .build();
     }
