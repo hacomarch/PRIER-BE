@@ -14,7 +14,7 @@ public class UserService {
 
     // refresh token 으로 사용자 식별하기
     private Long findUserByRefreshToken(String token) {
-        return refreshTokenService.findIdByRefreshToken(token);
+        return refreshTokenService.findUserIdByRefreshToken(token);
     }
 
     // 닉네임 수정하기
