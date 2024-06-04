@@ -23,7 +23,7 @@ public class KakaoService {
     @Value("${kakao.client_id}")
     private String client_id;
 
-    @Value(("${kakao.redirect_uri}"))
+    @Value("${kakao.redirect_uri}")
     private String redirect_uri;
 
     @Value("${kakao.client_secret}")
