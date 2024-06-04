@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Entity
 @Getter
@@ -35,12 +36,43 @@ public class Users {
     private String notionUrl;
     private LocalDateTime lastLoginAt;
 
+    // 카카오 로그인을 사용할 때 필요한 Builder
     @Builder
     public Users(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
     }
 
+    // 마이페이지 수정을 위한 Setter
+    public void updateNickName(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateIntro(String intro) {
+        this.intro = intro;
+    }
+
+    public void updateBelonging(String belonging) {
+        this.belonging = belonging;
+    }
+
+    public void updateBlog(String blogUrl) {
+        this.blogUrl = blogUrl;
+    }
+
+    public void updateGithub(String githubUrl) {
+        this.githubUrl = githubUrl;
+    }
+
+    public void updateFigma(String figmaUrl) {
+        this.figmaUrl = figmaUrl;
+    }
+
+    public void updateNotion(String notionUrl) {
+        this.notionUrl = notionUrl;
+    }
+
+    // 테이블 연관관계 설정
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
@@ -64,6 +96,4 @@ public class Users {
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Quest> quests = new ArrayList<>();
-
-
 }
