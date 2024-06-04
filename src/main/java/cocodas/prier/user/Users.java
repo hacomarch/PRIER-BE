@@ -36,8 +36,6 @@ public class Users {
     private String notionUrl;
     private LocalDateTime lastLoginAt;
 
-<<<<<<< HEAD
-=======
     // 마이페이지에서 수정할 때 필요한 Builder
     @Builder
     public Users(String nickname,
@@ -60,8 +58,6 @@ public class Users {
         this.lastLoginAt = lastLoginAt;
     }
 
-
->>>>>>> 704c3d42e2d9fbcfa39dd59e0ea1bee1c9066c0f
     // 카카오 로그인을 사용할 때 필요한 Builder
     @Builder
     public Users(String email, String nickname) {
