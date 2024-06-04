@@ -7,7 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoginSuccessResponse {
     private String accessToken;
-    private String refreshToken;
     private Long userId;
     private String email;
     private String nickname;
