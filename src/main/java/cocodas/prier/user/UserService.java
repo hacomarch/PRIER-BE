@@ -1,7 +1,6 @@
 package cocodas.prier.user;
 
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
-import cocodas.prier.user.kakao.jwt.token.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    private final RefreshTokenService refreshTokenService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
