@@ -7,7 +7,6 @@ import cocodas.prier.user.dto.response.KakaoUserInfoResponseDto;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import cocodas.prier.user.dto.response.LoginSuccessResponse;
 import cocodas.prier.user.kakao.jwt.UserAuthentication;
-import cocodas.prier.user.kakao.jwt.token.RefreshTokenService;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class KakaoService {
     private final UserRepository userRepository;
-    private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${kakao.client_id}")
@@ -91,13 +89,10 @@ public class KakaoService {
         UserAuthentication userAuthentication = new UserAuthentication(userId, null, null);
 
         String accessToken = jwtTokenProvider.generateToken(userAuthentication);
-        String refreshToken = jwtTokenProvider.issueRefreshToken(userAuthentication);
-        refreshTokenService.saveRefreshToken(userId, refreshToken);
 
         Users user = getUserById(userId);
         return new LoginSuccessResponse(
                 accessToken,
-                refreshToken,
                 userId,
                 user.getEmail(),
                 user.getNickname());

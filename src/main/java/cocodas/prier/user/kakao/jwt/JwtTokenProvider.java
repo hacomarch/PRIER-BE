@@ -19,7 +19,6 @@ public class JwtTokenProvider {
 
     private static final String USER_ID = "userId";
     private static final Long TOKEN_EXPIRATION_TIME = 60 * 60 * 1000L; //1시간
-    private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 14 * 24 * 60 * 60 * 1000L; // 2주
 
     @Value("${jwt.secret}")
     private String JWT_SECRET; //jwt 서명을 위한 비밀키
@@ -47,24 +46,15 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String issueRefreshToken(Authentication authentication) {
-        final Date now = new Date();
-        final Claims claims = Jwts.claims()
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_TIME));
-
-        claims.put(USER_ID, authentication.getPrincipal());
-        return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setClaims(claims)
-                .signWith(getSigningKey())
-                .compact();
-    }
-
     //서명에 사용할 키 생성
     private SecretKey getSigningKey() {
         String encodedKey = Base64.getEncoder().encodeToString(JWT_SECRET.getBytes());
         return Keys.hmacShaKeyFor(encodedKey.getBytes()); //인코딩된 키를 HMAC-SHA 키로 변환
+    }
+
+    public Long getUserIdFromJwt(String token) {
+        Claims claims = getBody(token);
+        return Long.valueOf(claims.get(USER_ID).toString()); //userId를 Long으로 변환해 반환
     }
 
     //토큰 유효성 검사
@@ -90,10 +80,5 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token) //토큰 파싱, 서명 검증
                 .getBody(); //클레임 반환
-    }
-
-    public Long getUserIdFromJwt(String token) {
-        Claims claims = getBody(token);
-        return Long.valueOf(claims.get(USER_ID).toString()); //userId를 Long으로 변환해 반환
     }
 }
