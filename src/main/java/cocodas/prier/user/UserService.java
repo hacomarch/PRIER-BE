@@ -25,7 +25,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateNickName(newNickname);
-        userRepository.save(user);
     }
 
     // 소속 수정하기
@@ -35,7 +34,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateBelonging(newBelonging);
-        userRepository.save(user);
     }
 
     // 자기소개 수정하기
@@ -45,7 +43,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateIntro(newIntro);
-        userRepository.save(user);
     }
 
     // 블로그 링크 수정하기
@@ -55,7 +52,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateBlog(newBlogUrl);
-        userRepository.save(user);
     }
 
     // 깃헙 링크 수정하기
@@ -65,7 +61,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateGithub(newGithubUrl);
-        userRepository.save(user);
     }
 
     // 피그마 주소 수정하기
@@ -75,7 +70,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateFigma(newFigmaUrl);
-        userRepository.save(user);
     }
 
     // 노션 주소 수정하기
@@ -85,7 +79,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         user.updateNotion(newNotionUrl);
-        userRepository.save(user);
     }
 
     // 퀘스트하기

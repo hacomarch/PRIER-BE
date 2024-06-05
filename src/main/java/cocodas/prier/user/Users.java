@@ -35,6 +35,7 @@ public class Users {
     private String figmaUrl;
     private String notionUrl;
     private LocalDateTime lastLoginAt;
+    private Integer balance;
 
     // 마이페이지에서 수정할 때 필요한 Builder
     @Builder
@@ -94,6 +95,10 @@ public class Users {
         this.notionUrl = notionUrl;
     }
 
+    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
     // 테이블 연관관계 설정
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
@@ -110,8 +115,8 @@ public class Users {
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Response> responses = new ArrayList<>();
 
-    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PointTransaction pointTransaction;
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PointTransaction> pointTransaction = new ArrayList<>();
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Orders> orders = new ArrayList<>();
