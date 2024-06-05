@@ -62,6 +62,11 @@ public class JwtTokenProvider {
         return Long.valueOf(claims.get(USER_ID).toString()); //userId를 Long으로 변환해 반환
     }
 
+    public String getKakaoAccessTokenFromJwt(String token) {
+        Claims claims = getBody(token);
+        return claims.get(KAKAO_ACCESS_TOKEN).toString();
+    }
+
     //토큰 유효성 검사
     public JwtValidationType validateToken(String token) {
         try {
