@@ -40,10 +40,6 @@ public class KakaoService {
         return getTokenByUserId(userId, accessToken);
     }
 
-    public void kakaoLogout() {
-
-    }
-
     public String getAccessToken(String code) {
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
