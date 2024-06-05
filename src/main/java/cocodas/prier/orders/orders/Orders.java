@@ -22,14 +22,14 @@ public class Orders {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private Users users;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
     @Builder
-    public Orders(Users user) {
-        this.user = user;
+    public Orders(Users users) {
+        this.users = users;
         this.createdAt = LocalDateTime.now();
     }
 }
