@@ -64,7 +64,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/intro")
     public void newIntro(@RequestHeader("Authorization") String authorizationHeader,
-                             @RequestBody IntroRequestDto introRequestDto) {
+                         @RequestBody IntroRequestDto introRequestDto) {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newIntro(token, introRequestDto.getIntro());
     }
