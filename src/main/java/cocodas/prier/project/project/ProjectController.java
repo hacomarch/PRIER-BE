@@ -34,4 +34,21 @@ public class ProjectController {
         return ResponseEntity.ok(result);
     }
 
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<String> deleteProject(@PathVariable Long projectId) {
+        String result = projectService.deleteProject(projectId);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{projectId}")
+    public ResponseEntity<String> updateProject(@PathVariable Long projectId,
+                                                @RequestPart("form") ProjectForm form,
+                                                @RequestParam("mainImage") MultipartFile mainImage,
+                                                @RequestParam("contentImages") MultipartFile[] contentImages) {
+
+        String result = projectService.updateProject(projectId, form, mainImage, contentImages);
+        return ResponseEntity.ok(result);
+    }
+
 }

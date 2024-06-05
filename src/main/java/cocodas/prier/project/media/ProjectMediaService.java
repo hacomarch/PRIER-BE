@@ -49,6 +49,17 @@ public class ProjectMediaService {
         return isMain ? "메인 이미지 등록 완료" : "이미지 등록 완료";
     }
 
+    //todo : 메인 이미지 업데이트 구현해야함
+    @Transactional
+    public void updateMainImage(Project project, MultipartFile file) throws IOException {
+
+    }
+
+    @Transactional
+    public void updateContentImages(Project project, MultipartFile[] files) throws IOException {
+
+    }
+
 
 
     private String handleFileUpload(MultipartFile file) throws IOException {

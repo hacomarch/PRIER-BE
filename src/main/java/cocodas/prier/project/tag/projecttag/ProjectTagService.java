@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,6 +52,34 @@ public class ProjectTagService {
     @Transactional
     public void deleteProjectTag(Long id) {
         projectTagRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateProjectTags(Project project, String[] updatedTags) {
+        List<ProjectTag> currentTags = projectTagRepository.findByProjectId(project.getProjectId());
+
+        Set<String> currentTagsNames = currentTags.stream()
+                .map(projectTag -> projectTag.getTag().getTagName())
+                .collect(Collectors.toSet());
+
+        Set<String> newTagNames = new HashSet<>(Arrays.asList(updatedTags));
+
+        currentTags.forEach(projectTag -> {
+            if (!newTagNames.contains(projectTag.getTag().getTagName())) {
+                projectTagRepository.delete(projectTag);
+            }
+        });
+
+        newTagNames.forEach(tagName -> {
+            if (!currentTagsNames.contains(tagName)) {
+                Tag tag = tagRepository.findByTagName(tagName);
+                if (tag == null) {
+                    tagRepository.save(new Tag(tagName));
+                }
+                projectTagRepository.save(new ProjectTag(tag, project));
+            }
+        });
+
     }
 
 
