@@ -73,6 +73,10 @@ public class Users {
         this.notionUrl = notionUrl;
     }
 
+    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
     // 테이블 연관관계 설정
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
