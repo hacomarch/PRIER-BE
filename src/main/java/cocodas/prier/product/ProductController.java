@@ -1,7 +1,12 @@
 package cocodas.prier.product;
 
+import cocodas.prier.orders.orders.OrderService;
+import cocodas.prier.orders.orders.Orders;
 import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
+import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.Users;
+import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +24,19 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final OrderService orderService;
+    private final JwtTokenProvider jwtTokenProvider;
+
+
+    private static String getToken(String auth) {
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            throw new RuntimeException("JWT Token is missing");
+        }
+
+        return auth.substring(7);
+    }
 
     @PostMapping("/products")
     public ResponseEntity<String> createProduct(@RequestPart("product") ProductForm form,
@@ -59,6 +77,23 @@ public class ProductController {
     public ProductResponseDto getProduct(@PathVariable Long productId) {
         return productService.getProduct(productId);
     }
+
+    @PostMapping("/purchase/{productId}")
+    public ResponseEntity<String> purchaseProduct(@PathVariable Long productId,
+                                                  @RequestHeader("Authorization") String auth,
+                                                  @RequestParam Integer count) {
+        String token = getToken(auth);
+        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
+
+        // 사용자 및 상품 조회
+        Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        // 새로운 주문 생성
+        Orders order = orderService.createOrder(user);
+
+        // 상품 구매
+        productService.createOrderProduct(userId, product, order, count);
+        return ResponseEntity.ok("상품 구매가 완료되었습니다.");
+    }
 }
-
-

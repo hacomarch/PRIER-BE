@@ -4,10 +4,13 @@ import cocodas.prier.aws.AwsS3Service;
 import cocodas.prier.orders.orderproduct.OrderProduct;
 import cocodas.prier.orders.orderproduct.OrderProductRepository;
 import cocodas.prier.orders.orders.Orders;
+import cocodas.prier.point.PointTransactionService;
 import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
 import cocodas.prier.product.media.ProductMedia;
 import cocodas.prier.product.media.ProductMediaRepository;
+import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.Users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +39,8 @@ public class ProductService {
     private final ProductMediaRepository productMediaRepository;
     private final AwsS3Service awsS3Service;
     private final OrderProductRepository orderProductRepository;
+    private final PointTransactionService pointTransactionService;
+    private final UserRepository userRepository;
 
 
     @Transactional
@@ -122,10 +127,40 @@ public class ProductService {
         return "상품 정보 업데이트 완료";
     }
 
+    @Transactional
+    public void createOrderProduct(Long userId, Product product, Orders order, Integer count) {
+        Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+
+        Integer unitPrice = product.getPrice();
+        Integer totalPrice = unitPrice * count;
+
+        // 구매 전 재고 확인
+        if (product.getStock() < 0) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+
+        // 포인트 차감
+        pointTransactionService.deductPointsForPurchase(user, totalPrice);
+
+        // 재고 감소
+        product.changeStock(product.getStock() - count);
+
+        // 주문 저장
+        OrderProduct orderProduct = OrderProduct.builder()
+                .product(product)
+                .orders(order)
+                .count(count)
+                .unitPrice(unitPrice)
+                .build();
+
+        productRepository.save(product);
+        orderProductRepository.save(orderProduct);
+    }
+
     public List<ProductResponseDto> getAllProducts() {
         List<Product> products = productRepository.findAllWithMedia();
         return products.stream()
-                .map(product -> convertToDto(product))
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
@@ -145,16 +180,4 @@ public class ProductService {
                                     imageUrl);
     }
 
-    // 주문 내역 기록
-    @Transactional
-    public void createOrderProduct(Product product, Orders order, Integer count) {
-        Integer unitPrice = product.getPrice();
-        OrderProduct orderProduct = OrderProduct.builder()
-                .product(product)
-                .orders(order)
-                .count(count)
-                .unitPrice(unitPrice)
-                .build();
-        orderProductRepository.save(orderProduct);
-    }
 }
