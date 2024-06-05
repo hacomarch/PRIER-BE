@@ -16,20 +16,20 @@ import java.time.LocalDateTime;
 @Builder
 public class PointTransaction {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
 
+    @Column(nullable = false)
     private Integer amount;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    private Integer balance;
-
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private Users users;
 }
