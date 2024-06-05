@@ -24,6 +24,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     private static final String[] AUTH_WHITELIST = {
+            "localhost:3000",
             "/kakao/login",
             "/kakao/callback",
             "/kakao/callback/**",
