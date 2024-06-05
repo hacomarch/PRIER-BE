@@ -8,6 +8,7 @@ import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -85,6 +86,26 @@ public class PointTransactionService {
         pointTransactionRepository.save(transaction);
 
         return convertToDto(transaction);
+    }
+
+    // 포인트 차감 (PRODUCT_PURCHASE)
+    @Transactional
+    public void deductPointsForPurchase(Users user, Integer amount) {
+        if (user.getBalance() < amount) {
+            throw new IllegalArgumentException("포인트가 부족합니다.");
+        }
+        user.updateBalance(-amount);
+
+        PointTransaction transaction = PointTransaction.builder()
+                .amount(-amount)
+                .transactionType(TransactionType.PRODUCT_PURCHASE)
+                .createdAt(LocalDateTime.now())
+                .balance(user.getBalance())
+                .users(user)
+                .build();
+
+        userRepository.save(user);
+        pointTransactionRepository.save(transaction);
     }
 
     private PointTransactionDTO convertToDto(PointTransaction transaction) {
