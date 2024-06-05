@@ -16,14 +16,16 @@ import java.util.stream.Collectors;
 @Service
 public class PointTransactionService {
 
-    @Autowired
-    private PointTransactionRepository pointTransactionRepository;
+    private final PointTransactionRepository pointTransactionRepository;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ProjectRepository projectRepository;
+    public PointTransactionService(PointTransactionRepository pointTransactionRepository, UserRepository userRepository, ProjectRepository projectRepository) {
+        this.pointTransactionRepository = pointTransactionRepository;
+        this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
+    }
 
     // 현재 포인트 조회
     public Integer getCurrentPoints(Long userId) {
