@@ -56,7 +56,7 @@ public class ProjectTagService {
 
     @Transactional
     public void updateProjectTags(Project project, String[] updatedTags) {
-        List<ProjectTag> currentTags = projectTagRepository.findByProjectId(project.getProjectId());
+        List<ProjectTag> currentTags = projectTagRepository.findByProjectProjectId(project.getProjectId());
 
         Set<String> currentTagsNames = currentTags.stream()
                 .map(projectTag -> projectTag.getTag().getTagName())

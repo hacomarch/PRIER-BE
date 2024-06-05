@@ -12,5 +12,5 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTag, Long> {
     @Query("SELECT pt FROM ProjectTag pt JOIN FETCH pt.project WHERE pt.tag.tagId = :tagId")
     List<ProjectTag> findByTagIdWithProject(Long tagId);
 
-    List<ProjectTag> findByProjectId(Long projectId);
+    List<ProjectTag> findByProjectProjectId(Long projectId);
 }
