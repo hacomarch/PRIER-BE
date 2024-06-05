@@ -42,6 +42,7 @@ public class Users {
     public Users(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
+        this.balance = 0;
     }
 
     // 마이페이지 수정을 위한 Setter
@@ -77,8 +78,11 @@ public class Users {
         this.lastLoginAt = lastLoginAt;
     }
 
-    public void updateBalance(int balance) {
-        this.balance = balance;
+    public void updateBalance(int amount) {
+        if (this.balance == null) {
+            this.balance = 0;
+        }
+        this.balance += amount;
     }
 
     // 테이블 연관관계 설정

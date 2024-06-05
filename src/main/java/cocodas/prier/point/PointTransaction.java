@@ -29,6 +29,9 @@ public class PointTransaction {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Integer balance; // 변동 직후 잔액
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private Users users;
