@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,76 +30,6 @@ public class ProjectService {
     private final QuestionService questionService;
     private final ProjectMediaService projectMediaService;
 
-//    @Transactional
-//    public String createProject(CreateProjectForm form,
-//                                MultipartFile mainImage,
-//                                MultipartFile[] contentImages,
-//                                String token) {
-//
-//        //유저 찾기
-//        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
-//        Users user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
-//
-//        Project project = Project.builder()
-//                .title(form.getTitle())
-//                .introduce(form.getIntroduce())
-//                .goal(form.getGoal())
-//                .teamName(form.getTeamName())
-//                .teamDescription(form.getTeamDescription())
-//                .teamMate(form.getTeamMate())
-//                .users(user)
-//                .build();
-//
-//        //status 처리
-//        switch (form.getStatus()) {
-//            case 0:
-//                project.setStatus(ProjectStatus.PLANNING);
-//                break;
-//            case 1:
-//                project.setStatus(ProjectStatus.DEVELOPING);
-//                break;
-//            case 2:
-//                project.setStatus(ProjectStatus.DEPLOYMENT_COMPLETE);
-//                break;
-//        }
-//
-//        projectRepository.save(project);
-//
-//        //tag 처리
-//        if (form.getTags() != null) {
-//            projectTagService.linkTagsToProject(project, form.getTags());
-//        }
-//
-//        // 질문 처리
-//        if (form.getQuestion() != null && form.getType() != null) {
-//            questionService.createQuestion(project, form.getQuestion(), form.getType());
-//        }
-//
-//        //미디어 처리
-//        if (mainImage != null) {
-//            try {
-//                String result = projectMediaService.createMainImage(project, mainImage);
-//                log.info(result);
-//            } catch (IOException e) {
-//                log.info("메인 이미지 등록 실패 = {}", e.getMessage());
-//            }
-//        }
-//
-//        if (contentImages != null) {
-//            try {
-//                String result = projectMediaService.createContentImage(project, contentImages);
-//                log.info(result);
-//            } catch (IOException e) {
-//                log.info("내용 이미지 등록 실패 = {}", e.getMessage());
-//            }
-//        }
-//
-//
-//        return "프로젝트 생성 완료";
-//
-//    }
-
     @Transactional
     public String createProject(ProjectForm form,
                                 MultipartFile mainImage,
@@ -111,7 +42,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
 
         Project project = buildProject(form, user);
-        handleProjectStatus(form.getStatus(), project);
+        project.setStatus(ProjectStatus.values()[form.getStatus()]);
         projectRepository.save(project);
 
         handleProjectTags(form, project);
@@ -168,18 +99,62 @@ public class ProjectService {
         }
     }
 
-    private void handleProjectStatus(int status, Project project) {
-        switch (status) {
-            case 0:
-                project.setStatus(ProjectStatus.PLANNING);
-                break;
-            case 1:
-                project.setStatus(ProjectStatus.DEVELOPING);
-                break;
-            case 2:
-                project.setStatus(ProjectStatus.DEPLOYMENT_COMPLETE);
-                break;
+    @Transactional
+    public String deleteProject(Long projectId) {
+        projectRepository.deleteById(projectId);
+        return "프로젝트 삭제 완료";
+    }
+
+    @Transactional
+    public String updateProject(Long projectId,
+                                ProjectForm projectForm,
+                                MultipartFile mainImage,
+                                MultipartFile[] contentImages) {
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+
+        project.setTitle(projectForm.getTitle());
+        project.setIntroduce(projectForm.getIntroduce());
+        project.setGoal(projectForm.getGoal());
+        project.setDevStartDate(projectForm.getStartDate());
+        project.setDevEndDate(projectForm.getEndDate());
+        project.setStatus(ProjectStatus.values()[projectForm.getStatus()]);
+        project.setTeamName(projectForm.getTeamName());
+        project.setTeamDescription(projectForm.getTeamDescription());
+        project.setTeamMate(projectForm.getTeamMate());
+        project.setLink(projectForm.getLink());
+
+        // 태그 업데이트
+        if (projectForm.getTags() != null) {
+            projectTagService.updateProjectTags(project, projectForm.getTags());
         }
+
+        // 질문 업데이트
+        if (projectForm.getQuestion() != null && projectForm.getType() != null) {
+            questionService.updateQuestions(project, projectForm.getQuestion(), projectForm.getType());
+        }
+
+        // 미디어 파일 업데이트
+        if (mainImage != null && !mainImage.isEmpty()) {
+            try {
+                projectMediaService.updateMainImage(project, mainImage);
+            } catch (IOException e) {
+                log.error("메인 이미지 업데이트 실패: {}", e.getMessage());
+                throw new RuntimeException("메인 이미지 업데이트 실패", e);
+            }
+        }
+        if (contentImages != null) {
+            try {
+                projectMediaService.updateContentImages(project, contentImages);
+            } catch (IOException e) {
+                log.error("내용 이미지 업데이트 실패: {}", e.getMessage());
+                throw new RuntimeException("내용 이미지 업데이트 실패", e);
+            }
+        }
+
+        return "프로젝트 업데이트 완료";
     }
 
 }

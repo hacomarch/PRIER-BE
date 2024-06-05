@@ -49,4 +49,8 @@ public class Question {
     public void changeCategory(Category category) {
         this.category = category;
     }
+
+    public void changeOrderIndex(int orderIndex) {
+        this.orderIndex = orderIndex;
+    }
 }
