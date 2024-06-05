@@ -33,7 +33,7 @@ public class PointTransactionService {
 
     // 포인트 트랜잭션 내역 조회
     public List<PointTransactionDTO> getPointHistory(Long userId) {
-        return pointTransactionRepository.findByUsers(userId).stream()
+        return pointTransactionRepository.findByUsers_UserId(userId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }

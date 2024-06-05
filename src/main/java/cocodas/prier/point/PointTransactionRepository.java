@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface PointTransactionRepository extends JpaRepository<PointTransaction, Long> {
-    List<PointTransaction> findByUsers(Long userId);
+    List<PointTransaction> findByUsers_UserId(Long userId);
 }
