@@ -49,6 +49,13 @@ public class ProjectMediaService {
         return isMain ? "메인 이미지 등록 완료" : "이미지 등록 완료";
     }
 
+    @Transactional
+    public void deleteImage(Project project) {
+        project.getProjectMedia().forEach(
+                projectMedia -> awsS3Service.deleteFile(projectMedia.getS3Key())
+        );
+    }
+
     //todo : 메인 이미지 업데이트 구현해야함
     @Transactional
     public void updateMainImage(Project project, MultipartFile file) throws IOException {
