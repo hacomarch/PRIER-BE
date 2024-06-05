@@ -37,28 +37,6 @@ public class Users {
     private LocalDateTime lastLoginAt;
     private Integer balance;
 
-    // 마이페이지에서 수정할 때 필요한 Builder
-    @Builder
-    public Users(String nickname,
-                 String intro,
-                 String belonging,
-                 Rank tier,
-                 String blogUrl,
-                 String githubUrl,
-                 String figmaUrl,
-                 String notionUrl,
-                 LocalDateTime lastLoginAt) {
-        this.nickname = nickname;
-        this.intro = intro;
-        this.belonging = belonging;
-        this.tier = tier;
-        this.blogUrl = blogUrl;
-        this.githubUrl = githubUrl;
-        this.figmaUrl = figmaUrl;
-        this.notionUrl = notionUrl;
-        this.lastLoginAt = lastLoginAt;
-    }
-
     // 카카오 로그인을 사용할 때 필요한 Builder
     @Builder
     public Users(String email, String nickname) {
@@ -97,6 +75,10 @@ public class Users {
 
     public void updateLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public void updateBalance(Integer balance) {
+        this.balance = balance;
     }
 
     // 테이블 연관관계 설정

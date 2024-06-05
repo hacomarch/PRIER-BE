@@ -45,7 +45,7 @@ public class PointTransactionService {
                 .users(user)
                 .build();
 
-        user.setBalance(user.getBalance() + request.getAmount());
+        user.updateBalance(user.getBalance() + request.getAmount());
         userRepository.save(user);
         pointTransactionRepository.save(transaction);
 
