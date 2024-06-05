@@ -28,8 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String token = getJwtFromRequest(request);
             if (jwtTokenProvider.validateToken(token) == JwtValidationType.VALID_JWT) {
                 Long userId = jwtTokenProvider.getUserIdFromJwt(token);
+                String kakaoAccessTokenFromJwt = jwtTokenProvider.getKakaoAccessTokenFromJwt(token);
                 //userId를 principal(주체)로 설정
-                UserAuthentication authentication = new UserAuthentication(userId.toString(), null, null);
+                UserAuthentication authentication = new UserAuthentication(userId.toString(), null, null, kakaoAccessTokenFromJwt);
                 //IP 주소, 세션 ID 같은 요청 관련 정보를 포함하는 객체를 생성해서 추가적인 인증 정보 설정
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 //spring security의 인증 컨텍스트에 설정
