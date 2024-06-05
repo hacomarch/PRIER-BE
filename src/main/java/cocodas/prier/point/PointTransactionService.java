@@ -33,7 +33,7 @@ public class PointTransactionService {
 
     // 포인트 트랜잭션 내역 조회
     public List<PointTransactionDTO> getPointHistory(Long userId) {
-        return pointTransactionRepository.findByUsers(userId).stream()
+        return pointTransactionRepository.findByUsers_UserId(userId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -62,7 +62,7 @@ public class PointTransactionService {
         Users user = userRepository.findById(userId).orElseThrow();
         Project project = projectRepository.findById(projectId).orElseThrow();
 
-        int cost = weeks * 500; // 1주당 500 포인트로 임의 설정
+        int cost = weeks * 250; // 한 주당 250 포인트 소모로 설정
         if (user.getBalance() < cost) {
             throw new IllegalArgumentException("포인트가 부족합니다.");
         }
