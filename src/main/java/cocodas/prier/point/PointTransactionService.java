@@ -67,7 +67,7 @@ public class PointTransactionService {
             throw new IllegalArgumentException("포인트가 부족합니다.");
         }
 
-        project.extendFeedbackPeriod(weeks);
+        //project.extendFeedbackPeriod(weeks);
         user.updateBalance(-cost);
 
         PointTransaction transaction = PointTransaction.builder()
