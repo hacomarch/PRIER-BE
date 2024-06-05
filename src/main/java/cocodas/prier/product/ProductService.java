@@ -1,6 +1,9 @@
 package cocodas.prier.product;
 
 import cocodas.prier.aws.AwsS3Service;
+import cocodas.prier.orders.orderproduct.OrderProduct;
+import cocodas.prier.orders.orderproduct.OrderProductRepository;
+import cocodas.prier.orders.orders.Orders;
 import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
 import cocodas.prier.product.media.ProductMedia;
@@ -32,6 +35,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMediaRepository productMediaRepository;
     private final AwsS3Service awsS3Service;
+    private final OrderProductRepository orderProductRepository;
 
 
     @Transactional
@@ -118,7 +122,6 @@ public class ProductService {
         return "상품 정보 업데이트 완료";
     }
 
-
     public List<ProductResponseDto> getAllProducts() {
         List<Product> products = productRepository.findAllWithMedia();
         return products.stream()
@@ -140,5 +143,18 @@ public class ProductService {
                                     product.getDescription(),
                                     product.getStock(),
                                     imageUrl);
+    }
+
+    // 주문 내역 기록
+    @Transactional
+    public void createOrderProduct(Product product, Orders order, Integer count) {
+        Integer unitPrice = product.getPrice();
+        OrderProduct orderProduct = OrderProduct.builder()
+                .product(product)
+                .orders(order)
+                .count(count)
+                .unitPrice(unitPrice)
+                .build();
+        orderProductRepository.save(orderProduct);
     }
 }
