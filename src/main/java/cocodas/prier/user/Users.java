@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Entity
 @Getter
@@ -30,7 +29,7 @@ public class Users {
     private String intro;
     private String belonging;
     @Enumerated(EnumType.STRING)
-    private Rank rank;
+    private Rank tier;
     private String blogUrl;
     private String githubUrl;
     private String figmaUrl;
@@ -43,7 +42,7 @@ public class Users {
     public Users(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
-        this.rank = Rank.Rookie;
+        this.tier = Rank.Rookie;
         this.balance = 0;
     }
 
