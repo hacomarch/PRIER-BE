@@ -3,15 +3,18 @@ package cocodas.prier.project.tag.tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TagService {
 
     private final TagRepository tagRepository;
 
+    @Transactional
     public Long createOrGetExistingTag(String tagName) {
         Tag existingTag = tagRepository.findByTagName(tagName);
         if (existingTag != null) {
@@ -25,6 +28,7 @@ public class TagService {
         }
     }
 
+    @Transactional
     public void deleteTag(Long tagId) {
         tagRepository.deleteById(tagId);
         log.info("태그 삭제 완료");

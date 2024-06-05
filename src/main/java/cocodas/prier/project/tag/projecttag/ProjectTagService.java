@@ -8,6 +8,7 @@ import cocodas.prier.project.tag.tag.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectTagService {
 
     private final ProjectTagRepository projectTagRepository;
@@ -24,6 +26,7 @@ public class ProjectTagService {
     private final TagService tagService;
 
 
+    @Transactional
     public void linkTagsToProject(Project project, String[] tagNames) {
         for (String tagName : tagNames) {
             Long tagId = tagService.createOrGetExistingTag(tagName);
@@ -43,6 +46,7 @@ public class ProjectTagService {
         projectTagRepository.save(projectTag);
     }
 
+    @Transactional
     public void deleteProjectTag(Long id) {
         projectTagRepository.deleteById(id);
     }
