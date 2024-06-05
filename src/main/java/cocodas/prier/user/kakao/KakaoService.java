@@ -14,6 +14,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
@@ -35,7 +37,11 @@ public class KakaoService {
         String accessToken = getAccessToken(code);
         KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
         Long userId = getUserByEmail(userInfo.getKakaoAccount().email).getUserId();
-        return getTokenByUserId(userId);
+        return getTokenByUserId(userId, accessToken);
+    }
+
+    public void kakaoLogout() {
+
     }
 
     public String getAccessToken(String code) {
@@ -77,6 +83,10 @@ public class KakaoService {
             userRepository.save(user);
         }
 
+        Users users = userRepository.findByEmail(userInfo.getKakaoAccount().email)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
+        users.updateLastLoginAt(LocalDateTime.now());
+
         return userInfo;
     }
 
@@ -85,8 +95,12 @@ public class KakaoService {
                 .orElseThrow(() -> new RuntimeException("이메일이 없습니다."));
     }
 
-    public LoginSuccessResponse getTokenByUserId(Long userId) {
-        UserAuthentication userAuthentication = new UserAuthentication(userId, null, null);
+    public LoginSuccessResponse getTokenByUserId(Long userId, String kakaoAccessToken) {
+        UserAuthentication userAuthentication = new UserAuthentication(
+                userId,
+                null,
+                null,
+                kakaoAccessToken);
 
         String accessToken = jwtTokenProvider.generateToken(userAuthentication);
 
