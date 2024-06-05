@@ -12,9 +12,9 @@ public class OrderService {
     private final OrdersRepository ordersRepository;
 
     @Transactional
-    public Orders createOrder(Users user) {
+    public Orders createOrder(Users users) {
         Orders order = Orders.builder()
-                .user(user)
+                .users(users)
                 .build();
         return ordersRepository.save(order);
     }
