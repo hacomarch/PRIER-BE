@@ -71,7 +71,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/blog")
-    public void newIntro(@RequestHeader("Authorization") String authorizationHeader,
+    public void newBlogUrl(@RequestHeader("Authorization") String authorizationHeader,
                          @RequestBody BlogUrlRequestDto blogUrlRequestDto) {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newBlogUrl(token, blogUrlRequestDto.getBlogUrl());
@@ -79,7 +79,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/github")
-    public void newIntro(@RequestHeader("Authorization") String authorizationHeader,
+    public void newGithubUrl(@RequestHeader("Authorization") String authorizationHeader,
                          @RequestBody GithubUrlRequestDto githubUrlRequestDto) {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newGithubUrl(token, githubUrlRequestDto.getGithubUrl());
@@ -87,7 +87,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/figma")
-    public void newIntro(@RequestHeader("Authorization") String authorizationHeader,
+    public void newFigmaUrl(@RequestHeader("Authorization") String authorizationHeader,
                          @RequestBody FigmaUrlRequestDto figmaUrlRequestDto) {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newFigmaUrl(token, figmaUrlRequestDto.getFigmaUrl());
@@ -95,7 +95,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/notion")
-    public void newIntro(@RequestHeader("Authorization") String authorizationHeader,
+    public void newNotionUrl(@RequestHeader("Authorization") String authorizationHeader,
                          @RequestBody NotionUrlRequestDto notionUrlRequestDto) {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newNotionUrl(token, notionUrlRequestDto.getNotionUrl());
