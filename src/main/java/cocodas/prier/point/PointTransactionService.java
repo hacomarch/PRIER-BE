@@ -3,6 +3,7 @@ package cocodas.prier.point;
 import cocodas.prier.point.dto.PointRechargeRequest;
 import cocodas.prier.point.dto.PointTransactionDTO;
 import cocodas.prier.project.project.Project;
+import cocodas.prier.project.project.ProjectRepository;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class PointTransactionService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     // 현재 포인트 조회
     public Integer getCurrentPoints(Long userId) {
@@ -55,9 +59,9 @@ public class PointTransactionService {
     // 피드백 기간 연장 (FEEDBACK_EXTENSION)
     public PointTransactionDTO extendFeedbackPeriod(Long userId, Long projectId, int weeks) {
         Users user = userRepository.findById(userId).orElseThrow();
-        Project project = projectRepository.findById(projectId).orElseThrow(); // project 수정 후 재수정 예정
+        Project project = projectRepository.findById(projectId).orElseThrow();
 
-        int cost = weeks * 500 // 1주당 500 포인트로 임의 설정
+        int cost = weeks * 500; // 1주당 500 포인트로 임의 설정
         if (user.getBalance() < cost) {
             throw new IllegalArgumentException("포인트가 부족합니다.");
         }
@@ -74,9 +78,10 @@ public class PointTransactionService {
                 .build();
 
         userRepository.save(user);
-        projectRepository.save(project); // project 수정 후 재수정 예정
+        projectRepository.save(project);
         pointTransactionRepository.save(transaction);
 
+        return convertToDto(transaction);
     }
 
     private PointTransactionDTO convertToDto(PointTransaction transaction) {
