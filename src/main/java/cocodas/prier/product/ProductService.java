@@ -83,12 +83,6 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
 
-        // S3에서 관련 파일 삭제
-//        productMediaRepository.findByProduct(product).forEach(media -> {
-//            awsS3Service.deleteFile(media.getS3Key());
-//            productMediaRepository.delete(media); // DB에서 미디어 정보 삭제
-//        });
-
         ProductMedia productMedia = productMediaRepository.findByProduct(product)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 상품이미지"));
         awsS3Service.deleteFile(productMedia.getS3Key());

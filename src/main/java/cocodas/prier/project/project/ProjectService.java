@@ -101,6 +101,10 @@ public class ProjectService {
 
     @Transactional
     public String deleteProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        projectMediaService.deleteImage(project);
         projectRepository.deleteById(projectId);
         return "프로젝트 삭제 완료";
     }
