@@ -18,6 +18,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private static final String USER_ID = "userId";
+    private static final String KAKAO_ACCESS_TOKEN = "kakaoAccessToken";
     private static final Long TOKEN_EXPIRATION_TIME = 60 * 60 * 1000L; //1시간
 
     @Value("${jwt.secret}")
@@ -39,6 +40,10 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME));
 
         claims.put(USER_ID, authentication.getPrincipal()); //userId 추가
+        if (authentication instanceof UserAuthentication) {
+            claims.put(KAKAO_ACCESS_TOKEN, ((UserAuthentication) authentication).getKakaoAccessToken());
+        }
+
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setClaims(claims)
