@@ -29,7 +29,8 @@ public class Users {
     private String nickname;
     private String intro;
     private String belonging;
-    private Rank tier;
+    @Enumerated(EnumType.STRING)
+    private Rank rank;
     private String blogUrl;
     private String githubUrl;
     private String figmaUrl;
@@ -42,6 +43,7 @@ public class Users {
     public Users(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
+        this.rank = Rank.Rookie;
         this.balance = 0;
     }
 
