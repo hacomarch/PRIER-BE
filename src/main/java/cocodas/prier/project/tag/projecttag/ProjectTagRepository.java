@@ -1,5 +1,6 @@
 package cocodas.prier.project.tag.projecttag;
 
+import cocodas.prier.project.project.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,6 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTag, Long> {
     List<ProjectTag> findByTagIdWithProject(Long tagId);
 
     List<ProjectTag> findByProjectProjectId(Long projectId);
+
+    void deleteAllByProject(Project project);
 }
