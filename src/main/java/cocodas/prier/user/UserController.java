@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,11 +38,9 @@ public class UserController {
     }
 
     @GetMapping("/kakao/callback")
-    public String callback(@RequestParam("code") String code, Model model) {
+    public ResponseEntity<LoginSuccessResponse> callback(@RequestParam("code") String code) {
         LoginSuccessResponse userResponse = kakaoService.kakaoLogin(code);
-        model.addAttribute("userResponse", userResponse);
-
-        return "home";
+        return ResponseEntity.ok().body(userResponse);
     }
 
     // 마이페이지 수정하기 Controller
