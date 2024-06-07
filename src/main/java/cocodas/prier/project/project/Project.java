@@ -147,22 +147,6 @@ public class Project {
         this.teamMate = teamMate;
     }
 
-    public void setProjectComments(List<ProjectComment> projectComments) {
-        this.projectComments = projectComments;
-    }
-
-    public void setProjectTags(List<ProjectTag> projectTags) {
-        this.projectTags = projectTags;
-    }
-
-    public void setProjectMedia(List<ProjectMedia> projectMedia) {
-        this.projectMedia = projectMedia;
-    }
-
-    public void setFeedbackQuestions(List<Question> feedbackQuestions) {
-        this.feedbackQuestions = feedbackQuestions;
-    }
-
     public void updateScore(int score) {
         this.score += score;
     }

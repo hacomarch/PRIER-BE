@@ -1,5 +1,7 @@
 package cocodas.prier.project.project;
 
+import cocodas.prier.point.PointTransactionService;
+import cocodas.prier.point.TransactionType;
 import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.media.ProjectMediaService;
 import cocodas.prier.project.project.dto.ProjectDetailDto;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,7 @@ public class ProjectService {
     private final ProjectTagService projectTagService;
     private final QuestionService questionService;
     private final ProjectMediaService projectMediaService;
+    private final PointTransactionService pointTransactionService;
 
     @Transactional
     public String createProject(ProjectForm form,
@@ -51,6 +55,7 @@ public class ProjectService {
         handleProjectQuestions(form, project);
         handleProjectMedia(mainImage, contentImages, project);
 
+        user.getProjects().add(project);
         return "프로젝트 생성 완료";
     }
 
@@ -176,6 +181,7 @@ public class ProjectService {
             }
         }
 
+        project.setUpdatedAt(LocalDateTime.now());
         return "프로젝트 업데이트 완료";
     }
 
@@ -237,9 +243,9 @@ public class ProjectService {
         if (!user.equals(project.getUsers())) {
             return "잘못된 사용자, 요청 실패";
         }
+        
+        pointTransactionService.deductPoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
 
-        user.updateBalance(weeks * -250);
-        project.addFeedbackEndAt(weeks);
         log.info(user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료");
         return user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료";
     }
