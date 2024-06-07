@@ -5,6 +5,7 @@ import cocodas.prier.project.project.ProjectRepository;
 import cocodas.prier.project.tag.tag.Tag;
 import cocodas.prier.project.tag.tag.TagRepository;
 import cocodas.prier.project.tag.tag.TagService;
+import cocodas.prier.project.tag.tag.dto.TagDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,31 +57,32 @@ public class ProjectTagService {
 
     @Transactional
     public void updateProjectTags(Project project, String[] updatedTags) {
-        List<ProjectTag> currentTags = projectTagRepository.findByProjectProjectId(project.getProjectId());
+        // 기존 태그 연결 모두 제거
+        projectTagRepository.deleteAllByProject(project);
+        project.getProjectTags().clear(); // 프로젝트 내부 태그 리스트도 클리어
 
-        Set<String> currentTagsNames = currentTags.stream()
-                .map(projectTag -> projectTag.getTag().getTagName())
-                .collect(Collectors.toSet());
-
+        // 새로운 태그들로 프로젝트 태그 목록 재구성
         Set<String> newTagNames = new HashSet<>(Arrays.asList(updatedTags));
-
-        currentTags.forEach(projectTag -> {
-            if (!newTagNames.contains(projectTag.getTag().getTagName())) {
-                projectTagRepository.delete(projectTag);
+        for (String tagName : newTagNames) {
+            Tag tag = tagRepository.findByTagName(tagName);
+            if (tag == null) {
+                tag = tagRepository.save(new Tag(tagName)); // 새 태그 생성 및 저장
             }
-        });
-
-        newTagNames.forEach(tagName -> {
-            if (!currentTagsNames.contains(tagName)) {
-                Tag tag = tagRepository.findByTagName(tagName);
-                if (tag == null) {
-                    tagRepository.save(new Tag(tagName));
-                }
-                projectTagRepository.save(new ProjectTag(tag, project));
-            }
-        });
-
+            ProjectTag projectTag = new ProjectTag(tag, project);
+            project.getProjectTags().add(projectTag); // 프로젝트의 태그 목록에 추가
+            projectTagRepository.save(projectTag); // 새 연결 생성
+        }
     }
+
+    public List<TagDto> getProjectTags(Project project) {
+        // 태그 정보 조회
+        return project.getProjectTags().stream()
+                .map(projectTag -> new TagDto(
+                        projectTag.getTag().getTagId(),
+                        projectTag.getTag().getTagName()))
+                .collect(Collectors.toList());
+    }
+
 
 
     //태그별 프로젝트 조회

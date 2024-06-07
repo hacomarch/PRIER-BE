@@ -2,8 +2,11 @@ package cocodas.prier.project.project;
 
 import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.media.ProjectMediaService;
+import cocodas.prier.project.project.dto.ProjectDetailDto;
 import cocodas.prier.project.project.dto.ProjectForm;
+import cocodas.prier.project.project.dto.ProjectDto;
 import cocodas.prier.project.tag.projecttag.ProjectTagService;
+import cocodas.prier.project.tag.tag.dto.TagDto;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
@@ -11,10 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -81,13 +85,11 @@ public class ProjectService {
     }
 
     private void handleProjectMedia(MultipartFile mainImage, MultipartFile[] contentImages, Project project) {
-        if (mainImage != null) {
-            try {
-                projectMediaService.createMainImage(project, mainImage);
-            } catch (IOException e) {
-                log.error("메인 이미지 업로드 실패: {}", e.getMessage());
-                throw new RuntimeException("메인 이미지 업로드 실패", e);
-            }
+        try {
+            projectMediaService.createMainImage(project, mainImage);
+        } catch (IOException e) {
+            log.error("메인 이미지 업로드 실패: {}", e.getMessage());
+            throw new RuntimeException("메인 이미지 업로드 실패", e);
         }
         if (contentImages != null) {
             try {
@@ -132,6 +134,7 @@ public class ProjectService {
 
         // 태그 업데이트
         if (projectForm.getTags() != null) {
+            log.info(projectForm.getTags()[0]);
             projectTagService.updateProjectTags(project, projectForm.getTags());
         }
 
@@ -141,14 +144,13 @@ public class ProjectService {
         }
 
         // 미디어 파일 업데이트
-        if (mainImage != null && !mainImage.isEmpty()) {
-            try {
-                projectMediaService.updateMainImage(project, mainImage);
-            } catch (IOException e) {
-                log.error("메인 이미지 업데이트 실패: {}", e.getMessage());
-                throw new RuntimeException("메인 이미지 업데이트 실패", e);
-            }
+        try {
+            projectMediaService.updateMainImage(project, mainImage);
+        } catch (IOException e) {
+            log.error("메인 이미지 업데이트 실패: {}", e.getMessage());
+            throw new RuntimeException("메인 이미지 업데이트 실패", e);
         }
+
         if (contentImages != null) {
             try {
                 projectMediaService.updateContentImages(project, contentImages);
@@ -159,6 +161,41 @@ public class ProjectService {
         }
 
         return "프로젝트 업데이트 완료";
+    }
+
+    public ProjectDetailDto getProjectDetail(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        return new ProjectDetailDto(
+                project.getProjectId(),
+                project.getTitle(),
+                project.getIntroduce(),
+                project.getGoal(),
+                project.getDevStartDate(),
+                project.getDevEndDate(),
+                project.getStatus(),
+                project.getTeamName(),
+                project.getTeamDescription(),
+                project.getTeamMate(),
+                project.getLink(),
+                questionService.getProjectQuestions(project),
+                projectMediaService.getProjectDetailMedia(project),
+                projectTagService.getProjectTags(project)
+        );
+    }
+
+    public List<ProjectDto> getAllProjects() {
+        List<Project> projects = projectRepository.findAll();
+
+        return projects.stream().map(project -> new ProjectDto(
+                project.getProjectId(),
+                project.getTitle(),
+                project.getTeamName(),
+                projectMediaService.getMainImageUrl(project),
+                projectTagService.getProjectTags(project),
+                project.getScore()
+        )).collect(Collectors.toList());
     }
 
 }

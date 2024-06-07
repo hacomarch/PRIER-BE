@@ -24,7 +24,6 @@ public class ProjectMedia {
     @Column(nullable = false)
     private MediaType mediaType = MediaType.IMAGE;
 
-    @Column(nullable = false)
     private String s3Key;
 
     private int orderIndex;

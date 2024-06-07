@@ -1,11 +1,15 @@
 package cocodas.prier.project.project;
 
+import cocodas.prier.project.project.dto.ProjectDetailDto;
+import cocodas.prier.project.project.dto.ProjectDto;
 import cocodas.prier.project.project.dto.ProjectForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,6 +53,20 @@ public class ProjectController {
 
         String result = projectService.updateProject(projectId, form, mainImage, contentImages);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDetailDto> getProjectDetail(@PathVariable Long projectId) {
+        ProjectDetailDto result = projectService.getProjectDetail(projectId);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProjectDto>> getAllProjects() {
+        List<ProjectDto> allProjects = projectService.getAllProjects();
+
+        return ResponseEntity.ok(allProjects);
     }
 
 }
