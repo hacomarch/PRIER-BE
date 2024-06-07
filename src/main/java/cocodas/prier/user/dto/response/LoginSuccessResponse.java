@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoginSuccessResponse {
     private String accessToken;
+    private String kakaoAccessToken;
 }

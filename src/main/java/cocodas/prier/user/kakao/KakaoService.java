@@ -100,7 +100,7 @@ public class KakaoService {
 
         String accessToken = jwtTokenProvider.generateToken(userAuthentication);
 
-        return new LoginSuccessResponse(accessToken);
+        return new LoginSuccessResponse(accessToken, kakaoAccessToken);
     }
 
     private Users getUserById(Long userId) {
