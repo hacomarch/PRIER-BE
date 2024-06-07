@@ -28,7 +28,7 @@ public class PointTransactionService {
     // 현재 포인트 조회
     public Integer getCurrentPoints(Long userId) {
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저 조회 불가: " + userId));
         return user.getBalance();
     }
 
@@ -42,7 +42,7 @@ public class PointTransactionService {
     // 포인트 충전 (POINT_CHARGE)
     public PointTransactionDTO rechargePoints(PointRechargeRequest request, Long userId) {
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저 조회 불가: " + userId));
 
         return processTransaction(user, request.getAmount(), TransactionType.POINT_CHARGE);
     }
@@ -51,7 +51,7 @@ public class PointTransactionService {
     @Transactional
     public PointTransactionDTO deductPoints(Users user, Integer amount, TransactionType transactionType) {
         if (user.getBalance() < amount) {
-            throw new IllegalArgumentException("Insufficient points.");
+            throw new IllegalArgumentException("포인트가 부족합니다.");
         }
 
         return processTransaction(user, -amount, transactionType);
