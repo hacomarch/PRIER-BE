@@ -3,6 +3,7 @@ package cocodas.prier.user;
 import cocodas.prier.user.dto.request.*;
 import cocodas.prier.user.kakao.KakaoService;
 import cocodas.prier.user.dto.response.LoginSuccessResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Slf4j
 @Controller
@@ -28,13 +31,10 @@ public class UserController {
     @Value(("${kakao.redirect_uri}"))
     private String redirect_uri;
 
-    //TODO : 프론트에서 주소 보내기
     @GetMapping("/kakao/login")
-    public String loginPage(Model model) {
+    public void loginPage(HttpServletResponse response) throws IOException {
         String location = getCodePath + client_id + "&redirect_uri=" + redirect_uri;
-        model.addAttribute("location", location);
-
-        return "login";
+        response.sendRedirect(location);
     }
 
     @GetMapping("/kakao/callback")
