@@ -16,13 +16,7 @@ public class OrderProduct {
     private Long orderProductId;
 
     @Column(nullable = false)
-    private Integer count;
-
-    @Column(nullable = false)
-    private Integer unitPrice;
-
-    @Column(nullable = false)
-    private Integer totalPrice;
+    private Integer price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -33,26 +27,9 @@ public class OrderProduct {
     private Orders orders;
 
     @Builder
-    public OrderProduct(Product product, Orders orders, Integer count, Integer unitPrice) {
+    public OrderProduct(Product product, Orders orders, Integer price) {
         this.product = product;
         this.orders = orders;
-        this.count = count;
-        this.unitPrice = unitPrice;
-        this.totalPrice = calculateTotalPrice();
-
-    }
-
-    private Integer calculateTotalPrice() {
-        return this.unitPrice * this.count;
-    }
-
-    public void changeCount(Integer count) {
-        this.count = count;
-        this.totalPrice = calculateTotalPrice();
-    }
-
-    public void changeUnitPrice(Integer unitPrice) {
-        this.unitPrice = unitPrice;
-        this.totalPrice = calculateTotalPrice();
+        this.price = price;
     }
 }

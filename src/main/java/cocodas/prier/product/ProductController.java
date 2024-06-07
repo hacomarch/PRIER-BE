@@ -86,14 +86,16 @@ public class ProductController {
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
 
         // 사용자 및 상품 조회
-        Users users = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+        Users users = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
         // 새로운 주문 생성
         Orders order = orderService.createOrder(users);
 
         // 상품 구매
-        productService.createOrderProduct(userId, product, order, count);
+        productService.createOrderProduct(userId, product, order);
         return ResponseEntity.ok("상품 구매가 완료되었습니다.");
     }
 }

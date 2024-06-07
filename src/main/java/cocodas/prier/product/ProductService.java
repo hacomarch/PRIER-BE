@@ -5,6 +5,7 @@ import cocodas.prier.orders.orderproduct.OrderProduct;
 import cocodas.prier.orders.orderproduct.OrderProductRepository;
 import cocodas.prier.orders.orders.Orders;
 import cocodas.prier.point.PointTransactionService;
+import cocodas.prier.point.TransactionType;
 import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
 import cocodas.prier.product.media.ProductMedia;
@@ -128,29 +129,27 @@ public class ProductService {
     }
 
     @Transactional
-    public void createOrderProduct(Long userId, Product product, Orders order, Integer count) {
+    public void createOrderProduct(Long userId, Product product, Orders order) {
         Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
 
-        Integer unitPrice = product.getPrice();
-        Integer totalPrice = unitPrice * count;
+        Integer price = product.getPrice();
 
         // 구매 전 재고 확인
-        if (product.getStock() < 0) {
+        if (product.getStock() <= 0) {
             throw new IllegalArgumentException("재고가 부족합니다.");
         }
 
         // 포인트 차감
-        pointTransactionService.deductPointsForPurchase(user, totalPrice);
+        pointTransactionService.deductPoints(user, price, TransactionType.PRODUCT_PURCHASE);
 
         // 재고 감소
-        product.changeStock(product.getStock() - count);
+        product.changeStock(product.getStock() - 1);
 
         // 주문 저장
         OrderProduct orderProduct = OrderProduct.builder()
                 .product(product)
                 .orders(order)
-                .count(count)
-                .unitPrice(unitPrice)
+                .price(price)
                 .build();
 
         productRepository.save(product);
