@@ -42,8 +42,8 @@ public class PointTransactionService {
     }
 
     // 포인트 충전 (POINT_CHARGE)
-    public PointTransactionDTO rechargePoints(PointRechargeRequest request) {
-        Users user = userRepository.findById(request.getUserId()).orElseThrow();
+    public PointTransactionDTO rechargePoints(PointRechargeRequest request, Long userId) {
+        Users user = userRepository.findById(userId).orElseThrow();
         PointTransaction transaction = PointTransaction.builder()
                 .amount(request.getAmount())
                 .transactionType(TransactionType.POINT_CHARGE)
@@ -52,13 +52,13 @@ public class PointTransactionService {
                 .users(user)
                 .build();
 
-        user.updateBalance(user.getBalance() + request.getAmount());
         user.updateBalance(request.getAmount());
         userRepository.save(user);
         pointTransactionRepository.save(transaction);
 
         return convertToDto(transaction);
     }
+
 
     // 피드백 기간 연장 (FEEDBACK_EXTENSION)
     public PointTransactionDTO extendFeedbackPeriod(Long userId, Long projectId, int weeks) {

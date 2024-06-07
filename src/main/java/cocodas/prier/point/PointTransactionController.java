@@ -1,33 +1,49 @@
 package cocodas.prier.point;
 
-
 import cocodas.prier.point.dto.PointRechargeRequest;
 import cocodas.prier.point.dto.PointTransactionDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/points")
 public class PointTransactionController {
 
-    @Autowired
-    private PointTransactionService pointTransactionService;
+    private final PointTransactionService pointTransactionService;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private static String getToken(String auth) {
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            throw new RuntimeException("JWT Token is missing");
+        }
+        return auth.substring(7);
+    }
 
     @GetMapping
-    public Integer getCurrentPoints(@RequestParam Long userId) {
+    public Integer getCurrentPoints(@RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
         return pointTransactionService.getCurrentPoints(userId);
     }
 
     @GetMapping("/history")
-    public List<PointTransactionDTO> getPointHistory(@RequestParam Long userId) {
+    public List<PointTransactionDTO> getPointHistory(@RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
         return pointTransactionService.getPointHistory(userId);
     }
 
     @PostMapping("/recharge")
-    public PointTransactionDTO rechargePoints(@RequestBody PointRechargeRequest request) {
-        return pointTransactionService.rechargePoints(request);
+    public PointTransactionDTO rechargePoints(@RequestHeader("Authorization") String auth, @RequestBody PointRechargeRequest request) {
+        String token = getToken(auth);
+        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
+        return pointTransactionService.rechargePoints(request, userId);
     }
 
 }
