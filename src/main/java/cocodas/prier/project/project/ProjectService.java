@@ -41,9 +41,7 @@ public class ProjectService {
                                 String token) {
 
         //유저 찾기
-        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
+        Users user = getUsersByToken(token);
 
         Project project = buildProject(form, user);
         project.setStatus(ProjectStatus.values()[form.getStatus()]);
@@ -54,6 +52,13 @@ public class ProjectService {
         handleProjectMedia(mainImage, contentImages, project);
 
         return "프로젝트 생성 완료";
+    }
+
+    private Users getUsersByToken(String token) {
+        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
+        return user;
     }
 
     private Project buildProject(ProjectForm form, Users user) {
@@ -102,9 +107,14 @@ public class ProjectService {
     }
 
     @Transactional
-    public String deleteProject(Long projectId) {
+    public String deleteProject(String token, Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        Users user = getUsersByToken(token);
+        if (!user.equals(project.getUsers())) {
+            return "잘못된 사용자, 삭제 실패";
+        }
 
         projectMediaService.deleteImage(project);
         projectRepository.deleteById(projectId);
@@ -115,10 +125,16 @@ public class ProjectService {
     public String updateProject(Long projectId,
                                 ProjectForm projectForm,
                                 MultipartFile mainImage,
-                                MultipartFile[] contentImages) {
+                                MultipartFile[] contentImages,
+                                String token) {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        Users user = getUsersByToken(token);
+        if (!user.equals(project.getUsers())) {
+            return "잘못된 사용자, 수정 실패";
+        }
 
 
         project.setTitle(projectForm.getTitle());
@@ -212,4 +228,19 @@ public class ProjectService {
         )).collect(Collectors.toList());
     }
 
+    @Transactional
+    public String extendFeedback(Long projectId, Integer weeks, String token) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        Users user = getUsersByToken(token);
+        if (!user.equals(project.getUsers())) {
+            return "잘못된 사용자, 요청 실패";
+        }
+
+        user.updateBalance(weeks * -250);
+        project.addFeedbackEndAt(weeks);
+        log.info(user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료");
+        return user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료";
+    }
 }

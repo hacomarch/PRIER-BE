@@ -39,8 +39,11 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<String> deleteProject(@PathVariable Long projectId) {
-        String result = projectService.deleteProject(projectId);
+    public ResponseEntity<String> deleteProject(@PathVariable Long projectId,
+                                                @RequestHeader("Authorization") String auth) {
+
+        String token = getToken(auth);
+        String result = projectService.deleteProject(auth, projectId);
 
         return ResponseEntity.ok(result);
     }
@@ -49,9 +52,10 @@ public class ProjectController {
     public ResponseEntity<String> updateProject(@PathVariable Long projectId,
                                                 @RequestPart("form") ProjectForm form,
                                                 @RequestParam("mainImage") MultipartFile mainImage,
-                                                @RequestParam("contentImages") MultipartFile[] contentImages) {
-
-        String result = projectService.updateProject(projectId, form, mainImage, contentImages);
+                                                @RequestParam("contentImages") MultipartFile[] contentImages,
+                                                @RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        String result = projectService.updateProject(projectId, form, mainImage, contentImages, token);
         return ResponseEntity.ok(result);
     }
 
@@ -72,6 +76,16 @@ public class ProjectController {
         }
 
         return ResponseEntity.ok(projects);
+    }
+
+    @PostMapping("/{projectId}/extend")
+    public ResponseEntity<String> extendFeedback(@PathVariable Long projectId,
+                                                 @RequestParam Integer weeks,
+                                                 @RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        String result = projectService.extendFeedback(projectId, weeks, token);
+
+        return ResponseEntity.ok(result);
     }
 
 }
