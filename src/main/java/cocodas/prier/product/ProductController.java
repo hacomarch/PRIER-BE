@@ -80,8 +80,7 @@ public class ProductController {
 
     @PostMapping("/purchase/{productId}")
     public ResponseEntity<String> purchaseProduct(@PathVariable Long productId,
-                                                  @RequestHeader("Authorization") String auth,
-                                                  @RequestParam Integer count) {
+                                                  @RequestHeader("Authorization") String auth) {
         String token = getToken(auth);
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
 
