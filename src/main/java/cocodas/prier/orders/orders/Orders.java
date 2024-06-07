@@ -31,5 +31,6 @@ public class Orders {
     public Orders(Users users) {
         this.users = users;
         this.createdAt = LocalDateTime.now();
+        this.orderProducts = new ArrayList<>();
     }
 }
