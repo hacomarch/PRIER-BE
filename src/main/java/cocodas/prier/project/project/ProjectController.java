@@ -63,10 +63,15 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectDto>> getAllProjects() {
-        List<ProjectDto> allProjects = projectService.getAllProjects();
+    public ResponseEntity<List<ProjectDto>> getProjects(@RequestParam(value = "search", required = false) String keyword) {
+        List<ProjectDto> projects;
+        if (keyword != null && !keyword.isEmpty()) {
+            projects = projectService.getSearchedProjects(keyword);
+        } else {
+            projects = projectService.getAllProjects();
+        }
 
-        return ResponseEntity.ok(allProjects);
+        return ResponseEntity.ok(projects);
     }
 
 }

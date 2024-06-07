@@ -198,4 +198,18 @@ public class ProjectService {
         )).collect(Collectors.toList());
     }
 
+    public List<ProjectDto> getSearchedProjects(String keyword) {
+
+        List<Project> searchedProjects = projectRepository.findByKeyword(keyword);
+
+        return searchedProjects.stream().map(project -> new ProjectDto(
+                project.getProjectId(),
+                project.getTitle(),
+                project.getTeamName(),
+                projectMediaService.getMainImageUrl(project),
+                projectTagService.getProjectTags(project),
+                project.getScore()
+        )).collect(Collectors.toList());
+    }
+
 }
