@@ -63,6 +63,7 @@ public class ProjectService {
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
+        log.info("유저 정보: " + user.getNickname());
         return user;
     }
 
@@ -203,7 +204,8 @@ public class ProjectService {
                 project.getLink(),
                 questionService.getProjectQuestions(project),
                 projectMediaService.getProjectDetailMedia(project),
-                projectTagService.getProjectTags(project)
+                projectTagService.getProjectTags(project),
+                calculateScore(project)
         );
     }
 
@@ -216,7 +218,7 @@ public class ProjectService {
                 project.getTeamName(),
                 projectMediaService.getMainImageUrl(project),
                 projectTagService.getProjectTags(project),
-                project.getScore()
+                calculateScore(project)
         )).collect(Collectors.toList());
     }
 
@@ -243,10 +245,20 @@ public class ProjectService {
         if (!user.equals(project.getUsers())) {
             return "잘못된 사용자, 요청 실패";
         }
-        
+
         pointTransactionService.deductPoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
 
         log.info(user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료");
         return user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료";
+    }
+
+    @Transactional
+    public Float calculateScore(Project project) {
+        int commentsAmount = project.getProjectComments().size();
+        float averageScore = project.getScore() / commentsAmount;
+
+        averageScore = Math.min(5, Math.round(averageScore * 2) / 2.0f);
+
+        return averageScore;
     }
 }

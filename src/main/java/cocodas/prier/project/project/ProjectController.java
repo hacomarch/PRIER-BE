@@ -43,7 +43,7 @@ public class ProjectController {
                                                 @RequestHeader("Authorization") String auth) {
 
         String token = getToken(auth);
-        String result = projectService.deleteProject(auth, projectId);
+        String result = projectService.deleteProject(token, projectId);
 
         return ResponseEntity.ok(result);
     }
