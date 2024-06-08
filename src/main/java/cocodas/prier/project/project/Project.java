@@ -147,7 +147,7 @@ public class Project {
         this.teamMate = teamMate;
     }
 
-    public void updateScore(int score) {
+    public void updateScore(Float score) {
         this.score += score;
     }
 }

@@ -27,5 +27,6 @@ public class ProjectDetailDto {
     private List<QuestionDto> questions;
     private List<ProjectMediaDto> media;
     private List<TagDto> tags;
+    private Float score;
 }
 
