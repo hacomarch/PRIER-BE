@@ -17,7 +17,7 @@
 ### BE(백엔드)
 |**김선희(BE)** | **이소은(BE)** | **천승환(BE)** | **윤하은(BE)** |
 |:-----------:|:-----------:|:-----------:|:-----------:|
-|  [<img src="https://github.com/INU-CapstoneDesign/INU-Festival-BE/assets/108293826/d7cec57c-2e78-4bd1-ad5b-f29c1c6387a3" height=120 width=120> <br/> @kimseonhee126](https://github.com/kimseonhee126) | [<img src="" height=120 width=120> <br/> @saokiritoni](https://github.com/saokiritoni) | [<img src="" height=120 width=120> <br/> @popeye0618](https://github.com/popeye0618) | [<img src="" height=120 width=120> <br/> @hacomarch](https://github.com/hacomarch) |
+|  [<img src="https://github.com/Coco-Das/PRIER-BE/assets/108293826/58048add-68bb-4f1c-b347-bba609059afa" height=120 width=120> <br/> @kimseonhee126](https://github.com/kimseonhee126) | [<img src="" height=120 width=120> <br/> @saokiritoni](https://github.com/saokiritoni) | [<img src="" height=120 width=120> <br/> @popeye0618](https://github.com/popeye0618) | [<img src="" height=120 width=120> <br/> @hacomarch](https://github.com/hacomarch) |
 
 
 <br/>
