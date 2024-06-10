@@ -25,7 +25,7 @@ public class ResponseController {
         return auth.substring(7);
     }
 
-    // 여러 질문에 대한 응답 생성
+    // 응답 생성
     @PostMapping("/{projectId}/feedbacks/responses")
     public ResponseEntity<List<ResponseDto>> createResponses(@PathVariable Long projectId,
                                                              @RequestBody List<ResponseRequestDto> responsesDto) {
@@ -59,7 +59,7 @@ public class ResponseController {
     @DeleteMapping("/{projectId}/responses")
     public ResponseEntity<String> deleteResponsesByUserAndProject(@PathVariable Long projectId,
                                                                   @RequestParam Long userId) {
-        responseService.deleteResponsesByUserAndProject(projectId, userId);
+        responseService.deleteResponses(projectId, userId);
         return ResponseEntity.ok("프로젝트 ID " + projectId + "에 대한 유저 ID " + userId + " 의 응답 삭제 완료");
     }
 }
