@@ -222,6 +222,11 @@ public class ProjectService {
         )).collect(Collectors.toList());
     }
 
+    public Project getProjectById(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid project ID"));
+    }
+
     public List<ProjectDto> getSearchedProjects(String keyword) {
 
         List<Project> searchedProjects = projectRepository.findByKeyword(keyword);
