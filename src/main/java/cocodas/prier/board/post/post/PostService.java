@@ -33,10 +33,15 @@ public class PostService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id" + userId));
     }
 
-    // 게시글 조회하기
+    // TODO : 게시글 조회하기
 
+    // TODO : 검색어에 맞춰 게시글 조회하기
 
-    // 검색어에 맞춰 게시글 조회하기
+    // TODO : 카테고리에 맞춰 게시글 조회하기
+
+    // TODO : 내가 작성한 글 조회하기 -> user에서 해야 하나?
+
+    // TODO : 좋아요한 글 조회하기 -> user에서 해야 하나?
 
 
     @Transactional
