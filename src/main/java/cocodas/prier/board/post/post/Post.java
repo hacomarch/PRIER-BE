@@ -21,7 +21,10 @@ public class Post {
     private Long postId;
     private String title;
     private String content;
+
+    @Enumerated(EnumType.STRING)
     private Category category;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
