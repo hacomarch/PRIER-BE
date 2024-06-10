@@ -1,5 +1,6 @@
 package cocodas.prier.board.post.post;
 
+import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -70,19 +70,10 @@ public class PostService {
             throw new IllegalStateException("해당 게시글을 수정할 권한이 없습니다.");
         }
 
-        if (postRequestDto.getTitle() != null && !postRequestDto.getTitle().isEmpty()) {
-            findPost.updateTitle(postRequestDto.getTitle());
-        }
-
-        if (postRequestDto.getCategory() != null) {
-            findPost.updateCategory(postRequestDto.getCategory());
-        }
-
-        if (postRequestDto.getContent() != null && !postRequestDto.getContent().isEmpty()) {
-            findPost.updateContent(postRequestDto.getContent());
-        }
-
-        findPost.updateUpdatedAt(LocalDateTime.now());
+        findPost.updateTitle(postRequestDto.getTitle());        // 제목 수정하기
+        findPost.updateCategory(postRequestDto.getCategory());  // 카테고리 수정하기
+        findPost.updateContent(postRequestDto.getContent());    // 내용 수정하기
+        findPost.updateUpdatedAt(LocalDateTime.now());          // 수정한 시간 수정하기
     }
 
     // 게시글 삭제하기

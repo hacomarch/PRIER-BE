@@ -1,6 +1,6 @@
 package cocodas.prier.board.post;
 
-import cocodas.prier.board.post.post.PostRequestDto;
+import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

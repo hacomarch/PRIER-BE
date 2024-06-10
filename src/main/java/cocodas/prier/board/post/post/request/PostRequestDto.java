@@ -1,5 +1,6 @@
-package cocodas.prier.board.post.post;
+package cocodas.prier.board.post.post.request;
 
+import cocodas.prier.board.post.post.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PostRequestDto {
 
-    // category 를 ENUM 으로 만들까?
     private String title;
     private String content;
     private Category category;
