@@ -17,11 +17,15 @@ import java.util.List;
 @NoArgsConstructor
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
     private String title;
     private String content;
+
+    @Enumerated(EnumType.STRING)
     private Category category;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -58,6 +62,9 @@ public class Post {
         this.content = content;
         this.category = category;
         this.users = users;
+        if (!users.getPosts().contains(this)) {
+            users.getPosts().add(this);
+        }
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
