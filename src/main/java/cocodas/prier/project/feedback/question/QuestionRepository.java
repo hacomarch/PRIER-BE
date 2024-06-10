@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     void deleteAllByProject(Project project);
+    List<Question> findAllById(Iterable<Long> ids);
 }
