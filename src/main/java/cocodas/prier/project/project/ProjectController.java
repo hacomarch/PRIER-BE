@@ -8,6 +8,7 @@ import cocodas.prier.project.project.dto.ProjectDto;
 import cocodas.prier.project.project.dto.ProjectForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,8 +33,8 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<String> createProject(@RequestPart("form") ProjectForm form,
-                                                @RequestParam("mainImage") MultipartFile mainImage,
-                                                @RequestParam("contentImages") MultipartFile[] contentImages,
+                                                @RequestParam(name = "mainImage", required = false) MultipartFile mainImage,
+                                                @RequestParam(name = "contentImages", required = false) MultipartFile[] contentImages,
                                                 @RequestHeader("Authorization") String auth) {
 
         String token = getToken(auth);
@@ -80,6 +81,18 @@ public class ProjectController {
 
         return ResponseEntity.ok(projects);
     }
+
+    @GetMapping("/my-projects")
+    public ResponseEntity<Page<ProjectDto>> getMyProjects(
+            @RequestHeader("Authorization") String auth,
+            @RequestParam("filter") Integer filter,
+            @RequestParam("page") int page) {
+
+        String token = getToken(auth);
+        return ResponseEntity.ok(projectService.getMyProjects(token, filter, page));
+    }
+
+
 
     @PostMapping("/{projectId}/extend")
     public ResponseEntity<String> extendFeedback(@PathVariable Long projectId,
