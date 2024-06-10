@@ -8,18 +8,24 @@ import cocodas.prier.project.project.dto.ProjectDetailDto;
 import cocodas.prier.project.project.dto.ProjectForm;
 import cocodas.prier.project.project.dto.ProjectDto;
 import cocodas.prier.project.tag.projecttag.ProjectTagService;
-import cocodas.prier.project.tag.tag.dto.TagDto;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -220,6 +226,41 @@ public class ProjectService {
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         )).collect(Collectors.toList());
+    }
+
+    public Page<ProjectDto> getMyProjects(String token, int filter, int page) {
+        Users user = getUsersByToken(token);
+
+        Specification<Project> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("users"), user));  // 사용자 기반 필터
+
+            // 진행 중인 프로젝트 필터링
+            if (filter == 2) {
+                predicates.add(cb.equal(root.get("status"), ProjectStatus.DEVELOPING));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // 페이지 및 정렬 조건 설정
+        Pageable pageable;
+        if (filter == 1) {  // 등록순 (오래된 순)
+            pageable = PageRequest.of(page, 5, Sort.by("createdAt").ascending());
+        } else {  // 기본 필터 및 진행 중인 프로젝트 필터: 최신순
+            pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
+        }
+
+        Page<Project> projects = projectRepository.findAll(spec, pageable);
+
+        return projects.map(project -> new ProjectDto(
+                project.getProjectId(),
+                project.getTitle(),
+                project.getTeamName(),
+                projectMediaService.getMainImageUrl(project),
+                projectTagService.getProjectTags(project),
+                calculateScore(project)
+        ));
     }
 
     public Project getProjectById(Long projectId) {
