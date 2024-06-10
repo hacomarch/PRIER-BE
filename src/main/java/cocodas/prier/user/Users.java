@@ -42,7 +42,7 @@ public class Users {
     public Users(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
-        this.tier = Rank.Rookie;
+        this.tier = Rank.ROOKIE;
         this.balance = 0;
     }
 
