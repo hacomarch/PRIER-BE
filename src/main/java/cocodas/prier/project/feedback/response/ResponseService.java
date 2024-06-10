@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,10 +30,20 @@ public class ResponseService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
+        List<Long> questionIds = responsesDto.stream()
+                .map(ResponseRequestDto::getQuestionId)
+                .collect(Collectors.toList());
+        List<Question> questions = questionRepository.findAllById(questionIds);
+        Map<Long, Question> questionMap = questions.stream()
+                .collect(Collectors.toMap(Question::getQuestionId, Function.identity()));
+
+
         List<Response> responses = responsesDto.stream()
                 .map(dto -> {
-                    Question question = questionRepository.findById(dto.getQuestionId())
-                            .orElseThrow(() -> new IllegalArgumentException("Invalid question ID"));
+                    Question question = questionMap.get(dto.getQuestionId());
+                    if (question == null) {
+                        throw new IllegalArgumentException("Invalid question ID" + dto.getQuestionId());
+                    }
 
                     return Response.builder()
                             .content(dto.getContent())
@@ -45,13 +57,7 @@ public class ResponseService {
         responseRepository.saveAll(responses);
 
         return responses.stream()
-                .map(response -> ResponseDto.builder()
-                        .responseId(response.getResponseId())
-                        .content(response.getContent())
-                        .createdAt(response.getCreatedAt().toString())
-                        .questionId(response.getQuestion().getQuestionId())
-                        .userId(response.getUsers().getUserId())
-                        .build())
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
@@ -59,13 +65,7 @@ public class ResponseService {
         List<Response> responses = responseRepository.findAllByQuestionQuestionId(questionId);
 
         return responses.stream()
-                .map(response -> ResponseDto.builder()
-                        .responseId(response.getResponseId())
-                        .content(response.getContent())
-                        .createdAt(response.getCreatedAt().toString())
-                        .questionId(response.getQuestion().getQuestionId())
-                        .userId(response.getUsers().getUserId())
-                        .build())
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
@@ -73,19 +73,23 @@ public class ResponseService {
         List<Response> responses = responseRepository.findAllByQuestionProjectProjectId(projectId);
 
         return responses.stream()
-                .map(response -> ResponseDto.builder()
-                        .responseId(response.getResponseId())
-                        .content(response.getContent())
-                        .createdAt(response.getCreatedAt().toString())
-                        .questionId(response.getQuestion().getQuestionId())
-                        .userId(response.getUsers().getUserId())
-                        .build())
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void deleteResponsesByUserAndProject(Long projectId, Long userId) {
+    public void deleteResponses(Long projectId, Long userId) {
         List<Response> responses = responseRepository.findAllByQuestionProjectProjectIdAndUsersUserId(projectId, userId);
         responseRepository.deleteAll(responses);
+    }
+
+    private ResponseDto mapToDto(Response response) {
+        return ResponseDto.builder()
+                .responseId(response.getResponseId())
+                .content(response.getContent())
+                .createdAt(response.getCreatedAt().toString())
+                .questionId(response.getQuestion().getQuestionId())
+                .userId(response.getUsers().getUserId())
+                .build();
     }
 }
