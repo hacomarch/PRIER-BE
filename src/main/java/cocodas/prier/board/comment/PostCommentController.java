@@ -42,8 +42,7 @@ public class PostCommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostCommentListResponseDto>> findByPostId(@RequestHeader("Authorization") String auth,
-                                                                         @PathVariable Long boardId) {
+    public ResponseEntity<List<PostCommentListResponseDto>> findByPostId(@PathVariable Long boardId) {
         return ResponseEntity.ok().body(postCommentService.findPostCommentByPostId(boardId));
     }
 
