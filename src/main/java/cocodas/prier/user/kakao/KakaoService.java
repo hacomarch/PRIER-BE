@@ -1,5 +1,6 @@
 package cocodas.prier.user.kakao;
 
+import cocodas.prier.quest.QuestService;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.dto.response.KakaoTokenResponseDto;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 public class KakaoService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final QuestService questService;
 
     @Value("${kakao.client_id}")
     private String client_id;
@@ -77,6 +79,7 @@ public class KakaoService {
                     .nickname(userInfo.getKakaoAccount().getProfile().nickName)
                     .build();
             userRepository.save(user);
+            questService.createQuest(user);
         }
 
         Users users = userRepository.findByEmail(userInfo.getKakaoAccount().email)

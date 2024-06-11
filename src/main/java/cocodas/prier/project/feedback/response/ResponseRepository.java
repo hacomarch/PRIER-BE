@@ -11,6 +11,7 @@ import java.util.List;
 public interface ResponseRepository extends JpaRepository<Response, Long> {
     List<Response> findAllByQuestionQuestionId(Long questionId);
     List<Response> findAllByQuestionProjectProjectId(Long projectId);
+    List<Response> findAllByUsers_UserId(Long userId);
     List<Response> findAllByQuestionProjectProjectIdAndUsersUserId(Long projectId, Long userId);
     @Query("SELECT r FROM Response r JOIN FETCH r.question q WHERE q.questionId IN :questionIds")
     List<Response> findAllByQuestionIds(@Param("questionIds") List<Long> questionIds);
