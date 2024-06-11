@@ -1,11 +1,14 @@
 package cocodas.prier.quest;
 
+import cocodas.prier.board.comment.PostCommentRepository;
+import cocodas.prier.project.feedback.response.ResponseRepository;
 import cocodas.prier.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Service
@@ -13,8 +16,9 @@ import java.time.ZoneId;
 @Transactional(readOnly = true)
 public class QuestService {
     private final QuestRepository questRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final ResponseRepository responseRepository;
 
-    //TODO : UserService에서 회원 create 할 때 이 메서드도 불러야 함
     @Transactional
     public void createQuest(Users users) {
         Quest quest = Quest.builder()
@@ -31,19 +35,55 @@ public class QuestService {
     @Transactional
     public void updateQuest(LocalDate createdAt, Long userId, int sequence) {
         Quest quest = findByCreatedAtAndUserId(createdAt, userId);
-        if (sequence == 1) {
-            quest.updateFirst(true);
-        } else if (sequence == 2) {
-            //TODO : 오늘치 나의 댓글이 있고 && first가 완료되었으면 updateSecond(true), 없으면 예외 처리
-        } else if (sequence == 3) {
-            //TODO : 오늘치 나의 피드백이 있고 && second가 완료되었으면 updateThird(true), 없으면 예외 처리
-        } else {
-            throw new RuntimeException("지원하지 않는 퀘스트 번호입니다.");
+        switch (sequence) {
+            case 1:
+                quest.updateFirst(true);
+                break;
+            case 2:
+                validateAndUpdateSecondQuest(userId, quest);
+                break;
+            case 3:
+                validateAndUpdateThirdQuest(userId, quest);
+                break;
+            default:
+                throw new RuntimeException("지원하지 않는 퀘스트 번호입니다.");
         }
     }
 
     public Quest findByCreatedAtAndUserId(LocalDate createdAt, Long userId) {
         return questRepository.findByCreatedAtAndUsers_UserId(createdAt, userId)
                 .orElseThrow(() -> new RuntimeException("Not Found Quest"));
+    }
+
+    private void validateAndUpdateSecondQuest(Long userId, Quest quest) {
+        if (quest.getFirst() && isHasTodayComment(userId)) {
+            quest.updateSecond(true);
+        } else {
+            throw new RuntimeException("오늘 작성한 댓글이 없거나 첫 번째 퀘스트가 완료되지 않았습니다.");
+        }
+    }
+
+    private boolean isHasTodayComment(Long userId) {
+        return postCommentRepository.findByUsers_UserId(userId)
+                .stream()
+                .anyMatch(comment -> isToday(comment.getCreatedAt()));
+    }
+
+    private void validateAndUpdateThirdQuest(Long userId, Quest quest) {
+        if (quest.getSecond() && isHasTodayResponse(userId)) {
+            quest.updateThird(true);
+        } else {
+            throw new RuntimeException("오늘 작성한 피드백이 없거나 두 번째 퀘스트가 완료되지 않았습니다.");
+        }
+    }
+
+    private boolean isHasTodayResponse(Long userId) {
+        return responseRepository.findAllByUsers_UserId(userId)
+                .stream()
+                .anyMatch(comment -> isToday(comment.getCreatedAt()));
+    }
+
+    private boolean isToday(LocalDateTime dateTime) {
+        return dateTime.toLocalDate().equals(LocalDate.now());
     }
 }
