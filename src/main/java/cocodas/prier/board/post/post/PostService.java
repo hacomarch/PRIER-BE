@@ -2,6 +2,7 @@ package cocodas.prier.board.post.post;
 
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
+import cocodas.prier.board.post.postmedia.PostMediaService;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
@@ -10,11 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -25,6 +27,8 @@ public class PostService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private UserRepository userRepository;
+
+    private PostMediaService postMediaService;
 
     // jwt 로 userId 찾기
     private Long findUserIdByJwt(String token) {
@@ -107,7 +111,7 @@ public class PostService {
 
     @Transactional
     // 게시글 작성하기
-    public void addPost(String token, PostRequestDto postRequestDto) {
+    public void addPost(String token, PostRequestDto postRequestDto, MultipartFile[] files) {
         Long userId = findUserIdByJwt(token);
 
         Users findUser = findUserObject(userId);
@@ -121,12 +125,20 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+        uploadMedia(files, post);
     }
 
-    // TODO: 코드 수정할 수 있으면 하기...ㅎㅎ (if 문이 너무 거슬려요...ㅎㅎ)
+    private void uploadMedia(MultipartFile[] files, Post post) {
+        try {
+            postMediaService.uploadFile(post, files);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed Upload Media");
+        }
+    }
+
     // 게시글 수정하기
     @Transactional
-    public void updatePost(String token, PostRequestDto postRequestDto, Long boardId) {
+    public void updatePost(String token, PostRequestDto postRequestDto, Long boardId, MultipartFile[] media) {
         Long userId = findUserIdByJwt(token);
 
         Post findPost = postRepository.findById(boardId)
@@ -140,6 +152,15 @@ public class PostService {
         findPost.updateCategory(postRequestDto.getCategory());  // 카테고리 수정하기
         findPost.updateContent(postRequestDto.getContent());    // 내용 수정하기
         findPost.updateUpdatedAt(LocalDateTime.now());          // 수정한 시간 수정하기
+        updateMedia(media, findPost);
+    }
+
+    private void updateMedia(MultipartFile[] media, Post findPost) {
+        try {
+            postMediaService.updateFile(findPost, media);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed Update Media");
+        }
     }
 
     // 게시글 삭제하기
