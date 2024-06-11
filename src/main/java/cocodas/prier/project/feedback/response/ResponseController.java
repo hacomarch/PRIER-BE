@@ -56,7 +56,7 @@ public class ResponseController {
         return ResponseEntity.ok(responses);
     }
 
-    // 자신의 피드백 삭제ㄱㄷ
+    // 자신의 피드백 삭제
     @DeleteMapping("/{projectId}/responses")
     public ResponseEntity<String> deleteResponsesByUserAndProject(@PathVariable Long projectId,
                                                                   Authentication authentication) {
