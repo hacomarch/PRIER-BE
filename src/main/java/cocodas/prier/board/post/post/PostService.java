@@ -1,6 +1,7 @@
 package cocodas.prier.board.post.post;
 
 import cocodas.prier.board.post.post.request.PostRequestDto;
+import cocodas.prier.board.post.post.response.PostResponseDto;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -33,13 +37,70 @@ public class PostService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id" + userId));
     }
 
-    // TODO : 게시글 조회하기
+    // 게시글 조회하기
+    public List<PostResponseDto> allPostList() {
+        return postRepository.findAll().stream()
+                .map(post -> PostResponseDto.builder()
+                        .boardId(post.getPostId())
+                        .title(post.getTitle())
+                        .createdAt(post.getCreatedAt())
+                        .updatedAt(post.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     // TODO : 검색어에 맞춰 게시글 조회하기
+//    public List<PostResponseDto> searchPosts(String keyword) {
+//        List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
+//        List<Post> postsByContent = postRepository.findByContentContaining(keyword);
+//
+//        // 두 리스트를 합쳐 중복을 제거합니다.
+//        List<Post> combinedPosts = Stream.concat(postsByTitle.stream(), postsByContent.stream())
+//                .distinct()
+//                .collect(Collectors.toList());
+//
+//        return combinedPosts.stream()
+//                .map(post -> PostResponseDto.builder()
+//                        .boardId(post.getPostId())
+//                        .title(post.getTitle())
+//                        .createdAt(post.getCreatedAt())
+//                        .updatedAt(post.getUpdatedAt())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 
-    // TODO : 카테고리에 맞춰 게시글 조회하기
+    // 카테고리에 맞춰 게시글 조회하기
+    public List<PostResponseDto> categorySearch(String category) {
+        Category categoryEnum = Category.valueOf(category.toUpperCase());
+        List<Post> posts = postRepository.findByCategory(categoryEnum);
+        return posts.stream()
+                .map(post -> PostResponseDto.builder()
+                        .boardId(post.getPostId())
+                        .title(post.getTitle())
+                        .createdAt(post.getCreatedAt())
+                        .updatedAt(post.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
-    // TODO : 내가 작성한 글 조회하기 -> user에서 해야 하나?
+    // 내가 작성한 글 조회하기 -> user에서 해야 하나?
+    public List<PostResponseDto> myPostList(String token) {
+        Long userId = findUserIdByJwt(token);
+
+        Users findUser = findUserObject(userId);
+
+        List<Post> findUserPosts = postRepository.findByUsers(findUser);
+
+        return findUserPosts.stream()
+                .map(post -> PostResponseDto.builder()
+                        .boardId(post.getPostId())
+                        .title(post.getTitle())
+                        .createdAt(post.getCreatedAt())
+                        .updatedAt(post.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 
     // TODO : 좋아요한 글 조회하기 -> user에서 해야 하나?
 
