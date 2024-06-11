@@ -30,7 +30,7 @@ public class PointTransaction {
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private Integer balance; // 변동 직후 잔액
+    private Integer balance;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")

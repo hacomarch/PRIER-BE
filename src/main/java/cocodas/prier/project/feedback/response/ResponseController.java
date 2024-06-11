@@ -5,6 +5,7 @@ import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,14 +29,12 @@ public class ResponseController {
     // 응답 생성
     @PostMapping("/{projectId}/feedbacks/responses")
     public ResponseEntity<List<ResponseDto>> createResponses(@PathVariable Long projectId,
-                                                             @RequestBody List<ResponseRequestDto> responsesDto) {
+                                                             @RequestBody List<ResponseRequestDto> responsesDto,
+                                                             Authentication authentication) {
         if (responsesDto.isEmpty()) {
             throw new IllegalArgumentException("Responses cannot be empty");
         }
-        Long userId = responsesDto.get(0).getUserId();
-        if (userId == null) {
-            throw new IllegalArgumentException("userId is required");
-        }
+        Long userId = Long.valueOf(authentication.getName());
         List<ResponseDto> createdResponses = responseService.createResponses(userId, responsesDto);
         return ResponseEntity.ok(createdResponses);
     }
@@ -50,7 +49,9 @@ public class ResponseController {
 
     // 프로젝트별 응답 조회
     @GetMapping("/{projectId}/responses")
-    public ResponseEntity<List<ResponseDto>> getResponsesByProject(@PathVariable Long projectId) {
+    public ResponseEntity<List<ResponseDto>> getResponsesByProject(@PathVariable Long projectId,
+                                                                   Authentication authentication) {
+        Long userId = Long.valueOf(authentication.getName());
         List<ResponseDto> responses = responseService.getResponsesByProject(projectId);
         return ResponseEntity.ok(responses);
     }
