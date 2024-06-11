@@ -59,7 +59,8 @@ public class ResponseController {
     // 자신의 피드백 삭제
     @DeleteMapping("/{projectId}/responses")
     public ResponseEntity<String> deleteResponsesByUserAndProject(@PathVariable Long projectId,
-                                                                  @RequestParam Long userId) {
+                                                                  Authentication authentication) {
+        Long userId = Long.valueOf(authentication.getName());
         responseService.deleteResponses(projectId, userId);
         return ResponseEntity.ok("프로젝트 ID " + projectId + "에 대한 유저 ID " + userId + " 의 응답 삭제 완료");
     }
