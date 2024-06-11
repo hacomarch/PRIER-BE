@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class QuestController {
     private final QuestService questService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -24,10 +25,6 @@ public class QuestController {
     }
 
     private static String getToken(String auth) {
-        if (auth == null || !auth.startsWith("Bearer ")) {
-            throw new RuntimeException("JWT Token is missing");
-        }
-
-        return auth.substring(7);
+        return auth.replace("Bearer ", "");
     }
 }
