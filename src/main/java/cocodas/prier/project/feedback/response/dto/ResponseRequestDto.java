@@ -1,12 +1,11 @@
 package cocodas.prier.project.feedback.response.dto;
 
+import lombok.Builder;
 import lombok.Data;
-import org.antlr.v4.runtime.misc.NotNull;
 
 @Data
+@Builder
 public class ResponseRequestDto {
-
     private Long questionId;
     private String content;
-    private Long userId;
 }

@@ -2,12 +2,14 @@ package cocodas.prier.project.project.dto;
 
 import cocodas.prier.project.tag.tag.dto.TagDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@Builder
 public class ProjectDto {
     private Long projectId;
     private String title;
