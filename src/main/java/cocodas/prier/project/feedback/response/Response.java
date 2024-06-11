@@ -2,7 +2,6 @@ package cocodas.prier.project.feedback.response;
 
 import cocodas.prier.keywords.Keywords;
 import cocodas.prier.project.feedback.question.Question;
-import cocodas.prier.project.project.Project;
 import cocodas.prier.user.Users;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -31,19 +30,14 @@ public class Response {
     @JoinColumn(name = "user_id")
     private Users users;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project project;
-
     @OneToMany(mappedBy = "response", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Keywords> keywords = new ArrayList<>();
 
     @Builder
-    public Response(String content, LocalDateTime createdAt,Question question, Users user, Project project) {
+    public Response(String content, LocalDateTime createdAt,Question question, Users user) {
         this.content = content;
         this.createdAt = createdAt;
         this.question = question;
         this.users = user;
-        this.project = project;
     }
 }

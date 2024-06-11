@@ -2,7 +2,6 @@ package cocodas.prier.project.project;
 
 import cocodas.prier.project.comment.ProjectComment;
 import cocodas.prier.project.feedback.question.Question;
-import cocodas.prier.project.feedback.response.Response;
 import cocodas.prier.project.media.ProjectMedia;
 import cocodas.prier.project.tag.projecttag.ProjectTag;
 import cocodas.prier.user.Users;
@@ -84,9 +83,6 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "orderIndex")
     private List<Question> feedbackQuestions = new ArrayList<>();
-
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Response> responses = new ArrayList<>();
 
     @Builder
     public Project(String title, String introduce, String goal, String teamName, String teamDescription, String link, LocalDate devStartDate, LocalDate devEndDate, String teamMate, Users users) {

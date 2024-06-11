@@ -2,7 +2,6 @@ package cocodas.prier.project.feedback.response;
 
 import cocodas.prier.project.feedback.response.dto.ResponseDto;
 import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
-import cocodas.prier.project.project.dto.ProjectDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +35,16 @@ public class ResponseController {
             throw new IllegalArgumentException("Responses cannot be empty");
         }
         Long userId = Long.valueOf(authentication.getName());
-        List<ResponseDto> createdResponses = responseService.createResponses(userId, projectId, responsesDto);
+        List<ResponseDto> createdResponses = responseService.createResponses(userId, responsesDto);
         return ResponseEntity.ok(createdResponses);
+    }
+
+    // 질문별 응답 조회
+    @GetMapping("/{projectId}/feedbacks/{questionId}/responses")
+    public ResponseEntity<List<ResponseDto>> getResponsesByQuestion(@PathVariable Long projectId,
+                                                                    @PathVariable Long questionId) {
+        List<ResponseDto> responses = responseService.getResponsesByQuestion(questionId);
+        return ResponseEntity.ok(responses);
     }
 
     // 프로젝트별 응답 조회
@@ -49,20 +56,12 @@ public class ResponseController {
         return ResponseEntity.ok(responses);
     }
 
-    // 자신의 피드백 삭제
+    // 자신의 피드백 삭제ㄱㄷ
     @DeleteMapping("/{projectId}/responses")
     public ResponseEntity<String> deleteResponsesByUserAndProject(@PathVariable Long projectId,
                                                                   Authentication authentication) {
         Long userId = Long.valueOf(authentication.getName());
         responseService.deleteResponses(projectId, userId);
         return ResponseEntity.ok("프로젝트 ID " + projectId + "에 대한 유저 ID " + userId + " 의 응답 삭제 완료");
-    }
-
-    // 자신이 응답한 프로젝트 리스트 조회
-    @GetMapping("/responses/projects")
-    public ResponseEntity<List<ProjectDto>> getRespondedProjectsByUser(Authentication authentication) {
-        Long userId = Long.valueOf(authentication.getName());
-        List<ProjectDto> projects = responseService.getRespondedProjectsByUser(userId);
-        return ResponseEntity.ok(projects);
     }
 }
