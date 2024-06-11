@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,19 +52,21 @@ public class PostController {
     @PostMapping("/boards")
     @ResponseStatus(HttpStatus.CREATED)
     public void addPost(@RequestHeader("Authorization") String authorizationHeader,
-                        @RequestBody PostRequestDto postRequestDto) {
+                        @RequestPart("dto") PostRequestDto postRequestDto,
+                        @RequestParam(name = "media", required = false) MultipartFile[] media) {
         String token = authorizationHeader.replace("Bearer ", "");
-        postService.addPost(token, postRequestDto);
+        postService.addPost(token, postRequestDto, media);
     }
 
     // 게시글 수정하기
     @PutMapping("/boards/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public void updatePost(@RequestHeader("Authorization") String authorizationHeader,
-                           @RequestBody PostRequestDto postRequestDto,
+                           @RequestPart("dto") PostRequestDto postRequestDto,
+                           @RequestParam(name = "media", required = false) MultipartFile[] media,
                            @PathVariable(name = "postId") Long postId) {
         String token = authorizationHeader.replace("Bearer ", "");
-        postService.updatePost(token, postRequestDto, postId);
+        postService.updatePost(token, postRequestDto, postId, media);
     }
 
     // 게시글 삭제하기
