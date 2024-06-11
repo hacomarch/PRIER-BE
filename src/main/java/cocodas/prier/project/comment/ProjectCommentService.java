@@ -89,6 +89,18 @@ public class ProjectCommentService {
                         comment.getScore())).collect(Collectors.toList());
     }
 
+    public List<CommentDto> getMyProjectComments(String token) {
+        Users user = getUsersByToken(token);
+
+        List<ProjectComment> allComments = projectCommentRepository.findAllByUsers(user);
+
+        return allComments.stream().map(comment -> new CommentDto(
+                comment.getCommentId(),
+                comment.getUsers().getNickname(),
+                comment.getContent(),
+                comment.getScore())).collect(Collectors.toList());
+    }
+
     @Transactional
     public CommentDto updateProjectComment(Long projectId, Long commentId, CommentForm form, String token) {
         Project project = projectRepository.findById(projectId)

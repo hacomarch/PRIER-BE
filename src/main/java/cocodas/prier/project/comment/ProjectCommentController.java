@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/projects/{projectId}/comment")
+@RequestMapping("/api/projects")
 public class ProjectCommentController {
 
     private final ProjectCommentService projectCommentService;
@@ -25,7 +25,7 @@ public class ProjectCommentController {
         return auth.substring(7);
     }
 
-    @PostMapping
+    @PostMapping("/{projectId}/comment")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long projectId,
                                         @RequestBody CommentForm form,
                                         @RequestHeader("Authorization") String auth) {
@@ -36,7 +36,7 @@ public class ProjectCommentController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/{projectId}/comment/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long projectId,
                                                     @PathVariable Long commentId,
                                                     @RequestHeader("Authorization") String auth) {
@@ -46,7 +46,7 @@ public class ProjectCommentController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/{commentId}")
+    @PutMapping("/{projectId}/comment/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@PathVariable Long projectId,
                                                     @PathVariable Long commentId,
                                                     @RequestBody CommentForm form,
@@ -57,9 +57,15 @@ public class ProjectCommentController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping
+    @GetMapping("/{projectId}/comment")
     public List<CommentDto> getProjectComments(@PathVariable Long projectId) {
 
         return projectCommentService.getProjectComments(projectId);
+    }
+
+    @GetMapping("/comment/my-comments")
+    public List<CommentDto> getMyProjectComments(@RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        return projectCommentService.getMyProjectComments(token);
     }
 }
