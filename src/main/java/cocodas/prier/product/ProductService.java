@@ -170,7 +170,7 @@ public class ProductService {
     }
 
     private ProductResponseDto convertToDto(Product product) {
-        String imageUrl = String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, product.getProductMedia().getS3Key());
+        String imageUrl = awsS3Service.getPublicUrl(product.getProductMedia().getS3Key());
         return new ProductResponseDto(product.getProductId(),
                                     product.getProductName(),
                                     product.getPrice(),

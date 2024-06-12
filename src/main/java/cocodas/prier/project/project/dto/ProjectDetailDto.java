@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -24,9 +25,12 @@ public class ProjectDetailDto {
     private String teamDescription;
     private String teamMate;
     private String link;
+    private Boolean isMine;
+    private LocalDateTime feedbackEndDate;
     private List<QuestionDto> questions;
     private List<ProjectMediaDto> media;
     private List<TagDto> tags;
     private Float score;
+    private int[] amount;
 }
 
