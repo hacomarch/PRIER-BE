@@ -2,8 +2,10 @@ package cocodas.prier.project.project;
 
 import cocodas.prier.point.PointTransactionService;
 import cocodas.prier.point.TransactionType;
+import cocodas.prier.project.feedback.question.Question;
 import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.media.ProjectMediaService;
+import cocodas.prier.project.project.dto.MyPageProjectDto;
 import cocodas.prier.project.project.dto.ProjectDetailDto;
 import cocodas.prier.project.project.dto.ProjectForm;
 import cocodas.prier.project.project.dto.ProjectDto;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,7 +48,7 @@ public class ProjectService {
     private final PointTransactionService pointTransactionService;
 
     @Transactional
-    public String createProject(ProjectForm form,
+    public Long createProject(ProjectForm form,
                                 MultipartFile mainImage,
                                 MultipartFile[] contentImages,
                                 String token) {
@@ -55,14 +58,14 @@ public class ProjectService {
 
         Project project = buildProject(form, user);
         project.setStatus(ProjectStatus.values()[form.getStatus()]);
-        projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
 
         handleProjectTags(form, project);
         handleProjectQuestions(form, project);
         handleProjectMedia(mainImage, contentImages, project);
 
         user.getProjects().add(project);
-        return "프로젝트 생성 완료";
+        return savedProject.getProjectId();
     }
 
     private Users getUsersByToken(String token) {
@@ -192,9 +195,18 @@ public class ProjectService {
         return "프로젝트 업데이트 완료";
     }
 
-    public ProjectDetailDto getProjectDetail(Long projectId) {
+    public ProjectDetailDto getProjectDetail(Long projectId, String token) {
+
+        Users user = getUsersByToken(token);
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        boolean isMine = true;
+
+        if (!project.getUsers().equals(user)) {
+            isMine = false;
+        }
 
         return new ProjectDetailDto(
                 project.getProjectId(),
@@ -208,24 +220,38 @@ public class ProjectService {
                 project.getTeamDescription(),
                 project.getTeamMate(),
                 project.getLink(),
+                isMine,
+                project.getFeedbackEndAt(),
                 questionService.getProjectQuestions(project),
                 projectMediaService.getProjectDetailMedia(project),
                 projectTagService.getProjectTags(project),
-                calculateScore(project)
+                calculateScore(project),
+                getFeedbackAmount(project)
         );
     }
 
-    public List<ProjectDto> getAllProjects() {
-        List<Project> projects = projectRepository.findAll();
 
-        return projects.stream().map(project -> new ProjectDto(
+
+    public Page<ProjectDto> getAllProjects(Integer filter, Pageable pageable) {
+        Sort sort = Sort.by("createdAt").descending();  // 기본 정렬: 최신순
+
+        if (filter != null) {
+            if (filter == 0) { // 인기순
+                sort = Sort.by("score").descending(); // score는 가정에 따라 수정 필요
+            } else if (filter == 1) { // 등록순
+                sort = Sort.by("createdAt").ascending();
+            }
+        }
+
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return projectRepository.findAll(pageable).map(project -> new ProjectDto(
                 project.getProjectId(),
                 project.getTitle(),
                 project.getTeamName(),
                 projectMediaService.getMainImageUrl(project),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
-        )).collect(Collectors.toList());
+        ));
     }
 
     public Page<ProjectDto> getMyProjects(String token, int filter, int page) {
@@ -263,23 +289,32 @@ public class ProjectService {
         ));
     }
 
-    public Project getProjectById(Long projectId) {
-        return projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid project ID"));
+    public MyPageProjectDto getMyRecentProject(String token) {
+        Users user = getUsersByToken(token);
+
+        Project project = projectRepository.findMyRecentProject(user)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        return MyPageProjectDto.builder()
+                .projectId(project.getProjectId())
+                .title(project.getTitle())
+                .teamName(project.getTeamName())
+                .score(project.getScore())
+                .feedbackAmount(getFeedbackAmount(project)[2])
+                .build();
     }
 
-    public List<ProjectDto> getSearchedProjects(String keyword) {
 
-        List<Project> searchedProjects = projectRepository.findByKeyword(keyword);
-
-        return searchedProjects.stream().map(project -> new ProjectDto(
-                project.getProjectId(),
-                project.getTitle(),
-                project.getTeamName(),
-                projectMediaService.getMainImageUrl(project),
-                projectTagService.getProjectTags(project),
-                project.getScore()
-        )).collect(Collectors.toList());
+    public Page<ProjectDto> getSearchedProjects(String keyword, Pageable pageable) {
+        return projectRepository.findByKeyword(keyword, pageable)
+                .map(project -> new ProjectDto(
+                        project.getProjectId(),
+                        project.getTitle(),
+                        project.getTeamName(),
+                        projectMediaService.getMainImageUrl(project),
+                        projectTagService.getProjectTags(project),
+                        calculateScore(project)
+                ));
     }
 
     @Transactional
@@ -306,5 +341,17 @@ public class ProjectService {
         averageScore = Math.min(5, Math.round(averageScore * 2) / 2.0f);
 
         return averageScore;
+    }
+
+    //프로젝트 댓글 수, 프로젝트 피드백 수, 이 둘의 합 이렇게 3개 반환
+    public int[] getFeedbackAmount(Project project) {
+        List<Question> feedbackQuestions = project.getFeedbackQuestions();
+        AtomicInteger minValue = new AtomicInteger(Integer.MAX_VALUE);
+        feedbackQuestions.forEach(q -> {
+            if (minValue.get() > q.getResponses().size()) {
+                minValue.set(q.getResponses().size());
+            }
+        });
+        return new int[]{project.getProjectComments().size(), minValue.get(), project.getProjectComments().size() + minValue.get()};
     }
 }

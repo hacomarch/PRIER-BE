@@ -3,12 +3,15 @@ package cocodas.prier.project.project;
 import cocodas.prier.project.feedback.response.dto.ResponseDto;
 import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
 import cocodas.prier.project.feedback.response.ResponseService;
+import cocodas.prier.project.project.dto.MyPageProjectDto;
 import cocodas.prier.project.project.dto.ProjectDetailDto;
 import cocodas.prier.project.project.dto.ProjectDto;
 import cocodas.prier.project.project.dto.ProjectForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,13 +35,13 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createProject(@RequestPart("form") ProjectForm form,
+    public ResponseEntity<Long> createProject(@RequestPart("form") ProjectForm form,
                                                 @RequestParam(name = "mainImage", required = false) MultipartFile mainImage,
                                                 @RequestParam(name = "contentImages", required = false) MultipartFile[] contentImages,
                                                 @RequestHeader("Authorization") String auth) {
 
         String token = getToken(auth);
-        String result = projectService.createProject(form, mainImage, contentImages, token);
+        Long result = projectService.createProject(form, mainImage, contentImages, token);
         return ResponseEntity.ok(result);
     }
 
@@ -64,35 +67,50 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectDetailDto> getProjectDetail(@PathVariable Long projectId) {
-        ProjectDetailDto result = projectService.getProjectDetail(projectId);
+    public ResponseEntity<ProjectDetailDto> getProjectDetail(@PathVariable Long projectId,
+                                                             @RequestHeader("Authorization") String auth) {
+
+        String token = getToken(auth);
+        ProjectDetailDto result = projectService.getProjectDetail(projectId, token);
 
         return ResponseEntity.ok(result);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectDto>> getProjects(@RequestParam(value = "search", required = false) String keyword) {
-        List<ProjectDto> projects;
+    public ResponseEntity<Page<ProjectDto>> getSearchedProjects(
+            @RequestParam(value = "search", required = false) String keyword,
+            @RequestParam(name = "filter", required = false) Integer filter,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        Pageable pageable = PageRequest.of(page, 8);  // 페이지 크기와 페이지 번호 설정
+        Page<ProjectDto> projectPage;
+
         if (keyword != null && !keyword.isEmpty()) {
-            projects = projectService.getSearchedProjects(keyword);
+            projectPage = projectService.getSearchedProjects(keyword, pageable);
         } else {
-            projects = projectService.getAllProjects();
+            projectPage = projectService.getAllProjects(filter, pageable);
         }
 
-        return ResponseEntity.ok(projects);
+        return ResponseEntity.ok(projectPage);
     }
+
 
     @GetMapping("/my-projects")
     public ResponseEntity<Page<ProjectDto>> getMyProjects(
             @RequestHeader("Authorization") String auth,
             @RequestParam("filter") Integer filter,
-            @RequestParam("page") int page) {
+            @RequestParam(name = "page", defaultValue = "0") int page) {
 
         String token = getToken(auth);
         return ResponseEntity.ok(projectService.getMyProjects(token, filter, page));
     }
 
 
+    @GetMapping("/my-recent-project")
+    public ResponseEntity<MyPageProjectDto> getMyRecentProject(@RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        return ResponseEntity.ok(projectService.getMyRecentProject(token));
+    }
 
     @PostMapping("/{projectId}/extend")
     public ResponseEntity<String> extendFeedback(@PathVariable Long projectId,

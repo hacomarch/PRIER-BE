@@ -2,6 +2,7 @@ package cocodas.prier.project.comment;
 
 import cocodas.prier.project.comment.dto.CommentDto;
 import cocodas.prier.project.comment.dto.CommentForm;
+import cocodas.prier.project.comment.dto.MyPageCommentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +65,7 @@ public class ProjectCommentController {
     }
 
     @GetMapping("/comment/my-comments")
-    public List<CommentDto> getMyProjectComments(@RequestHeader("Authorization") String auth) {
+    public List<MyPageCommentDto> getMyProjectComments(@RequestHeader("Authorization") String auth) {
         String token = getToken(auth);
         return projectCommentService.getMyProjectComments(token);
     }

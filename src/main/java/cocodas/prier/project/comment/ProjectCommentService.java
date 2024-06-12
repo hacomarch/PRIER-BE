@@ -2,6 +2,7 @@ package cocodas.prier.project.comment;
 
 import cocodas.prier.project.comment.dto.CommentDto;
 import cocodas.prier.project.comment.dto.CommentForm;
+import cocodas.prier.project.comment.dto.MyPageCommentDto;
 import cocodas.prier.project.project.Project;
 import cocodas.prier.project.project.ProjectRepository;
 import cocodas.prier.user.UserRepository;
@@ -89,14 +90,15 @@ public class ProjectCommentService {
                         comment.getScore())).collect(Collectors.toList());
     }
 
-    public List<CommentDto> getMyProjectComments(String token) {
+    public List<MyPageCommentDto> getMyProjectComments(String token) {
         Users user = getUsersByToken(token);
 
         List<ProjectComment> allComments = projectCommentRepository.findAllByUsers(user);
 
-        return allComments.stream().map(comment -> new CommentDto(
+        return allComments.stream().map(comment -> new MyPageCommentDto(
                 comment.getCommentId(),
-                comment.getUsers().getNickname(),
+                comment.getProject().getTitle(),
+                comment.getProject().getTeamName(),
                 comment.getContent(),
                 comment.getScore())).collect(Collectors.toList());
     }
