@@ -3,6 +3,7 @@ package cocodas.prier.board.post.post;
 import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.like.LikeRepository;
 import cocodas.prier.board.post.post.request.PostRequestDto;
+import cocodas.prier.board.post.post.response.PostDetailResponseDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
 import cocodas.prier.board.post.postmedia.PostMediaService;
 import cocodas.prier.user.UserRepository;
@@ -59,6 +60,26 @@ public class PostService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    // postId로 게시글 조회하기
+    @Transactional
+    public PostDetailResponseDto findByPostId(Long postId) {
+        Post post = findById(postId);
+        post.updateViews(post.getViews() + 1);
+
+        return new PostDetailResponseDto(
+                post.getTitle(),
+                post.getContent(),
+                post.getUsers().getNickname(),
+                post.getCategory().name(),
+                postMediaService.getPostMediaDetail(post),
+                post.getViews(),
+                post.getLikes().size(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
+
 
     // 검색어에 맞춰 게시글 조회하기
     public List<PostResponseDto> searchPostsByKeyword(String keyword) {
@@ -166,8 +187,7 @@ public class PostService {
     public void updatePost(String token, PostRequestDto postRequestDto, Long boardId, MultipartFile[] media) {
         Long userId = findUserIdByJwt(token);
 
-        Post findPost = postRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 postId를 가진 Post가 없습니다."));
+        Post findPost = findById(boardId);
 
         if (!findPost.getUsers().getUserId().equals(userId)) {
             throw new IllegalStateException("해당 게시글을 수정할 권한이 없습니다.");
@@ -193,8 +213,7 @@ public class PostService {
     public void deletePost(String token, Long postId) {
         Long userId = findUserIdByJwt(token);
 
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 postId를 가진 Post가 없습니다."));
+        Post findPost = findById(postId);
 
         if (!findPost.getUsers().getUserId().equals(userId)) {
             throw new IllegalStateException("해당 게시글을 삭제할 권한이 없습니다.");
@@ -202,5 +221,10 @@ public class PostService {
 
         postMediaService.deleteFile(findPost);
         postRepository.delete(findPost);
+    }
+
+    private Post findById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 postId를 가진 Post가 없습니다."));
     }
 }

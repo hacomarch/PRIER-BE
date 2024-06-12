@@ -30,6 +30,8 @@ public class Post {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private Integer views = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users users;
@@ -57,6 +59,10 @@ public class Post {
 
     public void updateUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void updateViews(int views) {
+        this.views = views;
     }
 
     @Builder
