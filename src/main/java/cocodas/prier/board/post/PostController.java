@@ -19,11 +19,15 @@ public class PostController {
 
     private final PostService postService;
 
-    // 모든 게시글 조회하기
+    // 모든 게시글 조회하기 & 검색 키워드 게시글 조회하기
     @GetMapping("/boards")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponseDto> allPosts() {
-        return postService.allPostList();
+    public List<PostResponseDto> allOrSearchPosts(@RequestParam(name = "search", required = false) String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
+            return postService.allPostList();
+        } else {
+            return postService.searchPostsByKeyword(keyword);
+        }
     }
 
     // 카테고리에 맞춰 조회하기

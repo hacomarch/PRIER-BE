@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -54,24 +55,24 @@ public class PostService {
     }
 
     // TODO : 검색어에 맞춰 게시글 조회하기
-//    public List<PostResponseDto> searchPosts(String keyword) {
-//        List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
-//        List<Post> postsByContent = postRepository.findByContentContaining(keyword);
-//
-//        // 두 리스트를 합쳐 중복을 제거합니다.
-//        List<Post> combinedPosts = Stream.concat(postsByTitle.stream(), postsByContent.stream())
-//                .distinct()
-//                .collect(Collectors.toList());
-//
-//        return combinedPosts.stream()
-//                .map(post -> PostResponseDto.builder()
-//                        .boardId(post.getPostId())
-//                        .title(post.getTitle())
-//                        .createdAt(post.getCreatedAt())
-//                        .updatedAt(post.getUpdatedAt())
-//                        .build())
-//                .collect(Collectors.toList());
-//    }
+    public List<PostResponseDto> searchPostsByKeyword(String keyword) {
+        List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
+        List<Post> postsByContent = postRepository.findByContentContaining(keyword);
+
+        // 두 리스트를 합쳐 중복을 제거합니다.
+        List<Post> combinedPosts = Stream.concat(postsByTitle.stream(), postsByContent.stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        return combinedPosts.stream()
+                .map(post -> PostResponseDto.builder()
+                        .boardId(post.getPostId())
+                        .title(post.getTitle())
+                        .createdAt(post.getCreatedAt())
+                        .updatedAt(post.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     // 카테고리에 맞춰 게시글 조회하기
     public List<PostResponseDto> categorySearch(String category) {
