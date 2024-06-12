@@ -45,12 +45,13 @@ public class PostController {
         return postService.myPostList(token);
     }
 
-    // 검색어로 모든 게시글 조회하기
-//    @GetMapping("/api/boards")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<PostResponseDto> searchPosts(@RequestParam(value = "search") String keyword) {
-//        return postService.searchPosts(keyword);
-//    }
+    // 내가 좋아요 누른 게시글 모두 조회하기
+    @GetMapping("/boards/like/my")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PostResponseDto> pushLikePost(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        return postService.pushLikePost(token);
+    }
 
     // 게시글 작성하기
     @PostMapping("/boards")

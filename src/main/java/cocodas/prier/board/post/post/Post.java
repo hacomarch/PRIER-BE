@@ -1,6 +1,7 @@
 package cocodas.prier.board.post.post;
 
 import cocodas.prier.board.comment.PostComment;
+import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.postmedia.PostMedia;
 import cocodas.prier.user.Users;
 import jakarta.persistence.*;
@@ -38,6 +39,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostMedia> postMedia = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Likes> likes = new ArrayList<>();
 
     public void updateTitle(String title) {
         this.title = title;
