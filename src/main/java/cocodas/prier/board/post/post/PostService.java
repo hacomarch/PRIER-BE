@@ -2,7 +2,6 @@ package cocodas.prier.board.post.post;
 
 import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.like.LikeRepository;
-import cocodas.prier.board.post.like.request.LikeRequestDto;
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
 import cocodas.prier.board.post.postmedia.PostMediaService;
@@ -124,7 +123,7 @@ public class PostService {
         // Like 엔티티에서 게시글 ID 추출
         List<Long> postIds = likes.stream()
                 .map(like -> like.getPost().getPostId())
-                .toList();
+                .collect(Collectors.toList());
 
         // 게시글 ID로 게시글 조회
         List<Post> posts = postRepository.findAllById(postIds);

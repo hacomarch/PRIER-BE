@@ -1,6 +1,7 @@
 package cocodas.prier.user;
 
 import cocodas.prier.board.comment.PostComment;
+import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.post.Post;
 import cocodas.prier.orders.orders.Orders;
 import cocodas.prier.point.PointTransaction;
@@ -92,6 +93,9 @@ public class Users {
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> postComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Likes> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Project> projects = new ArrayList<>();

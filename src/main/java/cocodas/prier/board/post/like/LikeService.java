@@ -1,6 +1,5 @@
 package cocodas.prier.board.post.like;
 
-import cocodas.prier.board.post.like.request.LikeRequestDto;
 import cocodas.prier.board.post.post.Post;
 import cocodas.prier.board.post.post.PostRepository;
 import cocodas.prier.user.UserRepository;
@@ -11,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -44,18 +45,27 @@ public class LikeService {
 
     // 좋아요 누르기
     @Transactional
-    public void pushLike(String token, LikeRequestDto likeRequestDto) {
+    // 좋아요 누르기
+    public void pushLike(String token, Long postId) {
         Long userId = findUserIdByJwt(token);
 
         Users findUser = findUserObject(userId);
+        Post findPost = findPostObject(postId);
 
-        Post findPost = findPostObject(likeRequestDto.getPostId());
+        // 사용자가 좋아요한 모든 Like 엔티티 조회
+        List<Likes> likes = likeRepository.findByUsers(findUser);
 
-        Likes like = Likes.builder()
-                .users(findUser)
-                .post(findPost)
-                .build();
+        // 중복 좋아요 방지
+        boolean alreadyLiked = likes.stream()
+                .anyMatch(like -> like.getPost().getPostId().equals(postId));
 
-        likeRepository.save(like);
+        // 중복한게 아니라면
+        if (!alreadyLiked) {
+            Likes like = Likes.builder()
+                    .users(findUser)
+                    .post(findPost)
+                    .build();
+            likeRepository.save(like);
+        }
     }
 }

@@ -27,6 +27,9 @@ public class Likes {
     @Builder
     public Likes(Users users, Post post) {
         this.users = users;
+        if (!users.getLikes().contains(this)) {
+            users.getLikes().add(this);
+        }
         this.post = post;
     }
 }

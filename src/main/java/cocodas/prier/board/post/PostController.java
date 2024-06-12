@@ -1,6 +1,5 @@
 package cocodas.prier.board.post;
 
-import cocodas.prier.board.post.like.request.LikeRequestDto;
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.PostService;
 import cocodas.prier.board.post.post.response.PostResponseDto;
@@ -48,6 +47,7 @@ public class PostController {
 
     // 내가 좋아요 누른 게시글 모두 조회하기
     @GetMapping("/boards/like/my")
+    @ResponseStatus(HttpStatus.OK)
     public List<PostResponseDto> pushLikePost(@RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "");
         return postService.pushLikePost(token);
