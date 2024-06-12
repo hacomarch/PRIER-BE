@@ -1,5 +1,8 @@
 package cocodas.prier.board.post.post;
 
+import cocodas.prier.board.post.like.Likes;
+import cocodas.prier.board.post.like.LikeRepository;
+import cocodas.prier.board.post.like.request.LikeRequestDto;
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
 import cocodas.prier.board.post.postmedia.PostMediaService;
@@ -25,6 +28,8 @@ import java.util.stream.Stream;
 public class PostService {
     private final PostRepository postRepository;
 
+    private final LikeRepository likeRepository;
+
     private final JwtTokenProvider jwtTokenProvider;
 
     private UserRepository userRepository;
@@ -42,6 +47,8 @@ public class PostService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id" + userId));
     }
 
+    //
+
     // 게시글 조회하기
     public List<PostResponseDto> allPostList() {
         return postRepository.findAll().stream()
@@ -54,15 +61,14 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // TODO : 검색어에 맞춰 게시글 조회하기
+    // 검색어에 맞춰 게시글 조회하기
     public List<PostResponseDto> searchPostsByKeyword(String keyword) {
         List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
         List<Post> postsByContent = postRepository.findByContentContaining(keyword);
 
-        // 두 리스트를 합쳐 중복을 제거합니다.
         List<Post> combinedPosts = Stream.concat(postsByTitle.stream(), postsByContent.stream())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         return combinedPosts.stream()
                 .map(post -> PostResponseDto.builder()
@@ -88,7 +94,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // 내가 작성한 글 조회하기 -> user에서 해야 하나?
+    // 내가 작성한 글 조회하기
     public List<PostResponseDto> myPostList(String token) {
         Long userId = findUserIdByJwt(token);
 
@@ -106,12 +112,31 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    // 좋아요한 글 조회하기
+    public List<PostResponseDto> pushLikePost(String token) {
+        Long userId = findUserIdByJwt(token);
 
-    // TODO : 좋아요한 글 조회하기 -> user에서 해야 하나?
+        Users findUser = findUserObject(userId);
 
+        // 사용자가 좋아요한 모든 Like 엔티티 조회
+        List<Likes> likes = likeRepository.findByUsers(findUser);
 
-    @Transactional
+        // Like 엔티티에서 게시글 ID 추출
+        List<Long> postIds = likes.stream()
+                .map(like -> like.getPost().getPostId())
+                .toList();
+
+        // 게시글 ID로 게시글 조회
+        List<Post> posts = postRepository.findAllById(postIds);
+
+        // Post 엔티티를 PostResponseDto 로 변환하여 반환
+        return posts.stream()
+                .map(post -> new PostResponseDto(post.getPostId(), post.getTitle(), post.getCreatedAt(), post.getUpdatedAt()))
+                .collect(Collectors.toList());
+    }
+
     // 게시글 작성하기
+    @Transactional
     public void addPost(String token, PostRequestDto postRequestDto, MultipartFile[] files) {
         Long userId = findUserIdByJwt(token);
 
