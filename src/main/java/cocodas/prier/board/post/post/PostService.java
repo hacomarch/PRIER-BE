@@ -175,6 +175,7 @@ public class PostService {
             throw new IllegalStateException("해당 게시글을 삭제할 권한이 없습니다.");
         }
 
+        postMediaService.deleteFile(findPost);
         postRepository.delete(findPost);
     }
 }
