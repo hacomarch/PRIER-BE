@@ -2,6 +2,7 @@ package cocodas.prier.board.post.postmedia;
 
 import cocodas.prier.aws.AwsS3Service;
 import cocodas.prier.board.post.post.Post;
+import cocodas.prier.board.post.post.response.PostMediaDto;
 import cocodas.prier.project.media.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +19,20 @@ import java.io.IOException;
 public class PostMediaService {
     private final PostMediaRepository postMediaRepository;
     private final AwsS3Service awsS3Service;
+
+    public List<PostMediaDto> getPostMediaDetail(Post post) {
+        return post.getPostMedia().stream()
+                .map(media -> new PostMediaDto(
+                        media.getMetadata(),
+                        media.getMediaType().name(),
+                        getS3Url(media.getS3Key())
+                ))
+                .toList();
+    }
+
+    private String getS3Url(String s3Key) {
+        return awsS3Service.getPublicUrl(s3Key);
+    }
 
     @Transactional
     public void uploadFile(Post post, MultipartFile[] files) throws IOException {

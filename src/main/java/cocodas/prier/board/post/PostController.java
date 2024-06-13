@@ -2,6 +2,7 @@ package cocodas.prier.board.post;
 
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.PostService;
+import cocodas.prier.board.post.post.response.PostDetailResponseDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,14 @@ public class PostController {
         }
     }
 
+    @GetMapping("/boards/{postId}")
+    @ResponseStatus(HttpStatus.OK)
+    public PostDetailResponseDto getPostByPostId(@PathVariable Long postId) {
+        return postService.findByPostId(postId);
+    }
+
     // 카테고리에 맞춰 조회하기
-    @GetMapping("/boards/{category}")
+    @GetMapping("/boards/category/{category}")
     @ResponseStatus(HttpStatus.OK)
     public List<PostResponseDto> categorySearch(@PathVariable(name = "category") String category) {
         return postService.categorySearch(category);
