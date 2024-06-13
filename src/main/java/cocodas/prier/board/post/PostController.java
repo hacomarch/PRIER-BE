@@ -40,7 +40,7 @@ public class PostController {
     // 카테고리에 맞춰 조회하기
     @GetMapping("/boards/category/{category}")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponseDto> categorySearch(@PathVariable(name = "category") String category) {
+    public List<PostDetailResponseDto> categorySearch(@PathVariable(name = "category") String category) {
         return postService.categorySearch(category);
     }
 

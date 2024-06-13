@@ -1,5 +1,6 @@
 package cocodas.prier.board.post.post;
 
+import cocodas.prier.board.comment.PostCommentService;
 import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.like.LikeRepository;
 import cocodas.prier.board.post.post.request.PostRequestDto;
@@ -35,6 +36,8 @@ public class PostService {
     private UserRepository userRepository;
 
     private PostMediaService postMediaService;
+
+    private PostCommentService postCommentService;
 
     // jwt 로 userId 찾기
     private Long findUserIdByJwt(String token) {
@@ -76,7 +79,8 @@ public class PostService {
                 post.getViews(),
                 post.getLikes().size(),
                 post.getCreatedAt(),
-                post.getUpdatedAt()
+                post.getUpdatedAt(),
+                postCommentService.findPostCommentByPostId(postId)
         );
     }
 
@@ -101,17 +105,23 @@ public class PostService {
     }
 
     // 카테고리에 맞춰 게시글 조회하기
-    public List<PostResponseDto> categorySearch(String category) {
+    public List<PostDetailResponseDto> categorySearch(String category) {
         Category categoryEnum = Category.valueOf(category.toUpperCase());
         List<Post> posts = postRepository.findByCategory(categoryEnum);
         return posts.stream()
-                .map(post -> PostResponseDto.builder()
-                        .boardId(post.getPostId())
-                        .title(post.getTitle())
-                        .createdAt(post.getCreatedAt())
-                        .updatedAt(post.getUpdatedAt())
-                        .build())
-                .collect(Collectors.toList());
+                .map(post -> new PostDetailResponseDto(
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getUsers().getNickname(),
+                        post.getCategory().name(),
+                        postMediaService.getPostMediaDetail(post),
+                        post.getViews(),
+                        post.getLikes().size(),
+                        post.getCreatedAt(),
+                        post.getUpdatedAt(),
+                        postCommentService.findPostCommentByPostId(post.getPostId())
+                ))
+                .toList();
     }
 
     // 내가 작성한 글 조회하기
