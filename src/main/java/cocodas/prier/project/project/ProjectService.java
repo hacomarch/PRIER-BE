@@ -76,6 +76,26 @@ public class ProjectService {
         return user;
     }
 
+    public Long handleCreateProject(ProjectForm form, MultipartFile mainImage, MultipartFile[] contentImages, String token) {
+        try {
+            validateProjectForm(form);
+            return createProject(form, mainImage, contentImages, token);
+        } catch (IllegalArgumentException e) {
+            log.error("Project creation failed: {}", e.getMessage());
+            return -1L;
+        }
+    }
+
+    private void validateProjectForm(ProjectForm form) {
+        if (form.getTitle() == null || form.getIntroduce() == null || form.getGoal() == null ||
+                form.getStartDate() == null || form.getEndDate() == null || form.getStatus() < 0 || form.getStatus() > 2 ||
+                form.getTeamName() == null || form.getTeamDescription() == null || form.getTeamMate() == null ||
+                form.getLink() == null || form.getQuestion() == null || form.getType() == null) {
+            log.error("입력 값 중 null이 포함되어 있습니다.");
+            throw new IllegalArgumentException("입력 필드 중 필수 값이 누락되었습니다.");
+        }
+    }
+
     private Project buildProject(ProjectForm form, Users user) {
         Project project = Project.builder()
                 .title(form.getTitle())
