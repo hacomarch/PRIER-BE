@@ -5,6 +5,7 @@ import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.like.LikeRepository;
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.response.PostDetailResponseDto;
+import cocodas.prier.board.post.post.response.PostListResponseDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
 import cocodas.prier.board.post.postmedia.PostMediaService;
 import cocodas.prier.user.UserRepository;
@@ -53,24 +54,32 @@ public class PostService {
     //
 
     // 게시글 조회하기
-    public List<PostResponseDto> allPostList() {
+    public List<PostListResponseDto> allPostList() {
         return postRepository.findAll().stream()
-                .map(post -> PostResponseDto.builder()
-                        .boardId(post.getPostId())
-                        .title(post.getTitle())
-                        .createdAt(post.getCreatedAt())
-                        .updatedAt(post.getUpdatedAt())
-                        .build())
+                .map(post -> new PostListResponseDto(
+                        post.getPostId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getUsers().getNickname(),
+                        post.getCategory().name(),
+                        postMediaService.getPostMediaDetail(post),
+                        post.getViews(),
+                        post.getLikes().size(),
+                        post.getCreatedAt(),
+                        post.getUpdatedAt()
+                ))
                 .collect(Collectors.toList());
     }
 
-    // postId로 게시글 조회하기
+    // postId로 게시글 조회하기(특정 글 조회하기)
     @Transactional
     public PostDetailResponseDto findByPostId(Long postId) {
         Post post = findById(postId);
         post.updateViews(post.getViews() + 1);
 
         return new PostDetailResponseDto(
+                post.getUsers().getUserId(),
+                post.getPostId(),
                 post.getTitle(),
                 post.getContent(),
                 post.getUsers().getNickname(),
@@ -84,9 +93,8 @@ public class PostService {
         );
     }
 
-
     // 검색어에 맞춰 게시글 조회하기
-    public List<PostResponseDto> searchPostsByKeyword(String keyword) {
+    public List<PostListResponseDto> searchPostsByKeyword(String keyword) {
         List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
         List<Post> postsByContent = postRepository.findByContentContaining(keyword);
 
@@ -95,21 +103,8 @@ public class PostService {
                 .toList();
 
         return combinedPosts.stream()
-                .map(post -> PostResponseDto.builder()
-                        .boardId(post.getPostId())
-                        .title(post.getTitle())
-                        .createdAt(post.getCreatedAt())
-                        .updatedAt(post.getUpdatedAt())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    // 카테고리에 맞춰 게시글 조회하기
-    public List<PostDetailResponseDto> categorySearch(String category) {
-        Category categoryEnum = Category.valueOf(category.toUpperCase());
-        List<Post> posts = postRepository.findByCategory(categoryEnum);
-        return posts.stream()
-                .map(post -> new PostDetailResponseDto(
+                .map(post -> new PostListResponseDto(
+                        post.getPostId(),
                         post.getTitle(),
                         post.getContent(),
                         post.getUsers().getNickname(),
@@ -118,14 +113,13 @@ public class PostService {
                         post.getViews(),
                         post.getLikes().size(),
                         post.getCreatedAt(),
-                        post.getUpdatedAt(),
-                        postCommentService.findPostCommentByPostId(post.getPostId())
+                        post.getUpdatedAt()
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     // 내가 작성한 글 조회하기
-    public List<PostResponseDto> myPostList(String token) {
+    public List<PostListResponseDto> myPostList(String token) {
         Long userId = findUserIdByJwt(token);
 
         Users findUser = findUserObject(userId);
@@ -133,17 +127,22 @@ public class PostService {
         List<Post> findUserPosts = postRepository.findByUsers(findUser);
 
         return findUserPosts.stream()
-                .map(post -> PostResponseDto.builder()
-                        .boardId(post.getPostId())
-                        .title(post.getTitle())
-                        .createdAt(post.getCreatedAt())
-                        .updatedAt(post.getUpdatedAt())
-                        .build())
-                .collect(Collectors.toList());
+                .map(post -> new PostListResponseDto(
+                        post.getPostId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getUsers().getNickname(),
+                        post.getCategory().name(),
+                        postMediaService.getPostMediaDetail(post),
+                        post.getViews(),
+                        post.getLikes().size(),
+                        post.getCreatedAt(),
+                        post.getUpdatedAt()
+                )).collect(Collectors.toList());
     }
 
     // 좋아요한 글 조회하기
-    public List<PostResponseDto> pushLikePost(String token) {
+    public List<PostListResponseDto> pushLikePost(String token) {
         Long userId = findUserIdByJwt(token);
 
         Users findUser = findUserObject(userId);
@@ -161,8 +160,18 @@ public class PostService {
 
         // Post 엔티티를 PostResponseDto 로 변환하여 반환
         return posts.stream()
-                .map(post -> new PostResponseDto(post.getPostId(), post.getTitle(), post.getCreatedAt(), post.getUpdatedAt()))
-                .collect(Collectors.toList());
+                .map(post -> new PostListResponseDto(
+                        post.getPostId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getUsers().getNickname(),
+                        post.getCategory().name(),
+                        postMediaService.getPostMediaDetail(post),
+                        post.getViews(),
+                        post.getLikes().size(),
+                        post.getCreatedAt(),
+                        post.getUpdatedAt()
+                )).collect(Collectors.toList());
     }
 
     // 게시글 작성하기

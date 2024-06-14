@@ -3,7 +3,7 @@ package cocodas.prier.board.post;
 import cocodas.prier.board.post.post.request.PostRequestDto;
 import cocodas.prier.board.post.post.PostService;
 import cocodas.prier.board.post.post.response.PostDetailResponseDto;
-import cocodas.prier.board.post.post.response.PostResponseDto;
+import cocodas.prier.board.post.post.response.PostListResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,9 +21,9 @@ public class PostController {
     private final PostService postService;
 
     // 모든 게시글 조회하기 & 검색 키워드 게시글 조회하기
-    @GetMapping("/boards")
+    @GetMapping("/posts")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponseDto> allOrSearchPosts(@RequestParam(name = "search", required = false) String keyword) {
+    public List<PostListResponseDto> allOrSearchPosts(@RequestParam(name = "search", required = false) String keyword) {
         if (keyword == null || keyword.isEmpty()) {
             return postService.allPostList();
         } else {
@@ -31,37 +31,31 @@ public class PostController {
         }
     }
 
-    @GetMapping("/boards/{postId}")
+    // 특정 게시글 조회하기
+    @GetMapping("/posts/{postId}")
     @ResponseStatus(HttpStatus.OK)
-    public PostDetailResponseDto getPostByPostId(@PathVariable Long postId) {
+    public PostDetailResponseDto getPostByPostId(@PathVariable(name = "postId") Long postId) {
         return postService.findByPostId(postId);
     }
 
-    // 카테고리에 맞춰 조회하기
-    @GetMapping("/boards/category/{category}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<PostDetailResponseDto> categorySearch(@PathVariable(name = "category") String category) {
-        return postService.categorySearch(category);
-    }
-
     // 내가 작성한 게시글 모두 조회하기
-    @GetMapping("/boards/my")
+    @GetMapping("/posts/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponseDto> myPostList(@RequestHeader("Authorization") String authorizationHeader) {
+    public List<PostListResponseDto> myPostList(@RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "");
         return postService.myPostList(token);
     }
 
     // 내가 좋아요 누른 게시글 모두 조회하기
-    @GetMapping("/boards/like/my")
+    @GetMapping("/posts/like/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostResponseDto> pushLikePost(@RequestHeader("Authorization") String authorizationHeader) {
+    public List<PostListResponseDto> pushLikePost(@RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "");
         return postService.pushLikePost(token);
     }
 
     // 게시글 작성하기
-    @PostMapping("/boards")
+    @PostMapping("/posts")
     @ResponseStatus(HttpStatus.CREATED)
     public void addPost(@RequestHeader("Authorization") String authorizationHeader,
                         @RequestPart("dto") PostRequestDto postRequestDto,
@@ -71,7 +65,7 @@ public class PostController {
     }
 
     // 게시글 수정하기
-    @PutMapping("/boards/{postId}")
+    @PutMapping("/posts/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public void updatePost(@RequestHeader("Authorization") String authorizationHeader,
                            @RequestPart("dto") PostRequestDto postRequestDto,
@@ -82,7 +76,7 @@ public class PostController {
     }
 
     // 게시글 삭제하기
-    @DeleteMapping("/boards/{postId}")
+    @DeleteMapping("/posts/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public void deletePost(@RequestHeader("Authorization") String authorizationHeader,
                            @PathVariable(name = "postId") Long postId) {

@@ -9,8 +9,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class PostDetailResponseDto {
-    private Long userId;
+public class PostListResponseDto {
     private Long postId;
     private String title;
     private String content;
@@ -21,5 +20,4 @@ public class PostDetailResponseDto {
     private int likes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<PostCommentListResponseDto> comments;
 }
