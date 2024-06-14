@@ -61,6 +61,7 @@ public class PostCommentService {
                 .stream()
                 .map(comment -> new PostCommentListResponseDto(
                         comment.getUsers().getUserId(),
+                        comment.getCommentId(),
                         comment.getContent(),
                         comment.getCreatedAt(),
                         comment.getUpdatedAt()
