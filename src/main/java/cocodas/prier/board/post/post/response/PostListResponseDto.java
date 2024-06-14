@@ -11,10 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 public class PostListResponseDto {
     private Long postId;
+    private Long userId;
     private String title;
     private String content;
     private String nickname;
     private String category;
+    private Boolean isLikedByMe;
     private List<PostMediaDto> media;
     private int views;
     private int likes;

@@ -51,17 +51,19 @@ public class PostService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id" + userId));
     }
 
-    //
+    // 전체 게시글 조회하기
+    public List<PostListResponseDto> allPostList(String token) {
+        Long userId = findUserIdByJwt(token);
 
-    // 게시글 조회하기
-    public List<PostListResponseDto> allPostList() {
         return postRepository.findAll().stream()
                 .map(post -> new PostListResponseDto(
                         post.getPostId(),
+                        post.getUsers().getUserId(),
                         post.getTitle(),
                         post.getContent(),
                         post.getUsers().getNickname(),
                         post.getCategory().name(),
+                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
                         postMediaService.getPostMediaDetail(post),
                         post.getViews(),
                         post.getLikes().size(),
@@ -94,7 +96,8 @@ public class PostService {
     }
 
     // 검색어에 맞춰 게시글 조회하기
-    public List<PostListResponseDto> searchPostsByKeyword(String keyword) {
+    public List<PostListResponseDto> searchPostsByKeyword(String token, String keyword) {
+        Long userId = findUserIdByJwt(token);
         List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
         List<Post> postsByContent = postRepository.findByContentContaining(keyword);
 
@@ -105,10 +108,12 @@ public class PostService {
         return combinedPosts.stream()
                 .map(post -> new PostListResponseDto(
                         post.getPostId(),
+                        post.getUsers().getUserId(),
                         post.getTitle(),
                         post.getContent(),
                         post.getUsers().getNickname(),
                         post.getCategory().name(),
+                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
                         postMediaService.getPostMediaDetail(post),
                         post.getViews(),
                         post.getLikes().size(),
@@ -129,10 +134,12 @@ public class PostService {
         return findUserPosts.stream()
                 .map(post -> new PostListResponseDto(
                         post.getPostId(),
+                        post.getUsers().getUserId(),
                         post.getTitle(),
                         post.getContent(),
                         post.getUsers().getNickname(),
                         post.getCategory().name(),
+                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
                         postMediaService.getPostMediaDetail(post),
                         post.getViews(),
                         post.getLikes().size(),
@@ -162,10 +169,12 @@ public class PostService {
         return posts.stream()
                 .map(post -> new PostListResponseDto(
                         post.getPostId(),
+                        post.getUsers().getUserId(),
                         post.getTitle(),
                         post.getContent(),
                         post.getUsers().getNickname(),
                         post.getCategory().name(),
+                        post.getLikes().stream().anyMatch(l -> l.getUsers().getUserId().equals(userId)),
                         postMediaService.getPostMediaDetail(post),
                         post.getViews(),
                         post.getLikes().size(),
