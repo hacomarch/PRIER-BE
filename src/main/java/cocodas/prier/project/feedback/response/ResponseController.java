@@ -1,5 +1,6 @@
 package cocodas.prier.project.feedback.response;
 
+import cocodas.prier.project.feedback.response.dto.UserResponseProjectDto;
 import cocodas.prier.project.feedback.response.dto.ResponseDto;
 import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -26,7 +28,7 @@ public class ResponseController {
         return auth.substring(7);
     }
 
-    // 응답 생성
+    // 응답 등록하기
     @PostMapping("/{projectId}/responses")
     public ResponseEntity<List<ResponseDto>> createResponses(@PathVariable Long projectId,
                                                              @RequestBody List<ResponseRequestDto> responsesDto,
@@ -37,14 +39,6 @@ public class ResponseController {
         Long userId = Long.valueOf(authentication.getName());
         List<ResponseDto> createdResponses = responseService.createResponses(userId, responsesDto);
         return ResponseEntity.ok(createdResponses);
-    }
-
-    // 질문별 응답 조회
-    @GetMapping("/{projectId}/{questionId}/responses")
-    public ResponseEntity<List<ResponseDto>> getResponsesByQuestion(@PathVariable Long projectId,
-                                                                    @PathVariable Long questionId) {
-        List<ResponseDto> responses = responseService.getResponsesByQuestion(questionId);
-        return ResponseEntity.ok(responses);
     }
 
     // 프로젝트별 응답 조회
@@ -62,6 +56,18 @@ public class ResponseController {
                                                                   Authentication authentication) {
         Long userId = Long.valueOf(authentication.getName());
         responseService.deleteResponses(projectId, userId);
-        return ResponseEntity.ok("프로젝트 ID " + projectId + "에 대한 유저 ID " + userId + " 의 응답 삭제 완료");
+        return ResponseEntity.ok("Responses for project ID " + projectId + " by user ID " + userId + " have been deleted.");
     }
+
+    // 자신이 응답을 남긴 프로젝트 목록 조회
+    @GetMapping("/my-feedbacks")
+    public ResponseEntity<List<UserResponseProjectDto>> getProjectsByUser(Authentication authentication) {
+        Long userId = Long.valueOf(authentication.getName());
+        List<Long> projectIds = responseService.getProjectsByUser(userId);
+        List<UserResponseProjectDto> projectDtos = projectIds.stream()
+                .map(projectId -> UserResponseProjectDto.builder().projectId(projectId).build())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(projectDtos);
+    }
+
 }
