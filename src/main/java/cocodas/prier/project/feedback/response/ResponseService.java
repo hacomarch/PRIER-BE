@@ -83,6 +83,11 @@ public class ResponseService {
         responseRepository.deleteAll(responses);
     }
 
+    public List<Long> getProjectsByUser(Long userId) {
+        List<Long> projectIds = responseRepository.findDistinctProjectIdsByUserId(userId);
+        return projectIds;
+    }
+
     private ResponseDto mapToDto(Response response) {
         return ResponseDto.builder()
                 .responseId(response.getResponseId())
