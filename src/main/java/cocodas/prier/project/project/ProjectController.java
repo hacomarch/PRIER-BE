@@ -41,7 +41,7 @@ public class ProjectController {
                                                 @RequestHeader("Authorization") String auth) {
 
         String token = getToken(auth);
-        Long result = projectService.createProject(form, mainImage, contentImages, token);
+        Long result = projectService.handleCreateProject(form, mainImage, contentImages, token);
         return ResponseEntity.ok(result);
     }
 
@@ -58,8 +58,8 @@ public class ProjectController {
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProject(@PathVariable Long projectId,
                                                 @RequestPart("form") ProjectForm form,
-                                                @RequestParam("mainImage") MultipartFile mainImage,
-                                                @RequestParam("contentImages") MultipartFile[] contentImages,
+                                                @RequestParam(name = "mainImage", required = false) MultipartFile mainImage,
+                                                @RequestParam(value = "contentImages", required = false) MultipartFile[] contentImages,
                                                 @RequestHeader("Authorization") String auth) {
         String token = getToken(auth);
         String result = projectService.updateProject(projectId, form, mainImage, contentImages, token);
