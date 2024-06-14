@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/boards/{boardId}/comment")
+@RequestMapping("/api/posts/{postId}/comment")
 public class PostCommentController {
     private final PostCommentService postCommentService;
 
@@ -19,16 +19,16 @@ public class PostCommentController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createComment(@RequestHeader("Authorization") String auth,
                               @RequestBody PostCommentRequestDto dto,
-                              @PathVariable Long boardId) {
+                              @PathVariable(name = "postId") Long postId) {
         String token = getToken(auth);
-        postCommentService.savePostComment(token, boardId, dto);
+        postCommentService.savePostComment(token, postId, dto);
     }
 
     @PutMapping("/{commentId}")
     @ResponseStatus(HttpStatus.OK)
     public void updateComment(@RequestHeader("Authorization") String auth,
                               @RequestBody PostCommentRequestDto dto,
-                              @PathVariable Long commentId) {
+                              @PathVariable(name = "commentId") Long commentId) {
         String token = getToken(auth);
         postCommentService.updatePostComment(token, commentId, dto);
     }
@@ -36,14 +36,14 @@ public class PostCommentController {
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteComment(@RequestHeader("Authorization") String auth,
-                              @PathVariable Long commentId) {
+                              @PathVariable(name = "commentId") Long commentId) {
         String token = getToken(auth);
         postCommentService.deletePostComment(token, commentId);
     }
 
     @GetMapping
-    public ResponseEntity<List<PostCommentListResponseDto>> findByPostId(@PathVariable Long boardId) {
-        return ResponseEntity.ok().body(postCommentService.findPostCommentByPostId(boardId));
+    public ResponseEntity<List<PostCommentListResponseDto>> findByPostId(@PathVariable(name = "postId") Long postId) {
+        return ResponseEntity.ok().body(postCommentService.findPostCommentByPostId(postId));
     }
 
     private String getToken(String auth) {
