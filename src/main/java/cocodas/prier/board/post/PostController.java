@@ -23,11 +23,13 @@ public class PostController {
     // 모든 게시글 조회하기 & 검색 키워드 게시글 조회하기
     @GetMapping("/posts")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostListResponseDto> allOrSearchPosts(@RequestParam(name = "search", required = false) String keyword) {
+    public List<PostListResponseDto> allOrSearchPosts(@RequestHeader("Authorization") String authorizationHeader,
+                                                      @RequestParam(name = "search", required = false) String keyword) {
+        String token = authorizationHeader.replace("Bearer ", "");
         if (keyword == null || keyword.isEmpty()) {
-            return postService.allPostList();
+            return postService.allPostList(token);
         } else {
-            return postService.searchPostsByKeyword(keyword);
+            return postService.searchPostsByKeyword(token, keyword);
         }
     }
 

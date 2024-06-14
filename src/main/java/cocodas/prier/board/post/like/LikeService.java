@@ -43,7 +43,6 @@ public class LikeService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with id" + postId));
     }
 
-    // 좋아요 누르기
     @Transactional
     // 좋아요 누르기
     public void pushLike(String token, Long postId) {
@@ -66,6 +65,9 @@ public class LikeService {
                     .post(findPost)
                     .build();
             likeRepository.save(like);
+        } else {
+            Likes cancelLike = likeRepository.findByPostAndUsers(findPost, findUser);
+            likeRepository.delete(cancelLike);
         }
     }
 }
