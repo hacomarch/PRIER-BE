@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostCommentListResponseDto {
     private Long userId;
+    private Long commentId;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
