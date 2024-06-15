@@ -1,5 +1,6 @@
 package cocodas.prier.project.project;
 
+import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.feedback.response.dto.ResponseDto;
 import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
 import cocodas.prier.project.feedback.response.ResponseService;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final QuestionService questionService;
 
     private static String getToken(String auth) {
         if (auth == null || !auth.startsWith("Bearer ")) {
@@ -55,6 +57,7 @@ public class ProjectController {
         return ResponseEntity.ok(result);
     }
 
+    //질문은 수정 못하게 프론트에서 막아줘야함.
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProject(@PathVariable Long projectId,
                                                 @RequestPart("form") ProjectForm form,

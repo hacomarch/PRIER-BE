@@ -190,9 +190,9 @@ public class ProjectService {
         }
 
         // 질문 업데이트
-        if (projectForm.getQuestion() != null && projectForm.getType() != null) {
-            questionService.updateQuestions(project, projectForm.getQuestion(), projectForm.getType());
-        }
+//        if (projectForm.getQuestion() != null && projectForm.getType() != null) {
+//            questionService.updateQuestions(project, projectForm.getQuestion(), projectForm.getType());
+//        }
 
         // 미디어 파일 업데이트
         try {
@@ -366,12 +366,12 @@ public class ProjectService {
     //프로젝트 댓글 수, 프로젝트 피드백 수, 이 둘의 합 이렇게 3개 반환
     public int[] getFeedbackAmount(Project project) {
         List<Question> feedbackQuestions = project.getFeedbackQuestions();
-        AtomicInteger minValue = new AtomicInteger(Integer.MAX_VALUE);
+        AtomicInteger maxValue = new AtomicInteger(Integer.MIN_VALUE);
         feedbackQuestions.forEach(q -> {
-            if (minValue.get() > q.getResponses().size()) {
-                minValue.set(q.getResponses().size());
+            if (maxValue.get() < q.getResponses().size()) {
+                maxValue.set(q.getResponses().size());
             }
         });
-        return new int[]{project.getProjectComments().size(), minValue.get(), project.getProjectComments().size() + minValue.get()};
+        return new int[]{project.getProjectComments().size(), maxValue.get(), project.getProjectComments().size() + maxValue.get()};
     }
 }
