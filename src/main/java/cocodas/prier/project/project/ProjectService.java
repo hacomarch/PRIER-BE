@@ -76,6 +76,7 @@ public class ProjectService {
         return user;
     }
 
+    @Transactional
     public Long handleCreateProject(ProjectForm form, MultipartFile mainImage, MultipartFile[] contentImages, String token) {
         try {
             validateProjectForm(form);
