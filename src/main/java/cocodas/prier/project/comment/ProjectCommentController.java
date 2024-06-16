@@ -59,9 +59,11 @@ public class ProjectCommentController {
     }
 
     @GetMapping("/{projectId}/comment")
-    public List<CommentDto> getProjectComments(@PathVariable Long projectId) {
+    public List<CommentDto> getProjectComments(@PathVariable Long projectId,
+                                               @RequestHeader("Authorization") String auth) {
 
-        return projectCommentService.getProjectComments(projectId);
+        String token = getToken(auth);
+        return projectCommentService.getProjectComments(projectId, token);
     }
 
     @GetMapping("/comment/my-comments")

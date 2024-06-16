@@ -77,7 +77,9 @@ public class ProjectCommentService {
         return "댓글 삭제 성공";
     }
 
-    public List<CommentDto> getProjectComments(Long projectId) {
+    public List<CommentDto> getProjectComments(Long projectId, String token) {
+        Users user = getUsersByToken(token);
+
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
 
@@ -87,7 +89,8 @@ public class ProjectCommentService {
                         comment.getCommentId(),
                         comment.getUsers().getNickname(),
                         comment.getContent(),
-                        comment.getScore())).collect(Collectors.toList());
+                        comment.getScore(),
+                        comment.getUsers().equals(user))).collect(Collectors.toList());
     }
 
     public List<MyPageCommentDto> getMyProjectComments(String token) {

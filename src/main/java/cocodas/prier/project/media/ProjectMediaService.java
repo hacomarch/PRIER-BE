@@ -49,7 +49,7 @@ public class ProjectMediaService {
         //s3Key == null 일 경우 기본 이미지
         if (file == null || file.isEmpty()) {
             ProjectMedia projectMedia = ProjectMedia.builder()
-                    .metadata("defaultImage")
+                    .metadata("defaultImage.jpeg")
                     .isMain(isMain)
                     .s3Key(null)
                     .orderIndex(order) // 순서 설정

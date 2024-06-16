@@ -11,5 +11,13 @@ public class CommentDto {
     private String userName;
     private String content;
     private Float score;
+    private Boolean isMine = false;
 
+
+    public CommentDto(Long commentId, String userName, String content, Float score) {
+        this.commentId = commentId;
+        this.userName = userName;
+        this.content = content;
+        this.score = score;
+    }
 }
