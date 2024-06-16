@@ -21,5 +21,6 @@ public class ProjectForm {
     private String teamMate;
     private String link;
     private String[] question;
+    private Long[] questionId = null;
     private String[] type;
 }
