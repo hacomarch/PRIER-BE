@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -191,9 +190,9 @@ public class ProjectService {
         }
 
         // 질문 업데이트
-//        if (projectForm.getQuestion() != null && projectForm.getType() != null) {
-//            questionService.updateQuestions(project, projectForm.getQuestion(), projectForm.getType());
-//        }
+        if (projectForm.getQuestion() != null && projectForm.getType() != null) {
+            questionService.updateQuestions(project, projectForm.getQuestion(), projectForm.getQuestionId(), projectForm.getType());
+        }
 
         // 미디어 파일 업데이트
         try {
@@ -349,6 +348,7 @@ public class ProjectService {
         }
 
         pointTransactionService.deductPoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
+        project.addFeedbackEndAt(weeks);
 
         log.info(user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료");
         return user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료";

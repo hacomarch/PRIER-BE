@@ -147,6 +147,10 @@ public class Project {
         this.teamMate = teamMate;
     }
 
+    public void setFeedbackQuestions(List<Question> feedbackQuestions) {
+        this.feedbackQuestions = feedbackQuestions;
+    }
+
     public void updateScore(Float score) {
         this.score += score;
     }

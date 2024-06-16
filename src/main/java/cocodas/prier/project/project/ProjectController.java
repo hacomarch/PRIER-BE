@@ -1,9 +1,6 @@
 package cocodas.prier.project.project;
 
 import cocodas.prier.project.feedback.question.QuestionService;
-import cocodas.prier.project.feedback.response.dto.ResponseDto;
-import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
-import cocodas.prier.project.feedback.response.ResponseService;
 import cocodas.prier.project.project.dto.MyPageProjectDto;
 import cocodas.prier.project.project.dto.ProjectDetailDto;
 import cocodas.prier.project.project.dto.ProjectDto;
@@ -16,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Slf4j
 @RestController
