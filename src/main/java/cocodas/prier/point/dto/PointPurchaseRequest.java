@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class PointPurchaseRequest {
     private Long productId;
-    private Long userId;
 }
