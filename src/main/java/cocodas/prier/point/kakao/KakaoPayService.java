@@ -1,5 +1,7 @@
 package cocodas.prier.point.kakao;
 
+import cocodas.prier.point.PointTransactionService;
+import cocodas.prier.point.TransactionType;
 import cocodas.prier.point.kakao.request.MakePayRequest;
 import cocodas.prier.point.kakao.request.PayRequest;
 import cocodas.prier.point.kakao.response.PayApproveResDto;
@@ -28,6 +30,7 @@ public class KakaoPayService {
     private final UserRepository userRepository;
     private final KakaoPayRepository kakaoPayRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PointTransactionService pointTransactionService;
 
     @Value("${kakao.admin-key}")
     private String adminKey;
@@ -95,7 +98,7 @@ public class KakaoPayService {
 
         log.info("결과: " + payApproveResDto.toString());
 
-        //todo : 사용자 포인트 올려주는거 추가해야함
+        pointTransactionService.increasePoints(user, payApproveResDto.getAmount().getTotal() / 10, TransactionType.POINT_CHARGE);
 
         return payApproveResDto;
     }
