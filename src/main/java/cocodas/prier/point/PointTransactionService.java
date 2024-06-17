@@ -7,6 +7,8 @@ import cocodas.prier.user.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PointTransactionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PointTransactionService.class);
 
     private final PointTransactionRepository pointTransactionRepository;
     private final UserRepository userRepository;
@@ -27,7 +31,7 @@ public class PointTransactionService {
     // 현재 포인트 조회
     public Integer getCurrentPoints(Long userId) {
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저 조회 불가: " + userId));
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
         return user.getBalance();
     }
 
@@ -41,16 +45,23 @@ public class PointTransactionService {
     // 포인트 증가
     @Transactional
     public PointTransactionDTO increasePoints(Users user, Integer amount, TransactionType transactionType) {
-        return processTransaction(user, amount, transactionType);
+        logger.info("Increasing points for user {} by {} points", user.getUserId(), amount);
+        PointTransactionDTO result = processTransaction(user, amount, transactionType);
+        logger.info("Points increased for user {}: new balance is {}", user.getUserId(), user.getBalance());
+        return result;
     }
 
     // 포인트 감소
     @Transactional
     public PointTransactionDTO decreasePoints(Users user, Integer amount, TransactionType transactionType) {
         if (user.getBalance() < amount) {
-            throw new IllegalArgumentException("포인트가 부족합니다.");
+            logger.warn("Attempt to deduct {} points from user {} failed due to insufficient balance", amount, user.getUserId());
+            throw new IllegalArgumentException("Insufficient points.");
         }
-        return processTransaction(user, -amount, transactionType);
+        logger.info("Decreasing points for user {} by {} points", user.getUserId(), amount);
+        PointTransactionDTO result = processTransaction(user, -amount, transactionType);
+        logger.info("Points decreased for user {}: new balance is {}", user.getUserId(), user.getBalance());
+        return result;
     }
 
     private PointTransactionDTO processTransaction(Users user, Integer amount, TransactionType transactionType) {
@@ -66,6 +77,9 @@ public class PointTransactionService {
 
         userRepository.save(user);
         pointTransactionRepository.save(transaction);
+
+        logger.info("Processed transaction for user {}: amount={}, transactionType={}, new balance={}",
+                user.getUserId(), amount, transactionType, user.getBalance());
 
         return PointTransactionMapper.toDto(transaction);
     }
