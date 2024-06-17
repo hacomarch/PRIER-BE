@@ -59,7 +59,6 @@ public class PointTransactionService {
         throw new IllegalArgumentException("유효하지 않은 트랜잭션 타입입니다.");
     }
 
-    // 감소는 quest 하면서 다시 해야할듯 (수정안함)
     @Transactional
     public PointTransactionDTO deductPoints(Users user, Integer amount, TransactionType transactionType) {
         if (user.getBalance() < amount) {
