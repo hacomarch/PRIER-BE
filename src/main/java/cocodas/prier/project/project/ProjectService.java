@@ -387,7 +387,7 @@ public class ProjectService {
             return "잘못된 사용자, 요청 실패";
         }
 
-        pointTransactionService.deductPoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
+        pointTransactionService.decreasePoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
         project.addFeedbackEndAt(weeks);
 
         log.info(user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료");
