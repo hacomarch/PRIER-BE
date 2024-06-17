@@ -5,5 +5,6 @@ import lombok.Data;
 
 @Data
 public class PointRequest {
-    private TransactionType transactionType;
+    private Long userId;
+    private Integer amount;
 }
