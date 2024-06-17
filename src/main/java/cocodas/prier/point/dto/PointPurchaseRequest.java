@@ -1,10 +1,11 @@
 package cocodas.prier.point.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
-public class PointPurchaseRequest {
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class PointPurchaseRequest extends PointRequest {
     private Long productId;
 }
