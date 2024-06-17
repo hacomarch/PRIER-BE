@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final QuestionService questionService;
 
     private static String getToken(String auth) {
         if (auth == null || !auth.startsWith("Bearer ")) {
@@ -68,10 +68,16 @@ public class ProjectController {
     public ResponseEntity<ProjectDetailDto> getProjectDetail(@PathVariable Long projectId,
                                                              @RequestHeader("Authorization") String auth) {
 
-        String token = getToken(auth);
-        ProjectDetailDto result = projectService.getProjectDetail(projectId, token);
+        try {
+            String token = getToken(auth);
+            ProjectDetailDto result = projectService.getProjectDetail(projectId, token);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
-        return ResponseEntity.ok(result);
+
+
     }
 
     @GetMapping
