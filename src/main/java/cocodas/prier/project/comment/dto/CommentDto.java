@@ -15,11 +15,11 @@ public class CommentDto {
     private Boolean isMine = false;
 
 
-    public CommentDto(Long commentId, Long userId, String userName, String content, Float score) {
-        this.commentId = commentId;
-        this.userId = userId;
-        this.userName = userName;
-        this.content = content;
-        this.score = score;
-    }
+//    public CommentDto(Long commentId, Long userId, String userName, String content, Float score) {
+//        this.commentId = commentId;
+//        this.userId = userId;
+//        this.userName = userName;
+//        this.content = content;
+//        this.score = score;
+//    }
 }

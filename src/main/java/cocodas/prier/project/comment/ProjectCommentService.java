@@ -35,7 +35,6 @@ public class ProjectCommentService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
     }
 
-    //todo: 퀘스트랑 연결해야할 것 같음
     @Transactional
     public CommentDto createProjectComment(Long projectId, CommentForm form, String token) {
         Project project = projectRepository.findById(projectId)
@@ -56,7 +55,12 @@ public class ProjectCommentService {
         project.getProjectComments().add(comment);
         project.updateScore(form.getScore());
         log.info("댓글 등록 성공");
-        return new CommentDto(comment.getCommentId(), comment.getUsers().getUserId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore());
+        return new CommentDto(comment.getCommentId(),
+                comment.getUsers().getUserId(),
+                comment.getUsers().getNickname(),
+                comment.getContent(),
+                comment.getScore(),
+                true);
     }
 
     @Transactional
@@ -107,7 +111,8 @@ public class ProjectCommentService {
                 comment.getProject().getTitle(),
                 comment.getProject().getTeamName(),
                 comment.getContent(),
-                comment.getScore())).collect(Collectors.toList());
+                comment.getScore()
+                )).collect(Collectors.toList());
     }
 
     @Transactional
@@ -136,6 +141,6 @@ public class ProjectCommentService {
         comment.setUpdatedAt(LocalDateTime.now());
 
         log.info("댓글 수정 완료");
-        return new CommentDto(comment.getCommentId(), comment.getUsers().getUserId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore());
+        return new CommentDto(comment.getCommentId(), comment.getUsers().getUserId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore(), true);
     }
 }
