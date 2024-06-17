@@ -40,6 +40,7 @@ public class PointTransactionService {
     }
 
     // 포인트 충전 (POINT_CHARGE)
+    @Transactional
     public PointTransactionDTO rechargePoints(PointRechargeRequest request, Long userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 조회 불가: " + userId));
