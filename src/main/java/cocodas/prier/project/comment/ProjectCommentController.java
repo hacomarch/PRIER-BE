@@ -66,9 +66,9 @@ public class ProjectCommentController {
         return projectCommentService.getProjectComments(projectId, token);
     }
 
-    @GetMapping("/comment/my-comments")
-    public List<MyPageCommentDto> getMyProjectComments(@RequestHeader("Authorization") String auth) {
-        String token = getToken(auth);
-        return projectCommentService.getMyProjectComments(token);
+    @GetMapping("/comments")
+    public List<MyPageCommentDto> getMyProjectComments(@RequestHeader("Authorization") String auth,
+                                                       @RequestParam("userId") Long userId) {
+        return projectCommentService.getProjectComments(userId);
     }
 }

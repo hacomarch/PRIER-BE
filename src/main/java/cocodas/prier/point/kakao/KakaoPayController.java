@@ -24,7 +24,7 @@ public class KakaoPayController {
         return auth.substring(7);
     }
 
-    @GetMapping("/ready")
+    @PostMapping("/ready")
     public ResponseEntity<?> getRedirectUrl(@RequestBody PayInfoDto payInfoDto,
                                             @RequestHeader("Authorization") String auth) {
 

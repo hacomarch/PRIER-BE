@@ -5,10 +5,7 @@ import cocodas.prier.point.TransactionType;
 import cocodas.prier.project.feedback.question.Question;
 import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.media.ProjectMediaService;
-import cocodas.prier.project.project.dto.MyPageProjectDto;
-import cocodas.prier.project.project.dto.ProjectDetailDto;
-import cocodas.prier.project.project.dto.ProjectForm;
-import cocodas.prier.project.project.dto.ProjectDto;
+import cocodas.prier.project.project.dto.*;
 import cocodas.prier.project.tag.projecttag.ProjectTagService;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
@@ -250,6 +247,21 @@ public class ProjectService {
         );
     }
 
+    // 피드백 상세보기에서 필요한 프로젝트 정보들 (마지막에 feedbackAmount는 프로젝트 댓글 수, 프로젝트 피드백 수, 이 둘의 합 이렇게 3개 반환)
+    public ProjectDetailForFeedbackPageDto getFeedbackPageDetail(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+
+        return new ProjectDetailForFeedbackPageDto(
+                projectId,
+                project.getTitle(),
+                project.getTeamName(),
+                project.getIntroduce(),
+                projectMediaService.getProjectDetailMedia(project).get(0),
+                project.getGoal(),
+                project.getLink(),
+                getFeedbackAmount(project));
+    }
 
 
     public Page<ProjectDto> getAllProjects(Integer filter, Pageable pageable) {
@@ -257,7 +269,7 @@ public class ProjectService {
 
         if (filter != null) {
             if (filter == 0) { // 인기순
-                sort = Sort.by("score").descending(); // score는 가정에 따라 수정 필요
+                sort = Sort.by("score").descending();
             } else if (filter == 1) { // 등록순
                 sort = Sort.by("createdAt").ascending();
             }
@@ -348,9 +360,10 @@ public class ProjectService {
         ));
     }
 
-    // 나의 최근 프로젝트 & 피드백 조회
-    public MyPageProjectDto getMyRecentProject(String token) {
-        Users user = getUsersByToken(token);
+    // %% 마이페이지 최근 프로젝트 & 피드백 개수 조회
+    public MyPageProjectDto getRecentProject(Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
 
         Project project = projectRepository.findMyRecentProject(user)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
@@ -387,7 +400,7 @@ public class ProjectService {
             return "잘못된 사용자, 요청 실패";
         }
 
-        pointTransactionService.deductPoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
+        pointTransactionService.decreasePoints(user, weeks * 250, TransactionType.FEEDBACK_EXTENSION);
         project.addFeedbackEndAt(weeks);
 
         log.info(user.getNickname() + " " + weeks * 250 + "포인트 차감 완료 " + weeks + "주 연장 완료");
