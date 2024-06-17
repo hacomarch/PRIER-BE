@@ -3,6 +3,7 @@ package cocodas.prier.point;
 import cocodas.prier.point.dto.PointRechargeRequest;
 import cocodas.prier.point.dto.PointTransactionDTO;
 import cocodas.prier.point.dto.PointTransactionMapper;
+import cocodas.prier.point.dto.PointRequest;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +40,26 @@ public class PointTransactionService {
                 .collect(Collectors.toList());
     }
 
-    // 포인트 충전 (POINT_CHARGE)
+    // 포인트 증가 트랜잭션 처리 (POINT_PURCHASE, QUEST_REWARD)
     @Transactional
-    public PointTransactionDTO rechargePoints(PointRechargeRequest request, Long userId) {
+    public PointTransactionDTO processPointIncreaseTransaction(PointRequest request, Long userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 조회 불가: " + userId));
 
-        return processTransaction(user, request.getAmount(), TransactionType.POINT_CHARGE);
+        Integer amount;
+        TransactionType transactionType = request.getTransactionType();
+
+        if (request instanceof PointRechargeRequest) {
+            amount = ((PointRechargeRequest) request).getAmount();
+            if (transactionType == TransactionType.POINT_CHARGE || transactionType == TransactionType.QUEST_REWARD) {
+                return processTransaction(user, amount, transactionType);
+            }
+        }
+
+        throw new IllegalArgumentException("유효하지 않은 트랜잭션 타입입니다.");
     }
 
-    // 포인트 차감 (PRODUCT_PURCHASE, FEEDBACK_EXTENSION)
+    // 감소는 quest 하면서 다시 해야할듯 (수정안함)
     @Transactional
     public PointTransactionDTO deductPoints(Users user, Integer amount, TransactionType transactionType) {
         if (user.getBalance() < amount) {

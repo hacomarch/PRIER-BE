@@ -43,7 +43,7 @@ public class PointTransactionController {
     public PointTransactionDTO rechargePoints(@RequestHeader("Authorization") String auth, @RequestBody PointRechargeRequest request) {
         String token = getToken(auth);
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
-        return pointTransactionService.rechargePoints(request, userId);
+        return pointTransactionService.processPointIncreaseTransaction(request, userId);
     }
 
 }
