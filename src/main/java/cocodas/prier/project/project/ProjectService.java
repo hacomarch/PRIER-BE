@@ -274,6 +274,7 @@ public class ProjectService {
         ));
     }
 
+    // 나의 프로젝트 조회
     public Page<ProjectDto> getMyProjects(String token, int filter, int page) {
         Users user = getUsersByToken(token);
 
@@ -309,6 +310,45 @@ public class ProjectService {
         ));
     }
 
+    // 유저 프로젝트 조회
+    public Page<ProjectDto> getUserProjects(Long userId, int filter, Pageable pageable) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
+
+        Specification<Project> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("users"), user));  // 사용자 기반 필터
+
+            // 진행 중인 프로젝트 필터링
+            if (filter == 2) {
+                predicates.add(cb.equal(root.get("status"), ProjectStatus.DEVELOPING));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Sort sort;
+        if (filter == 1) {  // 등록순 (오래된 순)
+            sort = Sort.by("createdAt").ascending();
+        } else {  // 기본 필터 및 진행 중인 프로젝트 필터: 최신순
+            sort = Sort.by("createdAt").descending();
+        }
+
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        Page<Project> projects = projectRepository.findAll(spec, sortedPageable);
+
+        return projects.map(project -> new ProjectDto(
+                project.getProjectId(),
+                project.getTitle(),
+                project.getTeamName(),
+                projectMediaService.getMainImageUrl(project),
+                projectTagService.getProjectTags(project),
+                calculateScore(project)
+        ));
+    }
+
+    // 나의 최근 프로젝트 & 피드백 조회
     public MyPageProjectDto getMyRecentProject(String token) {
         Users user = getUsersByToken(token);
 
