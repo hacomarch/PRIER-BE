@@ -1,6 +1,5 @@
 package cocodas.prier.project.feedback.response;
 
-import cocodas.prier.keywords.Keywords;
 import cocodas.prier.project.feedback.question.Question;
 import cocodas.prier.user.Users;
 import jakarta.persistence.*;
@@ -9,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -29,9 +26,6 @@ public class Response {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users users;
-
-    @OneToMany(mappedBy = "response", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Keywords> keywords = new ArrayList<>();
 
     @Builder
     public Response(String content, LocalDateTime createdAt,Question question, Users user) {
