@@ -1,6 +1,5 @@
 package cocodas.prier.point;
 
-import cocodas.prier.point.dto.PointRechargeRequest;
 import cocodas.prier.point.dto.PointTransactionDTO;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +36,6 @@ public class PointTransactionController {
         String token = getToken(auth);
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
         return pointTransactionService.getPointHistory(userId);
-    }
-
-    @PostMapping("/recharge")
-    public PointTransactionDTO rechargePoints(@RequestHeader("Authorization") String auth, @RequestBody PointRechargeRequest request) {
-        String token = getToken(auth);
-        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
-        return pointTransactionService.processPointIncreaseTransaction(request, userId);
     }
 
 }
