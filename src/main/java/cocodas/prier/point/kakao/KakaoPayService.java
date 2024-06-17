@@ -72,7 +72,6 @@ public class KakaoPayService {
     @Transactional
     public PayApproveResDto getApprove(String pgToken, Long id) throws Exception {
 
-        log.info("여긴 오니?");
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
         log.info("유저 정보: " + user.getNickname());
@@ -94,7 +93,9 @@ public class KakaoPayService {
         RestTemplate restTemplate = new RestTemplate();
         PayApproveResDto payApproveResDto = restTemplate.postForObject(payRequest.getUrl(), requestEntity, PayApproveResDto.class);
 
-        log.info(payApproveResDto.toString());
+        log.info("결과: " + payApproveResDto.toString());
+
+        //todo : 사용자 포인트 올려주는거 추가해야함
 
         return payApproveResDto;
     }

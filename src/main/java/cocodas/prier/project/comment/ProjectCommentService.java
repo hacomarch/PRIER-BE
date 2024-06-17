@@ -56,7 +56,7 @@ public class ProjectCommentService {
         project.getProjectComments().add(comment);
         project.updateScore(form.getScore());
         log.info("댓글 등록 성공");
-        return new CommentDto(comment.getCommentId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore());
+        return new CommentDto(comment.getCommentId(), comment.getUsers().getUserId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore());
     }
 
     @Transactional
@@ -77,6 +77,7 @@ public class ProjectCommentService {
         return "댓글 삭제 성공";
     }
 
+    // $$ 피드백 상세보기 페이지 댓글
     public List<CommentDto> getProjectComments(Long projectId, String token) {
         Users user = getUsersByToken(token);
 
@@ -87,14 +88,17 @@ public class ProjectCommentService {
 
         return allComments.stream().map(comment -> new CommentDto(
                         comment.getCommentId(),
+                        comment.getUsers().getUserId(),
                         comment.getUsers().getNickname(),
                         comment.getContent(),
                         comment.getScore(),
                         comment.getUsers().equals(user))).collect(Collectors.toList());
     }
 
-    public List<MyPageCommentDto> getMyProjectComments(String token) {
-        Users user = getUsersByToken(token);
+    // %% 마이페이지 댓글 조회
+    public List<MyPageCommentDto> getProjectComments(Long userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
 
         List<ProjectComment> allComments = projectCommentRepository.findAllByUsers(user);
 
@@ -132,6 +136,6 @@ public class ProjectCommentService {
         comment.setUpdatedAt(LocalDateTime.now());
 
         log.info("댓글 수정 완료");
-        return new CommentDto(comment.getCommentId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore());
+        return new CommentDto(comment.getCommentId(), comment.getUsers().getUserId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore());
     }
 }

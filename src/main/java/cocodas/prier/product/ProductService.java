@@ -140,7 +140,7 @@ public class ProductService {
         }
 
         // 포인트 차감
-        pointTransactionService.deductPoints(user, price, TransactionType.PRODUCT_PURCHASE);
+        pointTransactionService.decreasePoints(user, price, TransactionType.PRODUCT_PURCHASE);
 
         // 재고 감소
         product.changeStock(product.getStock() - 1);

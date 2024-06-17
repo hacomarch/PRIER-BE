@@ -1,6 +1,5 @@
 package cocodas.prier.project.project;
 
-import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.project.dto.MyPageProjectDto;
 import cocodas.prier.project.project.dto.ProjectDetailDto;
 import cocodas.prier.project.project.dto.ProjectDto;
@@ -125,10 +124,10 @@ public class ProjectController {
     }
 
     // 나의 최근 프로젝트, 피드백 개수
-    @GetMapping("/my-recent-project")
-    public ResponseEntity<MyPageProjectDto> getMyRecentProject(@RequestHeader("Authorization") String auth) {
-        String token = getToken(auth);
-        return ResponseEntity.ok(projectService.getMyRecentProject(token));
+    @GetMapping("/recent-project")
+    public ResponseEntity<MyPageProjectDto> getMyRecentProject(@RequestHeader("Authorization") String auth,
+                                                               @RequestParam("userId") Long userId) {
+        return ResponseEntity.ok(projectService.getRecentProject(userId));
     }
 
 
