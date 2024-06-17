@@ -77,7 +77,7 @@ public class ProjectCommentService {
         return "댓글 삭제 성공";
     }
 
-    // $$ 피드백 상세보기 페이지 댓글
+    // $$$ 피드백 상세보기 페이지 댓글
     public List<CommentDto> getProjectComments(Long projectId, String token) {
         Users user = getUsersByToken(token);
 
@@ -95,7 +95,7 @@ public class ProjectCommentService {
                         comment.getUsers().equals(user))).collect(Collectors.toList());
     }
 
-    // %% 마이페이지 댓글 조회
+    // %%% 마이페이지 댓글 조회
     public List<MyPageCommentDto> getProjectComments(Long userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));

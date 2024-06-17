@@ -247,7 +247,7 @@ public class ProjectService {
         );
     }
 
-    // 피드백 상세보기에서 필요한 프로젝트 정보들 (마지막에 feedbackAmount는 프로젝트 댓글 수, 프로젝트 피드백 수, 이 둘의 합 이렇게 3개 반환)
+    // $$$ 피드백 상세보기에서 필요한 프로젝트 정보들 (마지막에 feedbackAmount는 프로젝트 댓글 수, 프로젝트 피드백 수, 이 둘의 합 이렇게 3개 반환)
     public ProjectDetailForFeedbackPageDto getFeedbackPageDetail(Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
@@ -360,7 +360,7 @@ public class ProjectService {
         ));
     }
 
-    // %% 마이페이지 최근 프로젝트 & 피드백 개수 조회
+    // %%% 마이페이지 최근 프로젝트 & 피드백 개수 조회
     public MyPageProjectDto getRecentProject(Long userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
