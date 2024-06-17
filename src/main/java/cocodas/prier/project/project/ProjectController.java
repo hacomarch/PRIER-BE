@@ -31,6 +31,7 @@ public class ProjectController {
         return auth.substring(7);
     }
 
+    // 프로젝트 생성
     @PostMapping
     public ResponseEntity<Long> createProject(@RequestPart("form") ProjectForm form,
                                                 @RequestParam(name = "mainImage", required = false) MultipartFile mainImage,
@@ -42,6 +43,7 @@ public class ProjectController {
         return ResponseEntity.ok(result);
     }
 
+    // 프로젝트 삭제
     @DeleteMapping("/{projectId}")
     public ResponseEntity<String> deleteProject(@PathVariable Long projectId,
                                                 @RequestHeader("Authorization") String auth) {
@@ -52,6 +54,7 @@ public class ProjectController {
         return ResponseEntity.ok(result);
     }
 
+    // 프로젝트 수정
     //질문은 수정 못하게 프론트에서 막아줘야함.
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProject(@PathVariable Long projectId,
@@ -74,6 +77,7 @@ public class ProjectController {
         return ResponseEntity.ok(result);
     }
 
+    // 프로젝트 목록 조회
     @GetMapping
     public ResponseEntity<Page<ProjectDto>> getSearchedProjects(
             @RequestParam(value = "search", required = false) String keyword,
@@ -92,7 +96,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectPage);
     }
 
-
+    // 나의 프로젝트 조회
     @GetMapping("/my-projects")
     public ResponseEntity<Page<ProjectDto>> getMyProjects(
             @RequestHeader("Authorization") String auth,
@@ -103,13 +107,26 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getMyProjects(token, filter, page));
     }
 
+    // 유저 프로젝트 조회
+    @GetMapping("/user-projects")
+    public ResponseEntity<Page<ProjectDto>> getUserProjects(
+            @RequestParam("userId") Long userId,
+            @RequestParam("filter") Integer filter,
+            @RequestParam(name = "page", defaultValue = "0") int page) {
 
+        Pageable pageable = PageRequest.of(page, 8);  // 페이지 크기와 페이지 번호 설정
+        return ResponseEntity.ok(projectService.getUserProjects(userId, filter, pageable));
+    }
+
+    // 나의 최근 프로젝트, 피드백 개수
     @GetMapping("/my-recent-project")
     public ResponseEntity<MyPageProjectDto> getMyRecentProject(@RequestHeader("Authorization") String auth) {
         String token = getToken(auth);
         return ResponseEntity.ok(projectService.getMyRecentProject(token));
     }
 
+
+    // 프로젝트 피드백 기간 연장
     @PostMapping("/{projectId}/extend")
     public ResponseEntity<String> extendFeedback(@PathVariable Long projectId,
                                                  @RequestParam Integer weeks,
