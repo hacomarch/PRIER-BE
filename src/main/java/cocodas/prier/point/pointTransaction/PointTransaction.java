@@ -32,6 +32,9 @@ public class PointTransaction {
     @Column(nullable = false)
     private Integer balance;
 
+    @Column(nullable = true)
+    private String tid;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private Users users;
