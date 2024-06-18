@@ -12,6 +12,7 @@ public class PointTransactionMapper {
                 .createdAt(transaction.getCreatedAt())
                 .balance(transaction.getBalance())
                 .userId(transaction.getUsers().getUserId())
+                .tid(transaction.getTid())
                 .build();
     }
 }

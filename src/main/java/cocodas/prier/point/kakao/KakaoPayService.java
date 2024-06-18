@@ -105,7 +105,7 @@ public class KakaoPayService {
 
         log.info("결과: " + payApproveResDto.toString());
 
-        pointTransactionService.increasePoints(user, payApproveResDto.getAmount().getTotal() / 10, TransactionType.POINT_CHARGE);
+        pointTransactionService.increasePoints(user, payApproveResDto.getAmount().getTotal() / 10, TransactionType.POINT_CHARGE, tid);
 
         return payApproveResDto;
     }

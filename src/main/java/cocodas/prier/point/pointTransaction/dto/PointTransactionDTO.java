@@ -15,4 +15,6 @@ public class PointTransactionDTO {
     private LocalDateTime createdAt;
     private Integer balance;
     private Long userId;
+    private String tid;
 }
+
