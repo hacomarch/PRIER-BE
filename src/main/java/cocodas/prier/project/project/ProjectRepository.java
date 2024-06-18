@@ -3,6 +3,7 @@ package cocodas.prier.project.project;
 import cocodas.prier.user.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
             "ORDER BY p.createdAt DESC " +
             "LIMIT 1")
     Optional<Project> findMyRecentProject(@Param("user") Users user);
+
+    @EntityGraph(attributePaths = {"feedbackQuestions.responses"})
+    Optional<Project> findWithQuestionsAndResponsesByProjectId(Long projectId);
 }
