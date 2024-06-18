@@ -1,6 +1,6 @@
-package cocodas.prier.point.dto;
+package cocodas.prier.point.pointTransaction.dto;
 
-import cocodas.prier.point.TransactionType;
+import cocodas.prier.point.pointTransaction.TransactionType;
 import lombok.Builder;
 import lombok.Getter;
 

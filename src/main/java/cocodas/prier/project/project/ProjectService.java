@@ -1,7 +1,7 @@
 package cocodas.prier.project.project;
 
-import cocodas.prier.point.PointTransactionService;
-import cocodas.prier.point.TransactionType;
+import cocodas.prier.point.pointTransaction.PointTransactionService;
+import cocodas.prier.point.pointTransaction.TransactionType;
 import cocodas.prier.project.feedback.question.Question;
 import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.media.ProjectMediaService;

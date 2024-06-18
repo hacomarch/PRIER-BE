@@ -1,6 +1,5 @@
-package cocodas.prier.point.dto;
+package cocodas.prier.point.pointTransaction.dto;
 
-import cocodas.prier.point.TransactionType;
 import lombok.Data;
 
 @Data

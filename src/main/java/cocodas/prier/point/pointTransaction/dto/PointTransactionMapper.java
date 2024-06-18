@@ -1,7 +1,6 @@
-package cocodas.prier.point.dto;
+package cocodas.prier.point.pointTransaction.dto;
 
-import cocodas.prier.point.PointTransaction;
-import cocodas.prier.point.dto.PointTransactionDTO;
+import cocodas.prier.point.pointTransaction.PointTransaction;
 
 public class PointTransactionMapper {
 

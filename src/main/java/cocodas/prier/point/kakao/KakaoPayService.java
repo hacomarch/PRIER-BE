@@ -1,7 +1,8 @@
 package cocodas.prier.point.kakao;
 
-import cocodas.prier.point.PointTransactionService;
-import cocodas.prier.point.TransactionType;
+import cocodas.prier.point.kakao.response.KakaoCancelResponse;
+import cocodas.prier.point.pointTransaction.PointTransactionService;
+import cocodas.prier.point.pointTransaction.TransactionType;
 import cocodas.prier.point.kakao.request.MakePayRequest;
 import cocodas.prier.point.kakao.request.PayRequest;
 import cocodas.prier.point.kakao.response.PayApproveResDto;
@@ -14,8 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,6 +38,9 @@ public class KakaoPayService {
 
     @Value("${kakao.admin-key}")
     private String adminKey;
+
+    @Value("${cid}")
+    private String cid;
 
     private Users getUsersByToken(String token) {
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
@@ -101,5 +108,54 @@ public class KakaoPayService {
         pointTransactionService.increasePoints(user, payApproveResDto.getAmount().getTotal() / 10, TransactionType.POINT_CHARGE);
 
         return payApproveResDto;
+    }
+
+    public KakaoCancelResponse kakaoCancel(String tid, int cancelAmount, int cancelTaxFreeAmount, String token) {
+        Users user = getUsersByToken(token);  // 토큰을 사용하여 사용자 검증
+
+        // 카카오페이 요청
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("cid", cid);
+        parameters.add("tid", tid); // 환불할 결제 고유 번호
+        parameters.add("cancel_amount", String.valueOf(cancelAmount)); // 환불 금액
+        parameters.add("cancel_tax_free_amount", String.valueOf(cancelTaxFreeAmount)); // 환불 비과세 금액
+
+        // 파라미터, 헤더
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, getHeaders());
+
+        // 외부에 보낼 url
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            ResponseEntity<KakaoCancelResponse> responseEntity = restTemplate.postForEntity(
+                    "https://kapi.kakao.com/v1/payment/cancel",
+                    requestEntity,
+                    KakaoCancelResponse.class);
+
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                log.info("Payment cancellation successful: " + responseEntity.getBody());
+                return responseEntity.getBody();
+            } else {
+                log.error("Failed to cancel payment: " + responseEntity.getStatusCode());
+                throw new RuntimeException("Failed to cancel payment: " + responseEntity.getStatusCode());
+            }
+        } catch (Exception e) {
+            log.error("Exception during payment cancellation", e);
+            throw e;
+        }
+    }
+
+
+
+
+    private HttpHeaders getHeaders() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        String auth = "KakaoAK " + adminKey;
+
+        httpHeaders.set("Authorization", auth);
+        httpHeaders.set("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        return httpHeaders;
     }
 }

@@ -4,7 +4,7 @@ import cocodas.prier.board.comment.PostComment;
 import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.post.Post;
 import cocodas.prier.orders.orders.Orders;
-import cocodas.prier.point.PointTransaction;
+import cocodas.prier.point.pointTransaction.PointTransaction;
 import cocodas.prier.point.kakao.KakaoPay;
 import cocodas.prier.project.feedback.response.Response;
 import cocodas.prier.project.project.Project;

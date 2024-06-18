@@ -1,6 +1,6 @@
-package cocodas.prier.point;
+package cocodas.prier.point.pointTransaction;
 
-import cocodas.prier.point.dto.PointTransactionDTO;
+import cocodas.prier.point.pointTransaction.dto.PointTransactionDTO;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
