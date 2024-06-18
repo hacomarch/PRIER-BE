@@ -1,6 +1,6 @@
-package cocodas.prier.orders.orders;
+package cocodas.prier.order.order;
 
-import cocodas.prier.orders.orderproduct.OrderProduct;
+import cocodas.prier.order.orderproduct.OrderProduct;
 import cocodas.prier.user.Users;
 import jakarta.persistence.*;
 import lombok.Builder;

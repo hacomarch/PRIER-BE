@@ -1,7 +1,7 @@
 package cocodas.prier.product;
 
-import cocodas.prier.orders.orders.OrderService;
-import cocodas.prier.orders.orders.Orders;
+import cocodas.prier.order.order.OrderService;
+import cocodas.prier.order.order.Orders;
 import cocodas.prier.product.dto.ProductResponseDto;
 import cocodas.prier.product.dto.ProductForm;
 import cocodas.prier.user.UserRepository;

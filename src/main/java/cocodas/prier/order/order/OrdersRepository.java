@@ -1,4 +1,4 @@
-package cocodas.prier.orders.orders;
+package cocodas.prier.order.order;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

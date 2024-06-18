@@ -1,4 +1,4 @@
-package cocodas.prier.orders.orderproduct.dto;
+package cocodas.prier.order.orderproduct.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

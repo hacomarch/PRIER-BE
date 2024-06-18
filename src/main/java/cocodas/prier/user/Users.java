@@ -3,7 +3,7 @@ package cocodas.prier.user;
 import cocodas.prier.board.comment.PostComment;
 import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.post.Post;
-import cocodas.prier.orders.orders.Orders;
+import cocodas.prier.order.order.Orders;
 import cocodas.prier.point.pointTransaction.PointTransaction;
 import cocodas.prier.point.kakao.KakaoPay;
 import cocodas.prier.project.feedback.response.Response;
