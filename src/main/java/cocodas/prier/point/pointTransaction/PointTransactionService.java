@@ -1,7 +1,7 @@
-package cocodas.prier.point;
+package cocodas.prier.point.pointTransaction;
 
-import cocodas.prier.point.dto.PointTransactionDTO;
-import cocodas.prier.point.dto.PointTransactionMapper;
+import cocodas.prier.point.pointTransaction.dto.PointTransactionDTO;
+import cocodas.prier.point.pointTransaction.dto.PointTransactionMapper;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import org.springframework.beans.factory.annotation.Autowired;

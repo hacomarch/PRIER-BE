@@ -1,6 +1,8 @@
 package cocodas.prier.point.kakao;
 
+import cocodas.prier.point.kakao.request.RefundRequest;
 import cocodas.prier.point.kakao.response.BaseResponse;
+import cocodas.prier.point.kakao.response.KakaoCancelResponse;
 import cocodas.prier.point.kakao.response.PayApproveResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +64,25 @@ public class KakaoPayController {
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
                 .body(new BaseResponse<>(HttpStatus.EXPECTATION_FAILED.value(),"결제가 실패하였습니다."));
 
+    }
+
+    // 환불
+    @PostMapping("/refund")
+    public ResponseEntity<?> refund(@RequestBody RefundRequest refundRequest,
+                                    @RequestHeader("Authorization") String auth) {
+        String token = getToken(auth);
+        try {
+            KakaoCancelResponse kakaoCancelResponse = kakaoPayService.kakaoCancel(
+                    refundRequest.getTid(),
+                    refundRequest.getCancelAmount(),
+                    refundRequest.getCancelTaxFreeAmount(),
+                    token);
+
+            return new ResponseEntity<>(kakaoCancelResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package cocodas.prier.point;
+package cocodas.prier.point.pointTransaction;
 
 import cocodas.prier.user.Users;
 import jakarta.persistence.*;
