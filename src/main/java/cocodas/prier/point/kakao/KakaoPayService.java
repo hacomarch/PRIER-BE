@@ -134,6 +134,7 @@ public class KakaoPayService {
 
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 log.info("Payment cancellation successful: " + responseEntity.getBody());
+                pointTransactionService.decreasePoints(user, responseEntity.getBody().getAmount().getTotal() / 10, TransactionType.REFUND);
                 return responseEntity.getBody();
             } else {
                 log.error("Failed to cancel payment: " + responseEntity.getStatusCode());

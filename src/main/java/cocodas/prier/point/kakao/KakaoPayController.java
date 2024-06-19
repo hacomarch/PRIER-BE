@@ -4,6 +4,7 @@ import cocodas.prier.point.kakao.request.RefundRequest;
 import cocodas.prier.point.kakao.response.BaseResponse;
 import cocodas.prier.point.kakao.response.KakaoCancelResponse;
 import cocodas.prier.point.kakao.response.PayApproveResDto;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,15 +41,19 @@ public class KakaoPayController {
         }
     }
 
-    @GetMapping("/success/{id}")
-    public ResponseEntity<?> afterGetRedirectUrl(@PathVariable Long id,
+    @GetMapping("/success")
+    public void afterGetRedirectUrl(HttpServletResponse response,
+                                                 @RequestParam("id") Long id,
                                                  @RequestParam("pg_token") String pgToken) {
         try {
             PayApproveResDto kakaoApprove = kakaoPayService.getApprove(pgToken, id);
-            return ResponseEntity.ok(kakaoApprove);
+            response.sendRedirect("http://localhost:3000/store");
+
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+            log.info("에러 발생");
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
