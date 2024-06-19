@@ -63,6 +63,7 @@ public class PostCommentService {
                         comment.getUsers().getUserId(),
                         comment.getCommentId(),
                         comment.getContent(),
+                        comment.getUsers().getNickname(),
                         comment.getCreatedAt(),
                         comment.getUpdatedAt()
                 ))
