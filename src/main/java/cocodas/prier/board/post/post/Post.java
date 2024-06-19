@@ -67,6 +67,10 @@ public class Post {
         this.views = views;
     }
 
+    public void setPostMedia(List<PostMedia> postMedia) {
+        this.postMedia = postMedia;
+    }
+
     @Builder
     public Post(String title, String content, Category category,
                 Users users, LocalDateTime createdAt, LocalDateTime updatedAt) {

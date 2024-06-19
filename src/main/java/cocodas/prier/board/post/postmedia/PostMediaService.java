@@ -25,6 +25,7 @@ public class PostMediaService {
                 .map(media -> new PostMediaDto(
                         media.getMetadata(),
                         media.getMediaType().name(),
+                        media.getS3Key(),
                         getS3Url(media.getS3Key())
                 ))
                 .toList();
@@ -67,9 +68,32 @@ public class PostMediaService {
     }
 
     @Transactional
-    public void updateFile(Post post, MultipartFile[] files) throws IOException {
-        deleteFile(post);
-        uploadFile(post, files);
+    public void updateFile(String[] deleteImagesS3Key, Post post, MultipartFile[] files) throws IOException {
+
+        List<PostMedia> existingMedia = postMediaRepository.findByPost_PostId(post.getPostId());
+        for (String s3Key : deleteImagesS3Key) {
+            awsS3Service.deleteFile(s3Key);
+            existingMedia.removeIf(media -> media.getS3Key().equals(s3Key));
+        }
+
+
+        for (MultipartFile file : files) {
+
+            File tempFile = File.createTempFile("board-", file.getOriginalFilename());
+            file.transferTo(tempFile);
+            String s3Key = awsS3Service.uploadFile(tempFile);
+
+            PostMedia postMedia = PostMedia.builder()
+                    .metadata(file.getOriginalFilename())
+                    .s3Key(s3Key)
+                    .mediaType(MediaType.IMAGE)
+                    .post(post)
+                    .build();
+
+            existingMedia.add(postMedia);
+        }
+        post.setPostMedia(existingMedia);
+
     }
 
     @Transactional

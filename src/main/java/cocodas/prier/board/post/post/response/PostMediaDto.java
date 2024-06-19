@@ -8,5 +8,6 @@ import lombok.Data;
 public class PostMediaDto {
     private String metadata;
     private String mediaType;
+    private String s3Key;
     private String s3Url;
 }
