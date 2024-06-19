@@ -225,12 +225,12 @@ public class PostService {
         findPost.updateCategory(postRequestDto.getCategory());  // 카테고리 수정하기
         findPost.updateContent(postRequestDto.getContent());    // 내용 수정하기
         findPost.updateUpdatedAt(LocalDateTime.now());          // 수정한 시간 수정하기
-        updateMedia(media, findPost);
+        updateMedia(postRequestDto.getDeleteImages(), media, findPost);
     }
 
-    private void updateMedia(MultipartFile[] media, Post findPost) {
+    private void updateMedia(String[] deleteImagesS3Key, MultipartFile[] media, Post findPost) {
         try {
-            postMediaService.updateFile(findPost, media);
+            postMediaService.updateFile(deleteImagesS3Key, findPost, media);
         } catch (IOException e) {
             throw new RuntimeException("Failed Update Media");
         }
