@@ -214,6 +214,11 @@ public class PostService {
     // 게시글 수정하기
     @Transactional
     public void updatePost(String token, PostRequestDto postRequestDto, Long boardId, MultipartFile[] media) {
+
+        if (media == null) {
+            media = new MultipartFile[0];
+        }
+
         Long userId = findUserIdByJwt(token);
 
         Post findPost = findById(boardId);

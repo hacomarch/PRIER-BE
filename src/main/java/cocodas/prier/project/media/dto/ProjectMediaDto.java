@@ -10,6 +10,7 @@ public class ProjectMediaDto {
     private String metadata;
     private boolean isMain;
     private String mediaType;
+    private String s3Key;
     private String url;
     private int orderIndex;
 }

@@ -192,21 +192,24 @@ public class ProjectService {
         }
 
         // 미디어 파일 업데이트
+
         try {
-            projectMediaService.updateMainImage(project, mainImage);
+            projectMediaService.updateMainImage(project, projectForm.getDeleteMainImage(), mainImage);
         } catch (IOException e) {
             log.error("메인 이미지 업데이트 실패: {}", e.getMessage());
             throw new RuntimeException("메인 이미지 업데이트 실패", e);
         }
 
-        if (contentImages != null) {
-            try {
-                projectMediaService.updateContentImages(project, contentImages);
-            } catch (IOException e) {
-                log.error("내용 이미지 업데이트 실패: {}", e.getMessage());
-                throw new RuntimeException("내용 이미지 업데이트 실패", e);
-            }
+
+
+
+        try {
+            projectMediaService.updateContentImages(project, projectForm.getDeleteImages(), contentImages);
+        } catch (IOException e) {
+            log.error("내용 이미지 업데이트 실패: {}", e.getMessage());
+            throw new RuntimeException("내용 이미지 업데이트 실패", e);
         }
+
 
         project.setUpdatedAt(LocalDateTime.now());
         return "프로젝트 업데이트 완료";
