@@ -16,6 +16,7 @@ public class PostDetailResponseDto {
     private String content;
     private String nickname;
     private String category;
+    private Boolean isLikedByMe;
     private List<PostMediaDto> media;
     private int views;
     private int likes;

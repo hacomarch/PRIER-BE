@@ -86,6 +86,7 @@ public class PostService {
                 post.getContent(),
                 post.getUsers().getNickname(),
                 post.getCategory().name(),
+                post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(post.getUsers().getUserId())),
                 postMediaService.getPostMediaDetail(post),
                 post.getViews(),
                 post.getLikes().size(),
