@@ -20,8 +20,8 @@ public class QuestController {
                                         @RequestHeader("Authorization") String auth) {
         String token = getToken(auth);
         Long userId = jwtTokenProvider.getUserIdFromJwt(token);
-        questService.updateQuest(date, userId, sequence);
-        return ResponseEntity.ok("quest complete");
+        String result = questService.updateQuest(date, userId, sequence);
+        return ResponseEntity.ok(result);
     }
 
     private static String getToken(String auth) {
