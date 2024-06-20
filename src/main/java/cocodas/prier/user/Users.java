@@ -46,6 +46,7 @@ public class Users {
         this.nickname = nickname;
         this.tier = Rank.ROOKIE;
         this.balance = 0;
+        this.lastLoginAt = LocalDateTime.now();
     }
 
     // 마이페이지 수정을 위한 Setter

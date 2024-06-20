@@ -1,5 +1,6 @@
 package cocodas.prier.user.kakao;
 
+import cocodas.prier.quest.Quest;
 import cocodas.prier.quest.QuestService;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
@@ -13,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -35,6 +38,7 @@ public class KakaoService {
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
+    @Transactional
     public LoginSuccessResponse kakaoLogin(String code) {
         String accessToken = getAccessToken(code);
         KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
@@ -73,18 +77,28 @@ public class KakaoService {
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
 
-        if (!isDuplicateEmail(userInfo.getKakaoAccount().email)) {
+        if (!isDuplicateEmail(userInfo.getKakaoAccount().email)) { //가입하지 않은 사용자라면
             Users user = Users.builder()
                     .email(userInfo.getKakaoAccount().email)
                     .nickname(userInfo.getKakaoAccount().getProfile().nickName)
                     .build();
             userRepository.save(user);
             questService.createQuest(user);
-        }
+        } else { //가입한 사용자라면
+            Users users = userRepository.findByEmail(userInfo.getKakaoAccount().email)
+                    .orElseThrow(() -> new RuntimeException("User Not Found"));
+            users.updateLastLoginAt(LocalDateTime.now());
 
-        Users users = userRepository.findByEmail(userInfo.getKakaoAccount().email)
-                .orElseThrow(() -> new RuntimeException("User Not Found"));
-        users.updateLastLoginAt(LocalDateTime.now());
+            Quest todayQuest = users.getQuests()
+                    .stream()
+                    .filter(quest -> quest.getCreatedAt().equals(LocalDate.now()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (todayQuest == null) {
+                questService.createQuest(users);
+            }
+        }
 
         return userInfo;
     }
