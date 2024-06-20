@@ -64,16 +64,29 @@ public class UserService {
 
         // 최신 프로젝트 가져오기
         MyPageProjectDto nowProject = projectService.getRecentProject(userId);
+        Long projectId = null;
+        String teamName = null;
+        String projectTitle = null;
+        Integer feedbackAmount = null;
+        Float score = null;
+        String percentageStr = null;
+        List<KeyWordResponseDto> keywordByProjectId = null;
+        List<MyPageCommentDto> projectComments = null;
 
-        Long projectId = nowProject.getProjectId();
+        if (nowProject != null) {
+            projectId = nowProject.getProjectId();
+            teamName = nowProject.getTeamName();
+            projectTitle = nowProject.getTitle();
+            feedbackAmount = nowProject.getFeedbackAmount();
+            score = nowProject.getScore();
 
-        // static
-        Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            percentageStr = String.format("%.2f", percentage);
 
-        List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
+            keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
 
-        // 프로젝트 댓글
-        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(userId);
+            projectComments = projectCommentService.getProjectComments(userId);
+        }
 
         return new MyPageResponseDto(
                 users.getNickname(),
@@ -89,11 +102,11 @@ public class UserService {
                 quests.getSecond(),
                 quests.getThird(),
                 projectId,
-                nowProject.getTeamName(),
-                nowProject.getTitle(),
-                nowProject.getFeedbackAmount(),
-                nowProject.getScore(),
-                String.format("%.2f", percentage),
+                teamName,
+                projectTitle,
+                feedbackAmount,
+                score,
+                percentageStr,
                 keywordByProjectId,
                 projectComments,
                 users.getBalance()
@@ -117,16 +130,29 @@ public class UserService {
 
         // 최신 프로젝트 가져오기
         MyPageProjectDto nowProject = projectService.getRecentProject(otherUserId);
+        Long projectId = null;
+        String teamName = null;
+        String projectTitle = null;
+        Integer feedbackAmount = null;
+        Float score = null;
+        String percentageStr = null;
+        List<KeyWordResponseDto> keywordByProjectId = null;
+        List<MyPageCommentDto> projectComments = null;
 
-        Long projectId = nowProject.getProjectId();
+        if (nowProject != null) {
+            projectId = nowProject.getProjectId();
+            teamName = nowProject.getTeamName();
+            projectTitle = nowProject.getTitle();
+            feedbackAmount = nowProject.getFeedbackAmount();
+            score = nowProject.getScore();
 
-        // static
-        Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            percentageStr = String.format("%.2f", percentage);
 
-        List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
+            keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
 
-        // 프로젝트 댓글
-        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(otherUserId);
+            projectComments = projectCommentService.getProjectComments(otherUserId);
+        }
 
         return new MyPageResponseDto(
                 otherUsers.getNickname(),
@@ -142,11 +168,11 @@ public class UserService {
                 quests.getSecond(),
                 quests.getThird(),
                 projectId,
-                nowProject.getTeamName(),
-                nowProject.getTitle(),
-                nowProject.getFeedbackAmount(),
-                nowProject.getScore(),
-                String.format("%.2f", percentage),
+                teamName,
+                projectTitle,
+                feedbackAmount,
+                score,
+                percentageStr,
                 keywordByProjectId,
                 projectComments,
                 myUsers.getBalance()
