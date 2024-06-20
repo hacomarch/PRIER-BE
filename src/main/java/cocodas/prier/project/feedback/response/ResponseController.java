@@ -1,10 +1,12 @@
 package cocodas.prier.project.feedback.response;
 
+import cocodas.prier.project.feedback.response.dto.ResponseDetailDto;
 import cocodas.prier.project.feedback.response.dto.UserResponseProjectDto;
 import cocodas.prier.project.feedback.response.dto.ResponseDto;
 import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,16 @@ public class ResponseController {
         return auth.substring(7);
     }
 
+    // 프로젝트 응답 상세보기
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{projectId}/responses")
+    public ResponseDetailDto viewResponseDetail(@PathVariable(name = "projectId") Long projectId,
+                                                Authentication authentication) {
+        Long userId = Long.valueOf(authentication.getName());
+        return responseService.viewResponseDetail(projectId, userId);
+    }
+
+
     // 응답 등록하기
     @PostMapping("/{projectId}/responses")
     public ResponseEntity<List<ResponseDto>> createResponses(@PathVariable(name = "projectId") Long projectId,
@@ -42,13 +54,13 @@ public class ResponseController {
     }
 
     // 프로젝트별 응답 조회
-    @GetMapping("/{projectId}/responses")
-    public ResponseEntity<List<ResponseDto>> getResponsesByProject(@PathVariable(name = "projectId") Long projectId,
-                                                                   Authentication authentication) {
-        Long userId = Long.valueOf(authentication.getName());
-        List<ResponseDto> responses = responseService.getResponsesByProject(projectId);
-        return ResponseEntity.ok(responses);
-    }
+//    @GetMapping("/{projectId}/responses")
+//    public ResponseEntity<List<ResponseDto>> getResponsesByProject(@PathVariable(name = "projectId") Long projectId,
+//                                                                   Authentication authentication) {
+//        Long userId = Long.valueOf(authentication.getName());
+//        List<ResponseDto> responses = responseService.getResponsesByProject(projectId);
+//        return ResponseEntity.ok(responses);
+//    }
 
     // 자신의 피드백 삭제
     @DeleteMapping("/{projectId}/responses")
