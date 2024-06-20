@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -96,16 +95,6 @@ public class ResponseService {
                 .collect(Collectors.toList());
     }
 
-    /*
-    프로젝트(프로젝트 이름, 팀 이름, 프로젝트 상세내용, 깃허브 링크 or 배포링크)
-    AI 키워드 분석
-    제출된 피드백 개수
-    객관식 통계
-    상세응답 분석
-        - 주관식은 chatGPT 요약 2줄
-        - 객관식은 10 ~ 50까지 개수 count
-    해당 프로젝트의 댓글(내용, 작성자, 별점, 소속)
-    * */
     public ResponseDetailDto viewResponseDetail(Long projectId, Long userId) {
 
         Users users = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("사용자가 없습니다."));
@@ -150,19 +139,19 @@ public class ResponseService {
 
         for (Question question : questions) {
             long veryGoodCount = question.getResponses().stream()
-                    .filter(response ->response.getContent().equals("10"))
+                    .filter(response -> response.getContent().equals("10"))
                     .count();
             long goodCount = question.getResponses().stream()
-                    .filter(response ->response.getContent().equals("20"))
+                    .filter(response -> response.getContent().equals("20"))
                     .count();
             long sosoCount = question.getResponses().stream()
-                    .filter(response ->response.getContent().equals("30"))
+                    .filter(response -> response.getContent().equals("30"))
                     .count();
             long badCount = question.getResponses().stream()
-                    .filter(response ->response.getContent().equals("40"))
+                    .filter(response -> response.getContent().equals("40"))
                     .count();
             long veryBadCount = question.getResponses().stream()
-                    .filter(response ->response.getContent().equals("50"))
+                    .filter(response -> response.getContent().equals("50"))
                     .count();
 
             ResponseObjectiveDto dto = new ResponseObjectiveDto(
@@ -178,7 +167,6 @@ public class ResponseService {
         }
         return objectiveCountList;
     }
-
 
     @Transactional
     public void deleteResponses(Long projectId, Long userId) {
