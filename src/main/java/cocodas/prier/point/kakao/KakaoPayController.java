@@ -43,8 +43,8 @@ public class KakaoPayController {
 
     @GetMapping("/success")
     public void afterGetRedirectUrl(HttpServletResponse response,
-                                                 @RequestParam("id") Long id,
-                                                 @RequestParam("pg_token") String pgToken) {
+                                    @RequestParam("id") Long id,
+                                    @RequestParam("pg_token") String pgToken) {
         try {
             PayApproveResDto kakaoApprove = kakaoPayService.getApprove(pgToken, id);
             response.sendRedirect("http://localhost:3000/store");

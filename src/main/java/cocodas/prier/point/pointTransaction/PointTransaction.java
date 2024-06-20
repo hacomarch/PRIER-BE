@@ -38,4 +38,6 @@ public class PointTransaction {
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private Users users;
+
+
 }

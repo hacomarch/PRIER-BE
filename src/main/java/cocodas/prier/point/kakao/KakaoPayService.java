@@ -1,6 +1,8 @@
 package cocodas.prier.point.kakao;
 
 import cocodas.prier.point.kakao.response.KakaoCancelResponse;
+import cocodas.prier.point.pointTransaction.PointTransaction;
+import cocodas.prier.point.pointTransaction.PointTransactionRepository;
 import cocodas.prier.point.pointTransaction.PointTransactionService;
 import cocodas.prier.point.pointTransaction.TransactionType;
 import cocodas.prier.point.kakao.request.MakePayRequest;
@@ -35,6 +37,7 @@ public class KakaoPayService {
     private final KakaoPayRepository kakaoPayRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PointTransactionService pointTransactionService;
+    private final PointTransactionRepository pointTransactionRepository;
 
     @Value("${kakao.admin-key}")
     private String adminKey;
@@ -113,6 +116,15 @@ public class KakaoPayService {
     public KakaoCancelResponse kakaoCancel(String tid, int cancelAmount, int cancelTaxFreeAmount, String token) {
         Users user = getUsersByToken(token);  // 토큰을 사용하여 사용자 검증
 
+        // 해당 PointTransaction 찾기
+        PointTransaction transaction = pointTransactionRepository.findByTid(tid)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        // 환불 가능 여부 확인
+        if (!pointTransactionService.canRefund(user.getUserId(), transaction.getTransactionId())) {
+            throw new RuntimeException("Cannot refund: points have been used after the transaction");
+        }
+
         // 카카오페이 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
@@ -145,9 +157,6 @@ public class KakaoPayService {
             throw e;
         }
     }
-
-
-
 
     private HttpHeaders getHeaders() {
         HttpHeaders httpHeaders = new HttpHeaders();
