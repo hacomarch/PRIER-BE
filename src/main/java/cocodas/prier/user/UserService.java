@@ -1,22 +1,156 @@
 package cocodas.prier.user;
 
+import cocodas.prier.project.comment.ProjectCommentService;
+import cocodas.prier.project.comment.dto.MyPageCommentDto;
+import cocodas.prier.project.project.ProjectRepository;
+import cocodas.prier.project.project.ProjectService;
+import cocodas.prier.project.project.dto.MyPageProjectDto;
+import cocodas.prier.quest.Quest;
+import cocodas.prier.quest.QuestService;
+import cocodas.prier.statics.keywordAi.KeywordsService;
+import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
+import cocodas.prier.statics.objective.ObjectiveResponseService;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
+import cocodas.prier.user.response.MyPageResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepository;        // user
+
+    private final ProjectRepository projectRepository;  // project
+
+    private final QuestService questService;
+
+    private final ProjectService projectService;
+
+    private final KeywordsService keywordsService;
+
+    private final ObjectiveResponseService objectiveResponseService;
+
+    private final ProjectCommentService projectCommentService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
     private Long findUserIdByJwt(String token) {
         return jwtTokenProvider.getUserIdFromJwt(token);
+    }
+
+    // 나의 마이페이지 보기
+    public MyPageResponseDto viewMyPage(String token) {
+
+        Long userId = findUserIdByJwt(token);
+
+        Users users = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+
+        // 퀘스트
+        Quest quests = users.getQuests()
+                .stream()
+                .filter(quest -> quest.getCreatedAt().equals(LocalDate.now()))
+                .findFirst()
+                .orElse(null);
+
+        // 최신 프로젝트 가져오기
+        MyPageProjectDto nowProject = projectService.getRecentProject(userId);
+
+        Long projectId = nowProject.getProjectId();
+
+        // static
+        Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+
+        List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
+
+        // 프로젝트 댓글
+        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(userId);
+
+        return new MyPageResponseDto(
+                users.getNickname(),
+                users.getBelonging(),
+                users.getTier(),
+                users.getGithubUrl(),
+                users.getNotionUrl(),
+                users.getBlogUrl(),
+                users.getFigmaUrl(),
+                users.getEmail(),
+                users.getIntro(),
+                quests.getFirst(),
+                quests.getSecond(),
+                quests.getThird(),
+                projectId,
+                nowProject.getTeamName(),
+                nowProject.getTitle(),
+                nowProject.getFeedbackAmount(),
+                nowProject.getScore(),
+                String.format("%.2f", percentage),
+                keywordByProjectId,
+                projectComments,
+                users.getBalance()
+        );
+    }
+
+    // 다른 사람의 마이페이지 보기
+    public MyPageResponseDto viewOtherMyPage(String token, Long otherUserId) {
+        Long myUserId = findUserIdByJwt(token);
+
+        Users myUsers = userRepository.findById(myUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+
+        Users otherUsers = userRepository.findById(otherUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+
+        // 퀘스트
+        Quest quests = otherUsers.getQuests()
+                .stream()
+                .filter(quest -> quest.getCreatedAt().equals(LocalDate.now()))
+                .findFirst()
+                .orElse(null);
+
+        // 최신 프로젝트 가져오기
+        MyPageProjectDto nowProject = projectService.getRecentProject(otherUserId);
+
+        Long projectId = nowProject.getProjectId();
+
+        // static
+        Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+
+        List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
+
+        // 프로젝트 댓글
+        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(otherUserId);
+
+        return new MyPageResponseDto(
+                otherUsers.getNickname(),
+                otherUsers.getBelonging(),
+                otherUsers.getTier(),
+                otherUsers.getGithubUrl(),
+                otherUsers.getNotionUrl(),
+                otherUsers.getBlogUrl(),
+                otherUsers.getFigmaUrl(),
+                otherUsers.getEmail(),
+                otherUsers.getIntro(),
+                quests.getFirst(),
+                quests.getSecond(),
+                quests.getThird(),
+                projectId,
+                nowProject.getTeamName(),
+                nowProject.getTitle(),
+                nowProject.getFeedbackAmount(),
+                nowProject.getScore(),
+                String.format("%.2f", percentage),
+                keywordByProjectId,
+                projectComments,
+                myUsers.getBalance()
+        );
     }
 
     // 닉네임 수정하기
