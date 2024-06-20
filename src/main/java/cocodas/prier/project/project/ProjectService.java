@@ -369,7 +369,11 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
 
         Project project = projectRepository.findMyRecentProject(user)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
+                .orElse(null);
+
+        if (project == null) {
+            return null;
+        }
 
         return MyPageProjectDto.builder()
                 .projectId(project.getProjectId())
