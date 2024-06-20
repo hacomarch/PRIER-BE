@@ -11,6 +11,7 @@ public class PostCommentListResponseDto {
     private Long userId;
     private Long commentId;
     private String content;
+    private String nickname;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

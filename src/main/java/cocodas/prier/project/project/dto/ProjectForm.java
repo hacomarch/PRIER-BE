@@ -20,6 +20,8 @@ public class ProjectForm {
     private String teamDescription;
     private String teamMate;
     private String link;
+    private Boolean deleteMainImage;
+    private String[] deleteImages;
     private String[] question;
     private Long[] questionId = null;
     private String[] type;

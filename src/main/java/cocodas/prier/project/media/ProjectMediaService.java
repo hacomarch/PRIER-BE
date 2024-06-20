@@ -85,7 +85,7 @@ public class ProjectMediaService {
 
 
     @Transactional
-    public void updateMainImage(Project project, MultipartFile file) throws IOException {
+    public void updateMainImage(Project project, Boolean isDeleted, MultipartFile file) throws IOException {
         ProjectMedia mainMedia = project.getProjectMedia().stream()
                 .filter(ProjectMedia::isMain)
                 .findFirst()
@@ -93,56 +93,79 @@ public class ProjectMediaService {
 
         // 메인 이미지가 제공되지 않은 경우 기본 이미지로 교체
         if (file == null || file.isEmpty()) {
-            log.info("이미지 존재 -> 기본 이미지로, 빈 이미지로 들어가는지 = {}", file.isEmpty());
-            // 기존 메인 이미지가 기본 이미지가 아니라면 삭제
-            if (!"defaultImage".equals(mainMedia.getMetadata())) {
-                log.info("여기서 피자가 기본 이미지로 바뀔 것, 기존 이미지 = {}", mainMedia.getMetadata());
-                awsS3Service.deleteFile(mainMedia.getS3Key());  // S3에서 기존 이미지 삭제
-                mainMedia.setS3Key(null);  // S3 키 null 처리
-                mainMedia.setMetadata("defaultImage");  // 기본 이미지로 메타데이터 설정
+            if(isDeleted) {
+                // 기존 메인 이미지가 기본 이미지가 아니라면 삭제
+                if (mainMedia.getS3Key() != null) {
+                    awsS3Service.deleteFile(mainMedia.getS3Key());  // S3에서 기존 이미지 삭제
+                    mainMedia.setS3Key(null);  // S3 키 null 처리
+                    mainMedia.setMetadata("defaultImage");  // 기본 이미지로 메타데이터 설정
+                }
             }
+
         } else {
             // 새 이미지가 제공된 경우 기존 이미지 업데이트
-            if (!mainMedia.getMetadata().equals(file.getOriginalFilename())) {
+            if (mainMedia.getS3Key() != null) {
                 awsS3Service.deleteFile(mainMedia.getS3Key());  // 기존 파일 S3에서 삭제
+            }
 
                 String newS3Key = handleFileUpload(file);  // 새 파일 업로드
                 mainMedia.setS3Key(newS3Key);  // 새 S3 키 설정
                 mainMedia.setMetadata(file.getOriginalFilename());  // 새 메타데이터 설정
-            }
+
         }
 
         projectMediaRepository.save(mainMedia);  // 변경 사항 저장
     }
 
     @Transactional
-    public void updateContentImages(Project project, MultipartFile[] files) throws IOException {
+    public void updateContentImages(Project project, String[] deleteImages, MultipartFile[] files) throws IOException {
+        if (files == null) {
+            files = new MultipartFile[0];
+        }
+
+        // deleteImages가 null인지 확인하고 빈 배열로 대체
+        if (deleteImages == null) {
+            deleteImages = new String[0];
+        }
+
         List<ProjectMedia> contentImages = project.getProjectMedia().stream()
                 .filter(media -> !media.isMain())
                 .toList();
 
         Map<String, ProjectMedia> contentImagesMap = contentImages.stream()
-                .collect(Collectors.toMap(ProjectMedia::getMetadata, media -> media));
+                .collect(Collectors.toMap(ProjectMedia::getS3Key, media -> media));
 
-        Set<String> fileNames = Arrays.stream(files)
-                .map(MultipartFile::getOriginalFilename)
-                .collect(Collectors.toSet());
+        // 삭제할 이미지 처리
+        for (String s3Key : deleteImages) {
+            ProjectMedia media = contentImagesMap.get(s3Key);
+            if (media != null) {
+                awsS3Service.deleteFile(s3Key);
+                project.getProjectMedia().remove(media);
+                projectMediaRepository.delete(media);
+            }
+        }
 
-        // 기존에 없는 새 파일 업로드
+        // 기존에 없는 새 파일 업로드 및 순서 업데이트
         int index = 1;
         for (MultipartFile file : files) {
             if (!file.isEmpty()) {
-                ProjectMedia media = contentImagesMap.get(file.getOriginalFilename());
+                String originalFilename = file.getOriginalFilename();
+                ProjectMedia media = contentImagesMap.values().stream()
+                        .filter(m -> m.getMetadata().equals(originalFilename))
+                        .findFirst()
+                        .orElse(null);
+
                 if (media == null) {
                     String newS3Key = handleFileUpload(file);
                     ProjectMedia newMedia = ProjectMedia.builder()
-                            .metadata(file.getOriginalFilename())
+                            .metadata(originalFilename)
                             .isMain(false)
                             .s3Key(newS3Key)
                             .orderIndex(index)
                             .project(project)
                             .build();
                     projectMediaRepository.save(newMedia);
+                    project.getProjectMedia().add(newMedia);
                 } else {
                     // 순서 업데이트만 수행
                     if (media.getOrderIndex() != index) {
@@ -153,15 +176,6 @@ public class ProjectMediaService {
             }
             index++;
         }
-
-        // 제거된 파일 삭제
-        contentImages.forEach(media -> {
-            if (!fileNames.contains(media.getMetadata())) {
-                awsS3Service.deleteFile(media.getS3Key());
-                project.getProjectMedia().remove(media);
-                projectMediaRepository.delete(media);
-            }
-        });
     }
 
 
@@ -191,6 +205,7 @@ public class ProjectMediaService {
                         media.getMetadata(),
                         media.isMain(),
                         media.getMediaType().name(),
+                        media.getS3Key(),
                         getS3Url(media.getS3Key()),
                         media.getOrderIndex()))
                 .collect(Collectors.toList());
