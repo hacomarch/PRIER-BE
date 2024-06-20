@@ -64,6 +64,12 @@ public class PointTransactionService {
         return result;
     }
 
+    // 포인트 환불 가능 여부 확인
+    public boolean canRefund(Long userId, Long transactionId) {
+        return !pointTransactionRepository.existsByUsers_UserIdAndTransactionIdGreaterThanAndTransactionTypeIn(
+                userId, transactionId, List.of(TransactionType.PRODUCT_PURCHASE, TransactionType.FEEDBACK_EXTENSION));
+    }
+
     private PointTransactionDTO processTransaction(Users user, Integer amount, TransactionType transactionType, String tid) {
         user.updateBalance(amount);
 

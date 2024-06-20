@@ -1,6 +1,6 @@
 package cocodas.prier.product;
 
-import cocodas.prier.order.orderproduct.OrderProduct;
+import cocodas.prier.orders.orderproduct.OrderProduct;
 import cocodas.prier.product.media.ProductMedia;
 import jakarta.persistence.*;
 import lombok.Builder;

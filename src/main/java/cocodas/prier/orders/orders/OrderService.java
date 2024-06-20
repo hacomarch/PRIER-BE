@@ -1,4 +1,4 @@
-package cocodas.prier.order.order;
+package cocodas.prier.orders.orders;
 
 import cocodas.prier.user.Users;
 import lombok.RequiredArgsConstructor;

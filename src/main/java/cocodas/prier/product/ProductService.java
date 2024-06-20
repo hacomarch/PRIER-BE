@@ -1,9 +1,9 @@
 package cocodas.prier.product;
 
 import cocodas.prier.aws.AwsS3Service;
-import cocodas.prier.order.orderproduct.OrderProduct;
-import cocodas.prier.order.orderproduct.OrderProductRepository;
-import cocodas.prier.order.order.Orders;
+import cocodas.prier.orders.orderproduct.OrderProduct;
+import cocodas.prier.orders.orderproduct.OrderProductRepository;
+import cocodas.prier.orders.orders.Orders;
 import cocodas.prier.point.pointTransaction.PointTransactionService;
 import cocodas.prier.point.pointTransaction.TransactionType;
 import cocodas.prier.product.dto.ProductResponseDto;
