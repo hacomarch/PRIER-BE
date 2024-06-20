@@ -27,7 +27,7 @@ public class ProjectCommentController {
     }
 
     @PostMapping("/{projectId}/comment")
-    public ResponseEntity<CommentDto> createComment(@PathVariable Long projectId,
+    public ResponseEntity<CommentDto> createComment(@PathVariable(name = "projectId") Long projectId,
                                         @RequestBody CommentForm form,
                                         @RequestHeader("Authorization") String auth) {
 
@@ -38,7 +38,7 @@ public class ProjectCommentController {
     }
 
     @DeleteMapping("/{projectId}/comment/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long projectId,
+    public ResponseEntity<String> deleteComment(@PathVariable(name = "projectId") Long projectId,
                                                     @PathVariable Long commentId,
                                                     @RequestHeader("Authorization") String auth) {
         String token = getToken(auth);
@@ -48,7 +48,7 @@ public class ProjectCommentController {
     }
 
     @PutMapping("/{projectId}/comment/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable Long projectId,
+    public ResponseEntity<CommentDto> updateComment(@PathVariable(name = "projectId") Long projectId,
                                                     @PathVariable Long commentId,
                                                     @RequestBody CommentForm form,
                                                     @RequestHeader("Authorization") String auth) {
@@ -59,7 +59,7 @@ public class ProjectCommentController {
     }
 
     @GetMapping("/{projectId}/comment")
-    public List<CommentDto> getProjectComments(@PathVariable Long projectId,
+    public List<CommentDto> getProjectComments(@PathVariable(name = "projectId") Long projectId,
                                                @RequestHeader("Authorization") String auth) {
 
         String token = getToken(auth);

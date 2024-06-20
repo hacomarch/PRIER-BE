@@ -107,6 +107,7 @@ public class ProjectCommentService {
         List<ProjectComment> allComments = projectCommentRepository.findAllByUsers(user);
 
         return allComments.stream().map(comment -> new MyPageCommentDto(
+                comment.getProject().getProjectId(),
                 comment.getCommentId(),
                 comment.getProject().getTitle(),
                 comment.getProject().getTeamName(),

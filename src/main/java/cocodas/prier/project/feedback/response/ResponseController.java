@@ -30,7 +30,7 @@ public class ResponseController {
 
     // 응답 등록하기
     @PostMapping("/{projectId}/responses")
-    public ResponseEntity<List<ResponseDto>> createResponses(@PathVariable Long projectId,
+    public ResponseEntity<List<ResponseDto>> createResponses(@PathVariable(name = "projectId") Long projectId,
                                                              @RequestBody List<ResponseRequestDto> responsesDto,
                                                              Authentication authentication) {
         if (responsesDto.isEmpty()) {
@@ -43,7 +43,7 @@ public class ResponseController {
 
     // 프로젝트별 응답 조회
     @GetMapping("/{projectId}/responses")
-    public ResponseEntity<List<ResponseDto>> getResponsesByProject(@PathVariable Long projectId,
+    public ResponseEntity<List<ResponseDto>> getResponsesByProject(@PathVariable(name = "projectId") Long projectId,
                                                                    Authentication authentication) {
         Long userId = Long.valueOf(authentication.getName());
         List<ResponseDto> responses = responseService.getResponsesByProject(projectId);
@@ -52,7 +52,7 @@ public class ResponseController {
 
     // 자신의 피드백 삭제
     @DeleteMapping("/{projectId}/responses")
-    public ResponseEntity<String> deleteResponsesByUserAndProject(@PathVariable Long projectId,
+    public ResponseEntity<String> deleteResponsesByUserAndProject(@PathVariable(name = "projectId") Long projectId,
                                                                   Authentication authentication) {
         Long userId = Long.valueOf(authentication.getName());
         responseService.deleteResponses(projectId, userId);

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class KeyWordResponseDto {
-    private Long projectId;
+//    private Long projectId;
     private String content;
     private int count;
 }

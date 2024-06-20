@@ -10,6 +10,7 @@ import kr.co.shineware.nlp.komoran.constant.DEFAULT_MODEL;
 import kr.co.shineware.nlp.komoran.core.Komoran;
 import kr.co.shineware.nlp.komoran.model.Token;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,18 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KeywordsService {
     private final ProjectRepository projectRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
-    public List<KeyWordResponseDto> getKeywordByProjectId(Long projectId, String token) {
-        Long userId = findUserIdByJwt(token);
+    public List<KeyWordResponseDto> getKeywordByProjectId(Long projectId) {
         Project project = getProjectById(projectId);
-        if (!project.getUsers().getUserId().equals(userId)) {
-            throw new RuntimeException("권한이 없습니다.");
-        }
 
         List<String> feedbackList = getFeedbackList(project);
 
@@ -38,7 +35,7 @@ public class KeywordsService {
 
         List<KeyWordResponseDto> responseDtos = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : sortedKeywords) {
-            responseDtos.add(new KeyWordResponseDto(projectId, entry.getKey(), entry.getValue()));
+            responseDtos.add(new KeyWordResponseDto(entry.getKey(), entry.getValue()));
         }
 
         return responseDtos;
@@ -59,10 +56,6 @@ public class KeywordsService {
                 .toList();
     }
 
-    private Long findUserIdByJwt(String token) {
-        return jwtTokenProvider.getUserIdFromJwt(token);
-    }
-
     private Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Not Found Project"));
     }
@@ -80,7 +73,6 @@ public class KeywordsService {
                 }
             }
         }
-
         return keywordCountMap;
     }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class MyPageCommentDto {
+    private Long projectId;
     private Long commentId;
     private String projectName;
     private String teamName;
