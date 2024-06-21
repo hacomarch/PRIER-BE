@@ -2,11 +2,11 @@ package cocodas.prier.user;
 
 import cocodas.prier.project.comment.ProjectCommentService;
 import cocodas.prier.project.comment.dto.MyPageCommentDto;
-import cocodas.prier.project.project.ProjectRepository;
+import cocodas.prier.project.feedback.response.ResponseService;
 import cocodas.prier.project.project.ProjectService;
 import cocodas.prier.project.project.dto.MyPageProjectDto;
+import cocodas.prier.user.dto.NotificationDto;
 import cocodas.prier.quest.Quest;
-import cocodas.prier.quest.QuestService;
 import cocodas.prier.statics.keywordAi.KeywordsService;
 import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
 import cocodas.prier.statics.objective.ObjectiveResponseService;
@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -29,10 +26,6 @@ import java.util.stream.Stream;
 public class UserService {
 
     private final UserRepository userRepository;        // user
-
-    private final ProjectRepository projectRepository;  // project
-
-    private final QuestService questService;
 
     private final ProjectService projectService;
 
@@ -42,10 +35,17 @@ public class UserService {
 
     private final ProjectCommentService projectCommentService;
 
+    private final ResponseService responseService;
+
     private final JwtTokenProvider jwtTokenProvider;
 
     private Long findUserIdByJwt(String token) {
         return jwtTokenProvider.getUserIdFromJwt(token);
+    }
+
+    private Users findUserExist(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
     }
 
     // 나의 마이페이지 보기
@@ -53,7 +53,7 @@ public class UserService {
 
         Long userId = findUserIdByJwt(token);
 
-        Users users = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        Users users = findUserExist(userId);
 
         // 퀘스트
         Quest quests = users.getQuests()
@@ -64,16 +64,29 @@ public class UserService {
 
         // 최신 프로젝트 가져오기
         MyPageProjectDto nowProject = projectService.getRecentProject(userId);
+        Long projectId = null;
+        String teamName = null;
+        String projectTitle = null;
+        Integer feedbackAmount = null;
+        Float score = null;
+        String percentageStr = null;
+        List<KeyWordResponseDto> keywordByProjectId = null;
+        List<MyPageCommentDto> projectComments = null;
 
-        Long projectId = nowProject.getProjectId();
+        if (nowProject != null) {
+            projectId = nowProject.getProjectId();
+            teamName = nowProject.getTeamName();
+            projectTitle = nowProject.getTitle();
+            feedbackAmount = nowProject.getFeedbackAmount();
+            score = nowProject.getScore();
 
-        // static
-        Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            percentageStr = String.format("%.2f", percentage);
 
-        List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
+            keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
 
-        // 프로젝트 댓글
-        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(userId);
+            projectComments = projectCommentService.getProjectComments(userId);
+        }
 
         return new MyPageResponseDto(
                 users.getNickname(),
@@ -89,11 +102,11 @@ public class UserService {
                 quests.getSecond(),
                 quests.getThird(),
                 projectId,
-                nowProject.getTeamName(),
-                nowProject.getTitle(),
-                nowProject.getFeedbackAmount(),
-                nowProject.getScore(),
-                String.format("%.2f", percentage),
+                teamName,
+                projectTitle,
+                feedbackAmount,
+                score,
+                percentageStr,
                 keywordByProjectId,
                 projectComments,
                 users.getBalance()
@@ -104,9 +117,9 @@ public class UserService {
     public MyPageResponseDto viewOtherMyPage(String token, Long otherUserId) {
         Long myUserId = findUserIdByJwt(token);
 
-        Users myUsers = userRepository.findById(myUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        Users myUsers = findUserExist(myUserId);
 
-        Users otherUsers = userRepository.findById(otherUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        Users otherUsers = findUserExist(otherUserId);
 
         // 퀘스트
         Quest quests = otherUsers.getQuests()
@@ -117,16 +130,29 @@ public class UserService {
 
         // 최신 프로젝트 가져오기
         MyPageProjectDto nowProject = projectService.getRecentProject(otherUserId);
+        Long projectId = null;
+        String teamName = null;
+        String projectTitle = null;
+        Integer feedbackAmount = null;
+        Float score = null;
+        String percentageStr = null;
+        List<KeyWordResponseDto> keywordByProjectId = null;
+        List<MyPageCommentDto> projectComments = null;
 
-        Long projectId = nowProject.getProjectId();
+        if (nowProject != null) {
+            projectId = nowProject.getProjectId();
+            teamName = nowProject.getTeamName();
+            projectTitle = nowProject.getTitle();
+            feedbackAmount = nowProject.getFeedbackAmount();
+            score = nowProject.getScore();
 
-        // static
-        Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            Double percentage = objectiveResponseService.calculateFeedbackPercentage(projectId);
+            percentageStr = String.format("%.2f", percentage);
 
-        List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
+            keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
 
-        // 프로젝트 댓글
-        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(otherUserId);
+            projectComments = projectCommentService.getProjectComments(otherUserId);
+        }
 
         return new MyPageResponseDto(
                 otherUsers.getNickname(),
@@ -142,23 +168,31 @@ public class UserService {
                 quests.getSecond(),
                 quests.getThird(),
                 projectId,
-                nowProject.getTeamName(),
-                nowProject.getTitle(),
-                nowProject.getFeedbackAmount(),
-                nowProject.getScore(),
-                String.format("%.2f", percentage),
+                teamName,
+                projectTitle,
+                feedbackAmount,
+                score,
+                percentageStr,
                 keywordByProjectId,
                 projectComments,
                 myUsers.getBalance()
         );
     }
 
+    // 이메일 수정하기
+    @Transactional
+    public void newEmail(String token, String newEmail) {
+        Long userId = findUserIdByJwt(token);
+        Users user = findUserExist(userId);
+
+        user.updateEmail(newEmail);
+    }
+
     // 닉네임 수정하기
     @Transactional
     public void newNickName(String token, String newNickname) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateNickName(newNickname);
     }
@@ -167,8 +201,7 @@ public class UserService {
     @Transactional
     public void newBelonging(String token, String newBelonging) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateBelonging(newBelonging);
     }
@@ -177,8 +210,7 @@ public class UserService {
     @Transactional
     public void newIntro(String token, String newIntro) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateIntro(newIntro);
     }
@@ -187,8 +219,7 @@ public class UserService {
     @Transactional
     public void newBlogUrl(String token, String newBlogUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateBlog(newBlogUrl);
     }
@@ -197,8 +228,7 @@ public class UserService {
     @Transactional
     public void newGithubUrl(String token, String newGithubUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateGithub(newGithubUrl);
     }
@@ -207,8 +237,7 @@ public class UserService {
     @Transactional
     public void newFigmaUrl(String token, String newFigmaUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateFigma(newFigmaUrl);
     }
@@ -217,9 +246,22 @@ public class UserService {
     @Transactional
     public void newNotionUrl(String token, String newNotionUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateNotion(newNotionUrl);
+    }
+
+    // 알람
+    public NotificationDto noticeAmount(String token) {
+        Long userId = findUserIdByJwt(token);
+
+        long responseAmount = responseService.countFeedbackForUserProjectsAfterLastLogin(userId);
+        Long commentAmount = projectCommentService.commentCountsForLogin(userId);
+
+        return NotificationDto.builder()
+                .responseAmount(responseAmount)
+                .commentAmount(commentAmount)
+                .build();
+
     }
 }
