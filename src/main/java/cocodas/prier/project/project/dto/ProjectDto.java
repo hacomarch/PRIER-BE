@@ -17,6 +17,7 @@ public class ProjectDto {
     private String mainImageUrl;
     private LocalDate devStartDate;
     private ProjectStatus status;
+    private String link;
     private List<TagDto> tags;
     private Float score;
 }

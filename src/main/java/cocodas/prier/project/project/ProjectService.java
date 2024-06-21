@@ -286,6 +286,7 @@ public class ProjectService {
                 projectMediaService.getMainImageUrl(project),
                 project.getDevStartDate(),
                 project.getStatus(),
+                project.getLink(),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         ));
@@ -324,6 +325,7 @@ public class ProjectService {
                 projectMediaService.getMainImageUrl(project),
                 project.getDevStartDate(),
                 project.getStatus(),
+                project.getLink(),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         ));
@@ -364,6 +366,7 @@ public class ProjectService {
                 projectMediaService.getMainImageUrl(project),
                 project.getDevStartDate(),
                 project.getStatus(),
+                project.getLink(),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         ));
@@ -400,6 +403,7 @@ public class ProjectService {
                         projectMediaService.getMainImageUrl(project),
                         project.getDevStartDate(),
                         project.getStatus(),
+                        project.getLink(),
                         projectTagService.getProjectTags(project),
                         calculateScore(project)
                 ));
