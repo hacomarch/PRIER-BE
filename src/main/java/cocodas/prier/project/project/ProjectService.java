@@ -359,17 +359,22 @@ public class ProjectService {
 
         Page<Project> projects = projectRepository.findAll(spec, sortedPageable);
 
-        return projects.map(project -> new ProjectDto(
-                project.getProjectId(),
-                project.getTitle(),
-                project.getTeamName(),
-                projectMediaService.getMainImageUrl(project),
-                project.getDevStartDate(),
-                project.getStatus(),
-                project.getLink(),
-                projectTagService.getProjectTags(project),
-                calculateScore(project)
-        ));
+        return projects.map(project -> {
+            // 로그에 프로젝트 제목과 상태를 기록
+            log.info("Project 제목: {}, Project 상태: {}", project.getTitle(), project.getStatus());
+
+            return new ProjectDto(
+                    project.getProjectId(),
+                    project.getTitle(),
+                    project.getTeamName(),
+                    projectMediaService.getMainImageUrl(project),
+                    project.getDevStartDate(),
+                    project.getStatus(),
+                    project.getLink(),
+                    projectTagService.getProjectTags(project),
+                    calculateScore(project)
+            );
+        });
     }
 
     // %%% 마이페이지 최근 프로젝트 & 피드백 개수 조회
