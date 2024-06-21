@@ -284,6 +284,8 @@ public class ProjectService {
                 project.getTitle(),
                 project.getTeamName(),
                 projectMediaService.getMainImageUrl(project),
+                project.getDevStartDate(),
+                project.getStatus(),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         ));
@@ -320,6 +322,8 @@ public class ProjectService {
                 project.getTitle(),
                 project.getTeamName(),
                 projectMediaService.getMainImageUrl(project),
+                project.getDevStartDate(),
+                project.getStatus(),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         ));
@@ -358,6 +362,8 @@ public class ProjectService {
                 project.getTitle(),
                 project.getTeamName(),
                 projectMediaService.getMainImageUrl(project),
+                project.getDevStartDate(),
+                project.getStatus(),
                 projectTagService.getProjectTags(project),
                 calculateScore(project)
         ));
@@ -379,7 +385,7 @@ public class ProjectService {
                 .projectId(project.getProjectId())
                 .title(project.getTitle())
                 .teamName(project.getTeamName())
-                .score(project.getScore())
+                .score(calculateScore(project))
                 .feedbackAmount(getFeedbackAmount(project)[2])
                 .build();
     }
@@ -392,6 +398,8 @@ public class ProjectService {
                         project.getTitle(),
                         project.getTeamName(),
                         projectMediaService.getMainImageUrl(project),
+                        project.getDevStartDate(),
+                        project.getStatus(),
                         projectTagService.getProjectTags(project),
                         calculateScore(project)
                 ));
