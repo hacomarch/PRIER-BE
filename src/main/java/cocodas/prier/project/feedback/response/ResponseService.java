@@ -179,6 +179,13 @@ public class ResponseService {
         return projectIds;
     }
 
+    public long countFeedbackForUserProjectsAfterLastLogin(Long userId) {
+        LocalDateTime lastLoginAt = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"))
+                .getLastLoginAt();
+        return responseRepository.countFeedbackForUserProjectsAfterLastLogin(userId, lastLoginAt);
+    }
+
     private ResponseDto mapToDto(Response response) {
         return ResponseDto.builder()
                 .responseId(response.getResponseId())

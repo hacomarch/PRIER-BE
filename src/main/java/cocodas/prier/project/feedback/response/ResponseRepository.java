@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,5 +19,15 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
 
     @Query("SELECT DISTINCT r.question.project.projectId FROM Response r WHERE r.users.userId = :userId")
     List<Long> findDistinctProjectIdsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(DISTINCT p.projectId) " +
+            "FROM Response r " +
+            "JOIN r.question q " +
+            "JOIN q.project p " +
+            "WHERE p.users.userId = :userId " +
+            "AND r.createdAt > :lastLoginAt")
+    long countFeedbackForUserProjectsAfterLastLogin(@Param("userId") Long userId, @Param("lastLoginAt") LocalDateTime lastLoginAt);
+
+
 }
 
