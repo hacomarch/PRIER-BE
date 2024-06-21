@@ -119,7 +119,7 @@ public class ProjectController {
             @RequestParam("filter") Integer filter,
             @RequestParam(name = "page", defaultValue = "0") int page) {
 
-        Pageable pageable = PageRequest.of(page, 8);  // 페이지 크기와 페이지 번호 설정
+        Pageable pageable = PageRequest.of(page, 5);  // 페이지 크기와 페이지 번호 설정
         return ResponseEntity.ok(projectService.getUserProjects(userId, filter, pageable));
     }
 
