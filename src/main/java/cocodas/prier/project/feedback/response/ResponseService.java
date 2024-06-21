@@ -19,6 +19,7 @@ import cocodas.prier.statics.objective.ObjectiveResponseService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ResponseService {
 
     private final ResponseRepository responseRepository;
@@ -43,10 +45,14 @@ public class ResponseService {
     private final ChatGPTService chatGPTService;
     private final ProjectCommentService projectCommentService;
 
+
+    private static final String INVALID_USER_ID_MESSAGE = "Invalid user ID: ";
+    private static final String INVALID_QUESTION_ID_MESSAGE = "Invalid question ID: ";
+
     @Transactional
     public List<ResponseDto> createResponses(Long userId, List<ResponseRequestDto> responsesDto) {
         Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_USER_ID_MESSAGE + userId));
 
         List<Long> questionIds = responsesDto.stream()
                 .map(ResponseRequestDto::getQuestionId)
@@ -58,10 +64,8 @@ public class ResponseService {
 
         List<Response> responses = responsesDto.stream()
                 .map(dto -> {
-                    Question question = questionMap.get(dto.getQuestionId());
-                    if (question == null) {
-                        throw new IllegalArgumentException("Invalid question ID" + dto.getQuestionId());
-                    }
+                    Question question = Optional.ofNullable(questionMap.get(dto.getQuestionId()))
+                            .orElseThrow(() -> new IllegalArgumentException(INVALID_QUESTION_ID_MESSAGE + dto.getQuestionId()));
 
                     return Response.builder()
                             .content(dto.getContent())
@@ -73,23 +77,24 @@ public class ResponseService {
                 .collect(Collectors.toList());
 
         responseRepository.saveAll(responses);
+        log.info("Responses saved for user Id: {}", userId);
 
         return responses.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
-    public List<ResponseDto> getResponsesByQuestion(Long questionId) {
-        List<Response> responses = responseRepository.findAllByQuestionQuestionId(questionId);
-
-        return responses.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-    }
+//    public List<ResponseDto> getResponsesByQuestion(Long questionId) {
+//        List<Response> responses = responseRepository.findAllByQuestionQuestionId(questionId);
+//
+//        return responses.stream()
+//                .map(this::mapToDto)
+//                .collect(Collectors.toList());
+//    }
 
     public List<ResponseDto> getResponsesByProject(Long projectId) {
         List<Response> responses = responseRepository.findAllByQuestionProjectProjectId(projectId);
-
+        log.info("Response for project ID: {}", projectId);
         return responses.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -172,18 +177,22 @@ public class ResponseService {
     public void deleteResponses(Long projectId, Long userId) {
         List<Response> responses = responseRepository.findAllByQuestionProjectProjectIdAndUsersUserId(projectId, userId);
         responseRepository.deleteAll(responses);
+        log.info("Responses deleted for project ID: {} and user ID: {}", projectId, userId);
     }
 
     public List<Long> getProjectsByUser(Long userId) {
         List<Long> projectIds = responseRepository.findDistinctProjectIdsByUserId(userId);
+        log.info("Project IDs retrieved for user ID: {}", userId);
         return projectIds;
     }
 
     public long countFeedbackForUserProjectsAfterLastLogin(Long userId) {
         LocalDateTime lastLoginAt = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"))
+                .orElseThrow(() -> new IllegalArgumentException(INVALID_USER_ID_MESSAGE + userId))
                 .getLastLoginAt();
-        return responseRepository.countFeedbackForUserProjectsAfterLastLogin(userId, lastLoginAt);
+        long feedbackCount = responseRepository.countFeedbackForUserProjectsAfterLastLogin(userId, lastLoginAt);
+        log.info("Feedback count after last login for user ID: {} is {}", userId, feedbackCount);
+        return feedbackCount;
     }
 
     private ResponseDto mapToDto(Response response) {

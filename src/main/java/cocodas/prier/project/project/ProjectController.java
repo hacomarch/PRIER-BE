@@ -54,7 +54,7 @@ public class ProjectController {
     }
 
     // 프로젝트 수정
-    //질문은 수정 못하게 프론트에서 막아줘야함.
+    // 질문은 수정 못하게 프론트에서 막아줘야함.
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProject(@PathVariable Long projectId,
                                                 @RequestPart("form") ProjectForm form,
