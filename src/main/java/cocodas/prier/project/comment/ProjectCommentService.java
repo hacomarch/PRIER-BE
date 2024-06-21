@@ -146,8 +146,7 @@ public class ProjectCommentService {
     }
 
     //마지막 로그인 이후 내 프로젝트에 달린 댓글 개수 반환
-    public Long commentCountsForLogin(String token) {
-        Long userId = getUsersByToken(token).getUserId();
+    public Long commentCountsForLogin(Long userId) {
         List<Object[]> results = projectCommentRepository.countCommentsAfterLastLogin(userId);
 
         Long allComments = 0L;

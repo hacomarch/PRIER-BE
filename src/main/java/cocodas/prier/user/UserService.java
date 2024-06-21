@@ -2,11 +2,11 @@ package cocodas.prier.user;
 
 import cocodas.prier.project.comment.ProjectCommentService;
 import cocodas.prier.project.comment.dto.MyPageCommentDto;
-import cocodas.prier.project.project.ProjectRepository;
+import cocodas.prier.project.feedback.response.ResponseService;
 import cocodas.prier.project.project.ProjectService;
 import cocodas.prier.project.project.dto.MyPageProjectDto;
+import cocodas.prier.user.dto.NotificationDto;
 import cocodas.prier.quest.Quest;
-import cocodas.prier.quest.QuestService;
 import cocodas.prier.statics.keywordAi.KeywordsService;
 import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
 import cocodas.prier.statics.objective.ObjectiveResponseService;
@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -37,6 +34,8 @@ public class UserService {
     private final ObjectiveResponseService objectiveResponseService;
 
     private final ProjectCommentService projectCommentService;
+
+    private final ResponseService responseService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -250,5 +249,19 @@ public class UserService {
         Users user = findUserExist(userId);
 
         user.updateNotion(newNotionUrl);
+    }
+
+    // 알람
+    public NotificationDto noticeAmount(String token) {
+        Long userId = findUserIdByJwt(token);
+
+        long responseAmount = responseService.countFeedbackForUserProjectsAfterLastLogin(userId);
+        Long commentAmount = projectCommentService.commentCountsForLogin(userId);
+
+        return NotificationDto.builder()
+                .responseAmount(responseAmount)
+                .commentAmount(commentAmount)
+                .build();
+
     }
 }
