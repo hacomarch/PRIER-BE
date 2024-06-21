@@ -20,7 +20,7 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
     @Query("SELECT DISTINCT r.question.project.projectId FROM Response r WHERE r.users.userId = :userId")
     List<Long> findDistinctProjectIdsByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT COUNT(DISTINCT r.user.userId) " +
+    @Query("SELECT COUNT(DISTINCT p.projectId) " +
             "FROM Response r " +
             "JOIN r.question q " +
             "JOIN q.project p " +
