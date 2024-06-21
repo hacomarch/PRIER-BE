@@ -50,6 +50,10 @@ public class Users {
     }
 
     // 마이페이지 수정을 위한 Setter
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
     public void updateNickName(String nickname) {
         this.nickname = nickname;
     }

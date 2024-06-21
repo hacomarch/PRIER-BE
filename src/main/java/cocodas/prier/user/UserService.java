@@ -30,10 +30,6 @@ public class UserService {
 
     private final UserRepository userRepository;        // user
 
-    private final ProjectRepository projectRepository;  // project
-
-    private final QuestService questService;
-
     private final ProjectService projectService;
 
     private final KeywordsService keywordsService;
@@ -48,12 +44,17 @@ public class UserService {
         return jwtTokenProvider.getUserIdFromJwt(token);
     }
 
+    private Users findUserExist(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+    }
+
     // 나의 마이페이지 보기
     public MyPageResponseDto viewMyPage(String token) {
 
         Long userId = findUserIdByJwt(token);
 
-        Users users = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        Users users = findUserExist(userId);
 
         // 퀘스트
         Quest quests = users.getQuests()
@@ -117,9 +118,9 @@ public class UserService {
     public MyPageResponseDto viewOtherMyPage(String token, Long otherUserId) {
         Long myUserId = findUserIdByJwt(token);
 
-        Users myUsers = userRepository.findById(myUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        Users myUsers = findUserExist(myUserId);
 
-        Users otherUsers = userRepository.findById(otherUserId).orElseThrow(() -> new IllegalArgumentException("User not found!"));
+        Users otherUsers = findUserExist(otherUserId);
 
         // 퀘스트
         Quest quests = otherUsers.getQuests()
@@ -179,12 +180,20 @@ public class UserService {
         );
     }
 
+    // 이메일 수정하기
+    @Transactional
+    public void newEmail(String token, String newEmail) {
+        Long userId = findUserIdByJwt(token);
+        Users user = findUserExist(userId);
+
+        user.updateEmail(newEmail);
+    }
+
     // 닉네임 수정하기
     @Transactional
     public void newNickName(String token, String newNickname) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateNickName(newNickname);
     }
@@ -193,8 +202,7 @@ public class UserService {
     @Transactional
     public void newBelonging(String token, String newBelonging) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateBelonging(newBelonging);
     }
@@ -203,8 +211,7 @@ public class UserService {
     @Transactional
     public void newIntro(String token, String newIntro) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateIntro(newIntro);
     }
@@ -213,8 +220,7 @@ public class UserService {
     @Transactional
     public void newBlogUrl(String token, String newBlogUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateBlog(newBlogUrl);
     }
@@ -223,8 +229,7 @@ public class UserService {
     @Transactional
     public void newGithubUrl(String token, String newGithubUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateGithub(newGithubUrl);
     }
@@ -233,8 +238,7 @@ public class UserService {
     @Transactional
     public void newFigmaUrl(String token, String newFigmaUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateFigma(newFigmaUrl);
     }
@@ -243,8 +247,7 @@ public class UserService {
     @Transactional
     public void newNotionUrl(String token, String newNotionUrl) {
         Long userId = findUserIdByJwt(token);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Users user = findUserExist(userId);
 
         user.updateNotion(newNotionUrl);
     }
