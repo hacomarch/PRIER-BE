@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,6 +23,7 @@ public class PostMediaService {
 
     public List<PostMediaDto> getPostMediaDetail(Post post) {
         return post.getPostMedia().stream()
+                .sorted(Comparator.comparing(PostMedia::getPostMediaId)) // PostMedia의 ID를 기준으로 정렬
                 .map(media -> new PostMediaDto(
                         media.getMetadata(),
                         media.getMediaType().name(),
@@ -30,6 +32,7 @@ public class PostMediaService {
                 ))
                 .toList();
     }
+
 
     private String getS3Url(String s3Key) {
         return awsS3Service.getPublicUrl(s3Key);
