@@ -17,7 +17,7 @@
 ### BE(백엔드)
 |                                        **김선희(BE)**                                         | **이소은(BE)** | **천승환(BE)** | **윤하은(BE)** |
 |:------------------------------------------------------------------------------------------:|:-----------:|:-----------:|:-----------:|
-| [<img src="https://github.com/Coco-Das/PRIER-BE/assets/108293826/891c341b-26ad-4080-aff8-19f888f63deb" height=100 width=120> <br/> @kimseonhee126](https://github.com/kimseonhee126) | [<img src="https://github.com/Coco-Das/PRIER-BE/assets/144209738/8260248e-17be-4993-89b0-b7d579068726" height=120 width=120> <br/> @saokiritoni](https://github.com/saokiritoni) | [<img src="https://avatars.githubusercontent.com/u/89083254?v=4" height=120 width=120> <br/> @popeye0618](https://github.com/popeye0618) | [<img src="https://github.com/Coco-Das/PRIER-BE/assets/64404604/5930bc92-6c61-41f1-afee-627bda54bd17" height=120 width=120> <br/> @hacomarch](https://github.com/hacomarch) |
+| [<img src="https://github.com/Coco-Das/PRIER-BE/assets/108293826/891c341b-26ad-4080-aff8-19f888f63deb" height=120 width=130> <br/> @kimseonhee126](https://github.com/kimseonhee126) | [<img src="https://github.com/Coco-Das/PRIER-BE/assets/144209738/8260248e-17be-4993-89b0-b7d579068726" height=120 width=120> <br/> @saokiritoni](https://github.com/saokiritoni) | [<img src="https://avatars.githubusercontent.com/u/89083254?v=4" height=120 width=120> <br/> @popeye0618](https://github.com/popeye0618) | [<img src="https://github.com/Coco-Das/PRIER-BE/assets/64404604/5930bc92-6c61-41f1-afee-627bda54bd17" height=120 width=120> <br/> @hacomarch](https://github.com/hacomarch) |
 
 
 
