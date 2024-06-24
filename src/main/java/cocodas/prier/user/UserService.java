@@ -1,5 +1,6 @@
 package cocodas.prier.user;
 
+import cocodas.prier.aws.AwsS3Service;
 import cocodas.prier.project.comment.ProjectCommentService;
 import cocodas.prier.project.comment.dto.MyPageCommentDto;
 import cocodas.prier.project.feedback.response.ResponseService;
@@ -12,20 +13,25 @@ import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
 import cocodas.prier.statics.objective.ObjectiveResponseService;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import cocodas.prier.user.response.MyPageResponseDto;
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;        // user
+    private final UserRepository userRepository;
 
     private final ProjectService projectService;
 
@@ -35,9 +41,9 @@ public class UserService {
 
     private final ProjectCommentService projectCommentService;
 
-    private final ResponseService responseService;
-
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final AwsS3Service awsS3Service;
 
     private Long findUserIdByJwt(String token) {
         return jwtTokenProvider.getUserIdFromJwt(token);
@@ -251,17 +257,53 @@ public class UserService {
         user.updateNotion(newNotionUrl);
     }
 
-    // 알람
-    public NotificationDto noticeAmount(String token) {
+    // 마이페이지 프로필 수정하기
+    @Transactional
+    public void newProfileImg(String token, MultipartFile file) throws IOException {
         Long userId = findUserIdByJwt(token);
+        if (file != null) {
+            saveMedia(userId, file);
+        }
+    }
 
-        long responseAmount = responseService.countFeedbackForUserProjectsAfterLastLogin(userId);
-        Long commentAmount = projectCommentService.commentCountsForLogin(userId);
+    private void saveMedia(Long userId, MultipartFile file) throws IOException {
+        String key = awsFileUploadAndGetKey(file);
+        Users users = findUserExist(userId);
 
-        return NotificationDto.builder()
-                .responseAmount(responseAmount)
-                .commentAmount(commentAmount)
-                .build();
+        users.updateMetadata(file.getOriginalFilename());
+        users.updateS3Key(key);
+    }
 
+    private String awsFileUploadAndGetKey(MultipartFile file) throws IOException {
+        File tempFile = File.createTempFile("profile-", file.getOriginalFilename());
+        file.transferTo(tempFile);
+
+        String key = awsS3Service.uploadFile(tempFile);
+        tempFile.delete();
+        return key;
+    }
+
+    @Transactional
+    public void deleteProfileImg(String token) {
+        Long userId = findUserIdByJwt(token);
+        Users users = findUserExist(userId);
+
+        String imgUrl = awsS3Service.getPublicUrl("d7cee013-a3cd-400b-8272-d3273fbefa16");
+
+        users.updateMetadata("basic_profile.png");
+        users.updateS3Key(imgUrl);
+    }
+
+    // $$ 천승환, 이소은 -> 사용자 프로필 사진 가져가라
+    public ProfileImgDto getProfile(Long userId) {
+        Users users = findUserExist(userId);
+
+        String publicUrl = awsS3Service.getPublicUrl("d7cee013-a3cd-400b-8272-d3273fbefa16");
+
+        return new ProfileImgDto(
+                users.getMetadata(),
+                publicUrl,
+                users.getBalance()
+        );
     }
 }

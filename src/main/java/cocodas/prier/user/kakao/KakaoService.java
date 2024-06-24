@@ -1,14 +1,18 @@
 package cocodas.prier.user.kakao;
 
+import cocodas.prier.project.feedback.response.ResponseService;
 import cocodas.prier.quest.Quest;
 import cocodas.prier.quest.QuestService;
 import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
+import cocodas.prier.user.dto.NotificationDto;
 import cocodas.prier.user.dto.response.KakaoTokenResponseDto;
 import cocodas.prier.user.dto.response.KakaoUserInfoResponseDto;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import cocodas.prier.user.dto.response.LoginSuccessResponse;
 import cocodas.prier.user.kakao.jwt.UserAuthentication;
+import cocodas.prier.user.response.ProfileImgDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +30,8 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final QuestService questService;
+    private final UserService userService;
+    private final ResponseService responseService;
 
     @Value("${kakao.client_id}")
     private String client_id;
@@ -117,12 +123,11 @@ public class KakaoService {
 
         String accessToken = jwtTokenProvider.generateToken(userAuthentication);
 
-        return new LoginSuccessResponse(userId, accessToken, kakaoAccessToken);
-    }
+        ProfileImgDto profile = userService.getProfile(userId);
 
-    private Users getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User Not Found"));
+        NotificationDto notificationDto = responseService.noticeAmount(accessToken);
+
+        return new LoginSuccessResponse(userId, accessToken, kakaoAccessToken, profile, notificationDto);
     }
 
     private boolean isDuplicateEmail(String email) {
