@@ -92,7 +92,7 @@ public class ProjectController {
         Pageable pageable = PageRequest.of(page, 8);  // 페이지 크기와 페이지 번호 설정
         Page<ProjectDto> projectPage;
 
-        
+
         if (keyword != null && !keyword.isEmpty()) {
             projectPage = projectService.getSearchedProjects(keyword, pageable);
         } else {
