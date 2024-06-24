@@ -5,7 +5,9 @@ import cocodas.prier.project.comment.dto.CommentForm;
 import cocodas.prier.project.comment.dto.MyPageCommentDto;
 import cocodas.prier.project.project.Project;
 import cocodas.prier.project.project.ProjectRepository;
+import cocodas.prier.project.project.ProjectService;
 import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,9 @@ public class ProjectCommentService {
 
     private final ProjectCommentRepository projectCommentRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
 
 
@@ -54,13 +58,16 @@ public class ProjectCommentService {
         user.getProjectComments().add(comment);
         project.getProjectComments().add(comment);
         project.updateScore(form.getScore());
+        projectService.calculateScore(project);
+
         log.info("댓글 등록 성공");
         return new CommentDto(comment.getCommentId(),
                 comment.getUsers().getUserId(),
                 comment.getUsers().getNickname(),
                 comment.getContent(),
                 comment.getScore(),
-                true);
+                true,
+                userService.getProfile(comment.getUsers().getUserId()));
     }
 
     @Transactional
@@ -96,7 +103,8 @@ public class ProjectCommentService {
                         comment.getUsers().getNickname(),
                         comment.getContent(),
                         comment.getScore(),
-                        comment.getUsers().equals(user))).collect(Collectors.toList());
+                        comment.getUsers().equals(user),
+                        userService.getProfile(comment.getUsers().getUserId()))).collect(Collectors.toList());
     }
 
     // %%% 마이페이지 댓글 조회
@@ -141,8 +149,16 @@ public class ProjectCommentService {
         project.updateScore(form.getScore());
         comment.setUpdatedAt(LocalDateTime.now());
 
+        projectService.calculateScore(project);
+
         log.info("댓글 수정 완료");
-        return new CommentDto(comment.getCommentId(), comment.getUsers().getUserId(), comment.getUsers().getNickname(), comment.getContent(), comment.getScore(), true);
+        return new CommentDto(comment.getCommentId(),
+                comment.getUsers().getUserId(),
+                comment.getUsers().getNickname(),
+                comment.getContent(),
+                comment.getScore(),
+                true,
+                userService.getProfile(comment.getUsers().getUserId()));
     }
 
     //마지막 로그인 이후 내 프로젝트에 달린 댓글 개수 반환
