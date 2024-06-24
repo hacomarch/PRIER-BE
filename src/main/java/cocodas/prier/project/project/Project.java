@@ -66,6 +66,8 @@ public class Project {
     @Column(nullable = false)
     private Float score = 0F;
 
+    private Float calculatedScore;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users users;
@@ -153,5 +155,9 @@ public class Project {
 
     public void updateScore(Float score) {
         this.score += score;
+    }
+
+    public void setCalculatedScore(Float calculatedScore) {
+        this.calculatedScore = calculatedScore;
     }
 }

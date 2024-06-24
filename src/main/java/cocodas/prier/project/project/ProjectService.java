@@ -272,7 +272,7 @@ public class ProjectService {
 
         if (filter != null) {
             if (filter == 0) { // 인기순
-                sort = Sort.by("score").descending();
+                sort = Sort.by("calculatedScore").descending();
             } else if (filter == 1) { // 등록순
                 sort = Sort.by("createdAt").ascending();
             }
@@ -437,6 +437,9 @@ public class ProjectService {
         float averageScore = project.getScore() / commentsAmount;
 
         averageScore = Math.min(5, Math.round(averageScore * 2) / 2.0f);
+
+        project.setCalculatedScore(averageScore);
+        projectRepository.save(project);
 
         return averageScore;
     }
