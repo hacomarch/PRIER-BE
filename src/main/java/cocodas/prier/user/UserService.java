@@ -45,6 +45,8 @@ public class UserService {
 
     private final AwsS3Service awsS3Service;
 
+    private final UserProfileService userProfileService;
+
     private Long findUserIdByJwt(String token) {
         return jwtTokenProvider.getUserIdFromJwt(token);
     }
@@ -297,14 +299,6 @@ public class UserService {
     // $$ 천승환, 이소은 -> 사용자 프로필 사진 가져가라
     // ㅋㅋ 오키 고맙다.
     public ProfileImgDto getProfile(Long userId) {
-        Users users = findUserExist(userId);
-
-        String publicUrl = awsS3Service.getPublicUrl("d7cee013-a3cd-400b-8272-d3273fbefa16");
-
-        return new ProfileImgDto(
-                users.getMetadata(),
-                publicUrl,
-                users.getBalance()
-        );
+        return userProfileService.getProfile(userId);
     }
 }

@@ -6,6 +6,7 @@ import cocodas.prier.project.comment.dto.MyPageCommentDto;
 import cocodas.prier.project.project.Project;
 import cocodas.prier.project.project.ProjectRepository;
 import cocodas.prier.project.project.ProjectService;
+import cocodas.prier.user.UserProfileService;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
@@ -29,7 +30,7 @@ public class ProjectCommentService {
     private final ProjectRepository projectRepository;
     private final ProjectService projectService;
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final UserProfileService userProfileService;
     private final JwtTokenProvider jwtTokenProvider;
 
 
@@ -67,7 +68,7 @@ public class ProjectCommentService {
                 comment.getContent(),
                 comment.getScore(),
                 true,
-                userService.getProfile(comment.getUsers().getUserId()));
+                userProfileService.getProfile(comment.getUsers().getUserId()));
     }
 
     @Transactional
@@ -104,7 +105,7 @@ public class ProjectCommentService {
                         comment.getContent(),
                         comment.getScore(),
                         comment.getUsers().equals(user),
-                        userService.getProfile(comment.getUsers().getUserId()))).collect(Collectors.toList());
+                userProfileService.getProfile(comment.getUsers().getUserId()))).collect(Collectors.toList());
     }
 
     // %%% 마이페이지 댓글 조회
@@ -158,7 +159,7 @@ public class ProjectCommentService {
                 comment.getContent(),
                 comment.getScore(),
                 true,
-                userService.getProfile(comment.getUsers().getUserId()));
+                userProfileService.getProfile(comment.getUsers().getUserId()));
     }
 
     //마지막 로그인 이후 내 프로젝트에 달린 댓글 개수 반환
