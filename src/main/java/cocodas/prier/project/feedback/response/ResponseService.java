@@ -1,5 +1,6 @@
 package cocodas.prier.project.feedback.response;
 
+import cocodas.prier.aws.AwsS3Service;
 import cocodas.prier.project.comment.ProjectCommentService;
 import cocodas.prier.project.feedback.question.Category;
 import cocodas.prier.project.feedback.question.Question;
@@ -8,6 +9,7 @@ import cocodas.prier.project.feedback.response.dto.ResponseDetailDto;
 import cocodas.prier.project.feedback.response.dto.ResponseDto;
 import cocodas.prier.project.feedback.response.dto.ResponseObjectiveDto;
 import cocodas.prier.project.feedback.response.dto.ResponseRequestDto;
+import cocodas.prier.project.media.ProjectMedia;
 import cocodas.prier.project.project.Project;
 import cocodas.prier.project.project.ProjectRepository;
 import cocodas.prier.project.project.ProjectService;
@@ -49,6 +51,7 @@ public class ResponseService {
     private final ChatGPTService chatGPTService;
     private final ProjectCommentService projectCommentService;
     private final UserService userService;
+    private final AwsS3Service awsS3Service;
     private final JwtTokenProvider jwtTokenProvider;
 
 
@@ -113,6 +116,12 @@ public class ResponseService {
     public ResponseDetailDto viewResponseDetail(Long projectId, Long userId) {
 
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new IllegalArgumentException("프로젝트가 없습니다"));
+        ProjectMedia projectMedia = project.getProjectMedia()
+                .stream()
+                .filter(ProjectMedia::isMain)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("프로젝트 메인이 없습니다."));
+        String publicUrl = awsS3Service.getPublicUrl(projectMedia.getS3Key());
 
         List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
 
@@ -132,6 +141,7 @@ public class ResponseService {
                 project.getIntroduce(),
                 project.getTeamName(),
                 project.getLink(),
+                publicUrl,
                 keywordByProjectId,
                 feedbackAmount[2],
                 String.format("%.2f", percentage),

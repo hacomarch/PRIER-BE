@@ -14,10 +14,17 @@ public class UserProfileService {
 
     public ProfileImgDto getProfile(Long userId) {
         Users users = findUserExist(userId);
-        String publicUrl = awsS3Service.getPublicUrl("d7cee013-a3cd-400b-8272-d3273fbefa16");
+        String publicUrl = awsS3Service.getPublicUrl("936038af-8939-484b-b0e2-8ce72bf38d13");
+
+        String metadata;
+        if (users == null) {
+            metadata = "userProfile.svg";
+        } else {
+            metadata = users.getMetadata();
+        }
 
         return new ProfileImgDto(
-                users.getMetadata(),
+                metadata,
                 publicUrl,
                 users.getBalance()
         );

@@ -36,8 +36,8 @@ public class Users {
     private String githubUrl;
     private String figmaUrl;
     private String notionUrl;
-    private String metadata = "basic_profile.png";
-    private String s3Key = "d7cee013-a3cd-400b-8272-d3273fbefa16";
+    private String metadata = "userProfile.svg";
+    private String s3Key = "936038af-8939-484b-b0e2-8ce72bf38d13";
     private LocalDateTime lastLoginAt;
     private Integer balance;
 
