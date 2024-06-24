@@ -1,6 +1,7 @@
 package cocodas.prier.board.post.post.response;
 
 import cocodas.prier.board.comment.response.PostCommentListResponseDto;
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -22,4 +23,5 @@ public class PostListResponseDto {
     private int likes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private ProfileImgDto profileImgDto;
 }

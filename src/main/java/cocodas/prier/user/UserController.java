@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -95,4 +98,22 @@ public class UserController {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newNotionUrl(token, notionUrlRequestDto.getNotionUrl());
     }
+
+    // 프로필 사진 수정하기
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/users/profile/img")
+    public void newProfileImg(@RequestHeader("Authorization") String authorizationHeader,
+                              @RequestParam(name = "media", required = false) MultipartFile media) throws IOException {
+        String token = authorizationHeader.replace("Bearer ", "");
+        userService.newProfileImg(token, media);
+    }
+
+    // 프로필 사진 삭제하기
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/users/profile/img")
+    public void deleteProfileImg(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        userService.deleteProfileImg(token);
+    }
+
 }

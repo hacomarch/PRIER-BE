@@ -1,6 +1,7 @@
 package cocodas.prier.board.post.post.response;
 
 import cocodas.prier.board.comment.response.PostCommentListResponseDto;
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -23,4 +24,5 @@ public class PostDetailResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<PostCommentListResponseDto> comments;
+    private ProfileImgDto profileImgDto;
 }

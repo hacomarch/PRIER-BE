@@ -15,6 +15,7 @@ package cocodas.prier.project.feedback.response.dto;
 import cocodas.prier.project.comment.dto.MyPageCommentDto;
 import cocodas.prier.statics.chatgpt.response.SummaryResponse;
 import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -34,6 +35,6 @@ public class ResponseDetailDto {
     private List<SummaryResponse> chatGpt;
     private List<ResponseObjectiveDto> responseObjectiveDtoList;
     private List<MyPageCommentDto> myPageCommentDtoList;
-    private Integer balance;
+    private ProfileImgDto profileImgDto;
 
 }

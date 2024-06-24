@@ -16,8 +16,12 @@ import cocodas.prier.statics.chatgpt.response.SummaryResponse;
 import cocodas.prier.statics.keywordAi.KeywordsService;
 import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
 import cocodas.prier.statics.objective.ObjectiveResponseService;
+import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.dto.NotificationDto;
+import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,10 +48,16 @@ public class ResponseService {
     private final ObjectiveResponseService objectiveResponseService;
     private final ChatGPTService chatGPTService;
     private final ProjectCommentService projectCommentService;
+    private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     private static final String INVALID_USER_ID_MESSAGE = "Invalid user ID: ";
     private static final String INVALID_QUESTION_ID_MESSAGE = "Invalid question ID: ";
+
+    private Long findUserIdByJwt(String token) {
+        return jwtTokenProvider.getUserIdFromJwt(token);
+    }
 
     @Transactional
     public List<ResponseDto> createResponses(Long userId, List<ResponseRequestDto> responsesDto) {
@@ -102,8 +112,6 @@ public class ResponseService {
 
     public ResponseDetailDto viewResponseDetail(Long projectId, Long userId) {
 
-        Users users = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("사용자가 없습니다."));
-
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new IllegalArgumentException("프로젝트가 없습니다"));
 
         List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
@@ -115,6 +123,8 @@ public class ResponseService {
         List<SummaryResponse> chatGptResponse = chatGPTService.getChatGptResponse(projectId);
 
         List<ResponseObjectiveDto> objectiveByProject = getObjectiveByProject(projectId);
+
+        ProfileImgDto profile = userService.getProfile(userId);
 
         return new ResponseDetailDto(
                 projectId,
@@ -128,7 +138,7 @@ public class ResponseService {
                 chatGptResponse,
                 objectiveByProject,
                 projectCommentService.getProjectComments(userId),
-                users.getBalance()
+                profile
         );
     }
 
@@ -203,5 +213,19 @@ public class ResponseService {
                 .questionId(response.getQuestion().getQuestionId())
                 .userId(response.getUsers().getUserId())
                 .build();
+    }
+
+    // 개인 맞춤 서비스 알람
+    public NotificationDto noticeAmount(String token) {
+        Long userId = findUserIdByJwt(token);
+
+        long responseAmount = countFeedbackForUserProjectsAfterLastLogin(userId);
+        Long commentAmount = projectCommentService.commentCountsForLogin(userId);
+
+        return NotificationDto.builder()
+                .responseAmount(responseAmount)
+                .commentAmount(commentAmount)
+                .build();
+
     }
 }

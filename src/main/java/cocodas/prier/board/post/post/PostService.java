@@ -9,9 +9,12 @@ import cocodas.prier.board.post.post.response.PostListResponseDto;
 import cocodas.prier.board.post.post.response.PostResponseDto;
 import cocodas.prier.board.post.postmedia.PostMediaService;
 import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
 
@@ -34,11 +37,13 @@ public class PostService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private PostMediaService postMediaService;
+    private final PostMediaService postMediaService;
 
-    private PostCommentService postCommentService;
+    private final PostCommentService postCommentService;
+
+    private final UserService userService;
 
     // jwt 로 userId 찾기
     private Long findUserIdByJwt(String token) {
@@ -55,6 +60,8 @@ public class PostService {
     public List<PostListResponseDto> allPostList(String token) {
         Long userId = findUserIdByJwt(token);
 
+        ProfileImgDto profile = userService.getProfile(userId);
+
         return postRepository.findAll().stream()
                 .map(post -> new PostListResponseDto(
                         post.getPostId(),
@@ -68,7 +75,8 @@ public class PostService {
                         post.getViews(),
                         post.getLikes().size(),
                         post.getCreatedAt(),
-                        post.getUpdatedAt()
+                        post.getUpdatedAt(),
+                        profile
                 ))
                 .collect(Collectors.toList());
     }
@@ -78,6 +86,10 @@ public class PostService {
     public PostDetailResponseDto findByPostId(Long postId) {
         Post post = findById(postId);
         post.updateViews(post.getViews() + 1);
+
+        Long userId = post.getUsers().getUserId();
+
+        ProfileImgDto profile = userService.getProfile(userId);
 
         return new PostDetailResponseDto(
                 post.getUsers().getUserId(),
@@ -92,7 +104,8 @@ public class PostService {
                 post.getLikes().size(),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
-                postCommentService.findPostCommentByPostId(postId)
+                postCommentService.findPostCommentByPostId(postId),
+                profile
         );
     }
 
@@ -105,6 +118,8 @@ public class PostService {
         List<Post> combinedPosts = Stream.concat(postsByTitle.stream(), postsByContent.stream())
                 .distinct()
                 .toList();
+
+        ProfileImgDto profile = userService.getProfile(userId);
 
         return combinedPosts.stream()
                 .map(post -> new PostListResponseDto(
@@ -119,7 +134,8 @@ public class PostService {
                         post.getViews(),
                         post.getLikes().size(),
                         post.getCreatedAt(),
-                        post.getUpdatedAt()
+                        post.getUpdatedAt(),
+                        profile
                 ))
                 .collect(Collectors.toList());
     }
@@ -131,6 +147,8 @@ public class PostService {
         Users findUser = findUserObject(userId);
 
         List<Post> findUserPosts = postRepository.findByUsers(findUser);
+
+        ProfileImgDto profile = userService.getProfile(userId);
 
         return findUserPosts.stream()
                 .map(post -> new PostListResponseDto(
@@ -145,7 +163,8 @@ public class PostService {
                         post.getViews(),
                         post.getLikes().size(),
                         post.getCreatedAt(),
-                        post.getUpdatedAt()
+                        post.getUpdatedAt(),
+                        profile
                 )).collect(Collectors.toList());
     }
 
@@ -166,6 +185,8 @@ public class PostService {
         // 게시글 ID로 게시글 조회
         List<Post> posts = postRepository.findAllById(postIds);
 
+        ProfileImgDto profile = userService.getProfile(userId);
+
         // Post 엔티티를 PostResponseDto 로 변환하여 반환
         return posts.stream()
                 .map(post -> new PostListResponseDto(
@@ -180,7 +201,8 @@ public class PostService {
                         post.getViews(),
                         post.getLikes().size(),
                         post.getCreatedAt(),
-                        post.getUpdatedAt()
+                        post.getUpdatedAt(),
+                        profile
                 )).collect(Collectors.toList());
     }
 

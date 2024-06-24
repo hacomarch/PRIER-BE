@@ -36,6 +36,8 @@ public class Users {
     private String githubUrl;
     private String figmaUrl;
     private String notionUrl;
+    private String metadata = "basic_profile.png";
+    private String s3Key = "d7cee013-a3cd-400b-8272-d3273fbefa16";
     private LocalDateTime lastLoginAt;
     private Integer balance;
 
@@ -80,6 +82,14 @@ public class Users {
 
     public void updateNotion(String notionUrl) {
         this.notionUrl = notionUrl;
+    }
+
+    public void updateMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public void updateS3Key(String s3Key) {
+        this.s3Key = s3Key;
     }
 
     public void updateLastLoginAt(LocalDateTime lastLoginAt) {
