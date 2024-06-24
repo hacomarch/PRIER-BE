@@ -31,5 +31,5 @@ public class MyPageResponseDto {
     private String nowProjectStaticPercentage;
     private List<KeyWordResponseDto> nowProjectKeywordList;
     private List<MyPageCommentDto> myPageCommentDtoList;
-    private Integer balance;
+    private ProfileImgDto profileImgDto;
 }

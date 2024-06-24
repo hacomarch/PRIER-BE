@@ -70,6 +70,9 @@ public class UserService {
                 .findFirst()
                 .orElse(null);
 
+        // 프로필
+        ProfileImgDto profile = userProfileService.getProfile(userId);
+
         // 최신 프로젝트 가져오기
         MyPageProjectDto nowProject = projectService.getRecentProject(userId);
         Long projectId = null;
@@ -117,7 +120,7 @@ public class UserService {
                 percentageStr,
                 keywordByProjectId,
                 projectComments,
-                users.getBalance()
+                profile
         );
     }
 
@@ -135,6 +138,9 @@ public class UserService {
                 .filter(quest -> quest.getCreatedAt().equals(LocalDate.now()))
                 .findFirst()
                 .orElse(null);
+
+        // 프로필
+        ProfileImgDto profile = userProfileService.getProfile(myUserId);
 
         // 최신 프로젝트 가져오기
         MyPageProjectDto nowProject = projectService.getRecentProject(otherUserId);
@@ -183,7 +189,7 @@ public class UserService {
                 percentageStr,
                 keywordByProjectId,
                 projectComments,
-                myUsers.getBalance()
+                profile
         );
     }
 

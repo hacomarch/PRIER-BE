@@ -29,6 +29,7 @@ public class ResponseDetailDto {
     private String introduce;
     private String teamName;
     private String link;
+    private String projectImage;
     private List<KeyWordResponseDto> keyWordResponseDtoList;
     private Integer feedbackCount;
     private String percentage;
