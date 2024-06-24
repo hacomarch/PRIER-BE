@@ -66,7 +66,7 @@ public class Project {
     @Column(nullable = false)
     private Float score = 0F;
 
-    private Float calculatedScore;
+    private Float calculatedScore = 0F;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

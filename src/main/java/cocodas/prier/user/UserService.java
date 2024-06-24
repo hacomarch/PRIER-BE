@@ -295,6 +295,7 @@ public class UserService {
     }
 
     // $$ 천승환, 이소은 -> 사용자 프로필 사진 가져가라
+    // ㅋㅋ 오키 고맙다.
     public ProfileImgDto getProfile(Long userId) {
         Users users = findUserExist(userId);
 

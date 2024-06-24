@@ -1,5 +1,6 @@
 package cocodas.prier.project.comment.dto;
 
+import cocodas.prier.user.response.ProfileImgDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,13 +14,5 @@ public class CommentDto {
     private String content;
     private Float score;
     private Boolean isMine = false;
-
-
-//    public CommentDto(Long commentId, Long userId, String userName, String content, Float score) {
-//        this.commentId = commentId;
-//        this.userId = userId;
-//        this.userName = userName;
-//        this.content = content;
-//        this.score = score;
-//    }
+    private ProfileImgDto profileImageUrl;
 }

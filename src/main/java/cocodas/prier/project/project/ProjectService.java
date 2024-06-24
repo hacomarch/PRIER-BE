@@ -271,25 +271,29 @@ public class ProjectService {
         Sort sort = Sort.by("createdAt").descending();  // 기본 정렬: 최신순
 
         if (filter != null) {
-            if (filter == 0) { // 인기순
+            if (filter == 1) { // 인기순
                 sort = Sort.by("calculatedScore").descending();
-            } else if (filter == 1) { // 등록순
+            } else if (filter == 2) { // 등록순
                 sort = Sort.by("createdAt").ascending();
             }
         }
 
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return projectRepository.findAll(pageable).map(project -> new ProjectDto(
-                project.getProjectId(),
-                project.getTitle(),
-                project.getTeamName(),
-                projectMediaService.getMainImageUrl(project),
-                project.getDevStartDate(),
-                project.getStatus(),
-                project.getLink(),
-                projectTagService.getProjectTags(project),
-                calculateScore(project)
-        ));
+        return projectRepository.findAll(pageable).map(project -> {
+            Float score = project.getCalculatedScore();
+            log.info("Project ID: {}, Calculated Score: {}", project.getProjectId(), score);
+            return new ProjectDto(
+                    project.getProjectId(),
+                    project.getTitle(),
+                    project.getTeamName(),
+                    projectMediaService.getMainImageUrl(project),
+                    project.getDevStartDate(),
+                    project.getStatus(),
+                    project.getLink(),
+                    projectTagService.getProjectTags(project),
+                    score
+            );
+        });
     }
 
     // 나의 프로젝트 조회
