@@ -281,7 +281,6 @@ public class ProjectService {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return projectRepository.findAll(pageable).map(project -> {
             Float score = project.getCalculatedScore();
-            log.info("Project ID: {}, Calculated Score: {}", project.getProjectId(), score);
             return new ProjectDto(
                     project.getProjectId(),
                     project.getTitle(),
