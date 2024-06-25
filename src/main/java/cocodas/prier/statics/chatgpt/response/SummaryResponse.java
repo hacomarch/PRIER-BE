@@ -7,5 +7,7 @@ import lombok.Getter;
 @Getter
 public class SummaryResponse {
     private Long question_id;
+    private String questionContent;
+    private Integer feedbackCount;
     private String summary;
 }

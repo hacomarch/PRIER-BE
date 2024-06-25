@@ -8,6 +8,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class ResponseObjectiveDto {
     private Long questionId;
+    private String questionContent;
+    private Integer feedbackCount;
     private Integer veryGood;
     private Integer good;
     private Integer soso;

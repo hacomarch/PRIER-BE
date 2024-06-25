@@ -1,14 +1,12 @@
 package cocodas.prier.project.comment;
 
-import cocodas.prier.project.comment.dto.CommentDto;
-import cocodas.prier.project.comment.dto.CommentForm;
-import cocodas.prier.project.comment.dto.MyPageCommentDto;
+import cocodas.prier.aws.AwsS3Service;
+import cocodas.prier.project.comment.dto.*;
 import cocodas.prier.project.project.Project;
 import cocodas.prier.project.project.ProjectRepository;
 import cocodas.prier.project.project.ProjectService;
 import cocodas.prier.user.UserProfileService;
 import cocodas.prier.user.UserRepository;
-import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +30,7 @@ public class ProjectCommentService {
     private final UserRepository userRepository;
     private final UserProfileService userProfileService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AwsS3Service awsS3Service;
 
 
     private Users getUsersByToken(String token) {
@@ -90,22 +89,24 @@ public class ProjectCommentService {
     }
 
     // $$$ 피드백 상세보기 페이지 댓글
-    public List<CommentDto> getProjectComments(Long projectId, String token) {
-        Users user = getUsersByToken(token);
+    public List<CommentWithProfileDto> getProjectComments(Long projectId, Long userId) {
+
+        Users users = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 프로젝트"));
 
         List<ProjectComment> allComments = projectCommentRepository.findAllByProject(project);
 
-        return allComments.stream().map(comment -> new CommentDto(
-                        comment.getCommentId(),
-                        comment.getUsers().getUserId(),
-                        comment.getUsers().getNickname(),
-                        comment.getContent(),
-                        comment.getScore(),
-                        comment.getUsers().equals(user),
-                userProfileService.getProfile(comment.getUsers().getUserId()))).collect(Collectors.toList());
+        return allComments.stream().map(projectComment -> new CommentWithProfileDto(
+                projectComment.getCommentId(),
+                projectComment.getUsers().getUserId(),
+                projectComment.getUsers().getNickname(),
+                projectComment.getContent(),
+                projectComment.getScore(),
+                projectComment.getUsers().equals(users),
+                awsS3Service.getPublicUrl(projectComment.getUsers().getS3Key())
+        )).toList();
     }
 
     // %%% 마이페이지 댓글 조회
