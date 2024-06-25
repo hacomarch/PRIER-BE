@@ -23,9 +23,9 @@ public class MakePayRequest {
         map.add("total_amount", payInfoDto.getPrice()+"");
         map.add("tax_free_amount", "0");
 
-        map.add("approval_url", "http://52.78.144.83:8080/api/payment/success?id=" + id); // 성공 시 redirect url
-        map.add("cancel_url", "http://52.78.144.83:8080/api/payment/cancel"); // 취소 시 redirect url
-        map.add("fail_url", "http://52.78.144.83:8080/api/payment/fail"); // 실패 시 redirect url
+        map.add("approval_url", "http://52.79.204.128:8080/api/payment/success?id=" + id); // 성공 시 redirect url
+        map.add("cancel_url", "http://52.79.204.128:8080/api/payment/cancel"); // 취소 시 redirect url
+        map.add("fail_url", "http://52.79.204.128:8080/api/payment/fail"); // 실패 시 redirect url
 
         return new PayRequest("https://kapi.kakao.com/v1/payment/ready", map);
     }

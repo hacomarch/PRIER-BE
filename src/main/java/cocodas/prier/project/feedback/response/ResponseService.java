@@ -230,7 +230,7 @@ public class ResponseService {
         Long userId = findUserIdByJwt(token);
 
         long responseAmount = countFeedbackForUserProjectsAfterLastLogin(userId);
-        Long commentAmount = projectCommentService.commentCountsForLogin(userId);
+        long commentAmount = projectCommentService.commentCountsForLogin(userId);
 
         return NotificationDto.builder()
                 .responseAmount(responseAmount)

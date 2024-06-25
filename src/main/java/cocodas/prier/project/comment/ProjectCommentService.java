@@ -164,15 +164,10 @@ public class ProjectCommentService {
 
     //마지막 로그인 이후 내 프로젝트에 달린 댓글 개수 반환
     public Long commentCountsForLogin(Long userId) {
-        List<Object[]> results = projectCommentRepository.countCommentsAfterLastLogin(userId);
 
-        Long allComments = 0L;
-        for (Object[] result : results) {
-            Long commentCount = (Long) result[1];
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
 
-            allComments += commentCount;
-        }
-
-        return allComments;
+        return projectCommentRepository.countProjectCommentsForUserAfterLastLogin(userId, user.getLastLoginAt());
     }
 }
