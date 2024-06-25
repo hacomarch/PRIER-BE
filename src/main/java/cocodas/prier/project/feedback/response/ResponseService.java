@@ -18,7 +18,7 @@ import cocodas.prier.statics.chatgpt.response.SummaryResponse;
 import cocodas.prier.statics.keywordAi.KeywordsService;
 import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
 import cocodas.prier.statics.objective.ObjectiveResponseService;
-import cocodas.prier.user.UserService;
+import cocodas.prier.user.UserProfileService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.dto.NotificationDto;
@@ -50,9 +50,9 @@ public class ResponseService {
     private final ObjectiveResponseService objectiveResponseService;
     private final ChatGPTService chatGPTService;
     private final ProjectCommentService projectCommentService;
-    private final UserService userService;
     private final AwsS3Service awsS3Service;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserProfileService userProfileService;
 
 
     private static final String INVALID_USER_ID_MESSAGE = "Invalid user ID: ";
@@ -116,11 +116,13 @@ public class ResponseService {
     public ResponseDetailDto viewResponseDetail(Long projectId, Long userId) {
 
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new IllegalArgumentException("프로젝트가 없습니다"));
+
         ProjectMedia projectMedia = project.getProjectMedia()
                 .stream()
                 .filter(ProjectMedia::isMain)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("프로젝트 메인이 없습니다."));
+
         String publicUrl = awsS3Service.getPublicUrl(projectMedia.getS3Key());
 
         List<KeyWordResponseDto> keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
@@ -133,7 +135,7 @@ public class ResponseService {
 
         List<ResponseObjectiveDto> objectiveByProject = getObjectiveByProject(projectId);
 
-        ProfileImgDto profile = userService.getProfile(userId);
+        ProfileImgDto profile = userProfileService.getProfile(userId);
 
         return new ResponseDetailDto(
                 projectId,
@@ -142,12 +144,13 @@ public class ResponseService {
                 project.getTeamName(),
                 project.getLink(),
                 publicUrl,
+                project.getCalculatedScore(),
                 keywordByProjectId,
                 feedbackAmount[2],
                 String.format("%.2f", percentage),
                 chatGptResponse,
                 objectiveByProject,
-                projectCommentService.getProjectComments(userId),
+                projectCommentService.getProjectComments(projectId, userId),
                 profile
         );
     }
@@ -178,9 +181,12 @@ public class ResponseService {
             long veryBadCount = question.getResponses().stream()
                     .filter(response -> response.getContent().equals("50"))
                     .count();
+            long feedbackCount = question.getResponses().size();
 
             ResponseObjectiveDto dto = new ResponseObjectiveDto(
                     question.getQuestionId(),
+                    question.getContent(),
+                    (int) feedbackCount,
                     (int) veryGoodCount,
                     (int) goodCount,
                     (int) sosoCount,

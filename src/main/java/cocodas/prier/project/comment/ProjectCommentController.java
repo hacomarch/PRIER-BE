@@ -1,8 +1,9 @@
 package cocodas.prier.project.comment;
 
-import cocodas.prier.project.comment.dto.CommentDto;
-import cocodas.prier.project.comment.dto.CommentForm;
-import cocodas.prier.project.comment.dto.MyPageCommentDto;
+import cocodas.prier.project.comment.dto.*;
+import cocodas.prier.user.UserRepository;
+import cocodas.prier.user.Users;
+import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ProjectCommentController {
 
     private final ProjectCommentService projectCommentService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private static String getToken(String auth) {
         if (auth == null || !auth.startsWith("Bearer ")) {
@@ -59,11 +61,12 @@ public class ProjectCommentController {
     }
 
     @GetMapping("/{projectId}/comment")
-    public List<CommentDto> getProjectComments(@PathVariable(name = "projectId") Long projectId,
-                                               @RequestHeader("Authorization") String auth) {
+    public List<CommentWithProfileDto> getProjectComments(@PathVariable(name = "projectId") Long projectId,
+                                                          @RequestHeader("Authorization") String auth) {
 
         String token = getToken(auth);
-        return projectCommentService.getProjectComments(projectId, token);
+        Long userId = jwtTokenProvider.getUserIdFromJwt(token);
+        return projectCommentService.getProjectComments(projectId, userId);
     }
 
     @GetMapping("/comments")

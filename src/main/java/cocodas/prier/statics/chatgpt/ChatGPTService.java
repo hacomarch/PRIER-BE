@@ -36,7 +36,7 @@ public class ChatGPTService {
 
         List<Mono<SummaryResponse>> responseMonos = questions.stream()
                 .map(question -> createSummaryMono(webClient, question))
-                .collect(Collectors.toList());
+                .toList();
 
         return Flux.merge(responseMonos)
                 .collectList()
@@ -65,7 +65,10 @@ public class ChatGPTService {
                 .map(Response::getContent)
                 .collect(Collectors.joining(" "));
         return sendChatGptRequest(webClient, prompt)
-                .map(response -> new SummaryResponse(question.getQuestionId(), response));
+                .map(response -> new SummaryResponse(question.getQuestionId(),
+                        question.getContent(),
+                        question.getResponses().size(),
+                        response));
     }
 
     private Mono<String> sendChatGptRequest(WebClient webClient, String prompt) {
