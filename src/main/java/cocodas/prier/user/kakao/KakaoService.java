@@ -93,7 +93,6 @@ public class KakaoService {
         } else { //가입한 사용자라면
             Users users = userRepository.findByEmail(userInfo.getKakaoAccount().email)
                     .orElseThrow(() -> new RuntimeException("User Not Found"));
-            users.updateLastLoginAt(LocalDateTime.now());
 
             Quest todayQuest = users.getQuests()
                     .stream()
@@ -126,6 +125,9 @@ public class KakaoService {
         ProfileImgDto profile = userService.getProfile(userId);
 
         NotificationDto notificationDto = responseService.noticeAmount(accessToken);
+
+        Users users = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Not Found User"));
+        users.updateLastLoginAt(LocalDateTime.now());
 
         return new LoginSuccessResponse(userId, accessToken, kakaoAccessToken, profile, notificationDto);
     }
