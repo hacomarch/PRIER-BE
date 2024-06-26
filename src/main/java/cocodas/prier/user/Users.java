@@ -37,7 +37,7 @@ public class Users {
     private String figmaUrl;
     private String notionUrl;
     private String metadata = "userProfile.svg";
-    private String s3Key = "936038af-8939-484b-b0e2-8ce72bf38d13";
+    private String s3Key = "0af06fa9-a078-4fe3-9df8-0c1e85368fba";
     private LocalDateTime lastLoginAt;
     private Integer balance;
 
