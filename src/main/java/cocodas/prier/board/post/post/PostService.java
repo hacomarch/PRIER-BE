@@ -253,10 +253,10 @@ public class PostService {
         findPost.updateCategory(postRequestDto.getCategory());  // 카테고리 수정하기
         findPost.updateContent(postRequestDto.getContent());    // 내용 수정하기
         findPost.updateUpdatedAt(LocalDateTime.now());          // 수정한 시간 수정하기
-        updateMedia(postRequestDto.getDeleteImages(), media, findPost);
+        updateMedia(postRequestDto.getPostMediaIds(), media, findPost);
     }
 
-    private void updateMedia(String[] deleteImagesS3Key, MultipartFile[] media, Post findPost) {
+    private void updateMedia(Long[] deleteImagesS3Key, MultipartFile[] media, Post findPost) {
         try {
             postMediaService.updateFile(deleteImagesS3Key, findPost, media);
         } catch (IOException e) {

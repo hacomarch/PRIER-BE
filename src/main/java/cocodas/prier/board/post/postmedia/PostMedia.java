@@ -39,6 +39,4 @@ public class PostMedia {
             post.getPostMedia().add(this);
         }
     }
-
-
 }
