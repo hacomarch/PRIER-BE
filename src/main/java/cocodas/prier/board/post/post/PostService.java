@@ -84,6 +84,7 @@ public class PostService {
 
         return new PostDetailResponseDto(
                 post.getUsers().getUserId(),
+                awsS3Service.getPublicUrl(post.getUsers().getS3Key()),
                 post.getPostId(),
                 post.getTitle(),
                 post.getContent(),
