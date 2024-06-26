@@ -11,7 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class PostDetailResponseDto {
-    private Long userId;
+    private Long writerId;
+    private String writerProfileUrl;
     private Long postId;
     private String title;
     private String content;
@@ -24,5 +25,5 @@ public class PostDetailResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<PostCommentListResponseDto> comments;
-    private ProfileImgDto profileImgDto;
+    private ProfileImgDto myProfileImgDto;
 }

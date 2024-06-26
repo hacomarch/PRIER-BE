@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class PostCommentListResponseDto {
-    private Long userId;
+    private Long writerId;
+    private String writerProfileUrl;
     private Long commentId;
     private String content;
     private String nickname;

@@ -1,5 +1,6 @@
 package cocodas.prier.board.comment;
 
+import cocodas.prier.aws.AwsS3Service;
 import cocodas.prier.board.comment.request.PostCommentRequestDto;
 import cocodas.prier.board.comment.response.PostCommentListResponseDto;
 import cocodas.prier.board.post.post.Post;
@@ -21,6 +22,7 @@ public class PostCommentService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AwsS3Service awsS3Service;
 
     @Transactional
     public void savePostComment(String token, Long postId, PostCommentRequestDto dto) {
@@ -61,6 +63,7 @@ public class PostCommentService {
                 .stream()
                 .map(comment -> new PostCommentListResponseDto(
                         comment.getUsers().getUserId(),
+                        awsS3Service.getPublicUrl(comment.getUsers().getS3Key()),
                         comment.getCommentId(),
                         comment.getContent(),
                         comment.getUsers().getNickname(),
