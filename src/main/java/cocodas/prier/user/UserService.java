@@ -16,6 +16,7 @@ import cocodas.prier.user.response.MyPageResponseDto;
 import cocodas.prier.user.response.ProfileImgDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +47,9 @@ public class UserService {
     private final AwsS3Service awsS3Service;
 
     private final UserProfileService userProfileService;
+
+    @Value("${profile.default.s3key}")
+    private String defaultProfileS3Key;
 
     private Long findUserIdByJwt(String token) {
         return jwtTokenProvider.getUserIdFromJwt(token);
@@ -296,10 +300,8 @@ public class UserService {
         Long userId = findUserIdByJwt(token);
         Users users = findUserExist(userId);
 
-        String imgUrl = awsS3Service.getPublicUrl("d7cee013-a3cd-400b-8272-d3273fbefa16");
-
         users.updateMetadata("basic_profile.png");
-        users.updateS3Key(imgUrl);
+        users.updateS3Key(defaultProfileS3Key);
     }
 
     // $$ 천승환, 이소은 -> 사용자 프로필 사진 가져가라
