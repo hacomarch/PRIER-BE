@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PostMediaDto {
+    private Long postMediaId;
     private String metadata;
     private String mediaType;
     private String s3Key;

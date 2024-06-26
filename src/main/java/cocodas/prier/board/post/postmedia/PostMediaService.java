@@ -25,6 +25,7 @@ public class PostMediaService {
         return post.getPostMedia().stream()
                 .sorted(Comparator.comparing(PostMedia::getPostMediaId)) // PostMedia의 ID를 기준으로 정렬
                 .map(media -> new PostMediaDto(
+                        media.getPostMediaId(),
                         media.getMetadata(),
                         media.getMediaType().name(),
                         media.getS3Key(),
@@ -71,32 +72,35 @@ public class PostMediaService {
     }
 
     @Transactional
-    public void updateFile(String[] deleteImagesS3Key, Post post, MultipartFile[] files) throws IOException {
+    public void updateFile(Long[] postMediaIds, Post post, MultipartFile[] files) throws IOException {
 
-        List<PostMedia> existingMedia = postMediaRepository.findByPost_PostId(post.getPostId());
-        for (String s3Key : deleteImagesS3Key) {
-            awsS3Service.deleteFile(s3Key);
-            existingMedia.removeIf(media -> media.getS3Key().equals(s3Key));
+        if (postMediaIds != null) {
+            for (Long mediaId : postMediaIds) {
+                System.out.println("post media id ------> " + mediaId);
+                PostMedia postMedia = postMediaRepository.findById(mediaId).orElseThrow(() -> new RuntimeException("해당 게시글에 알맞는 사진이 없습니다."));
+                awsS3Service.deleteFile(postMedia.getS3Key());
+                postMediaRepository.delete(postMedia);
+                post.getPostMedia().remove(postMedia);
+            }
         }
 
+        if (files != null) {
+            for (MultipartFile file : files) {
 
-        for (MultipartFile file : files) {
+                File tempFile = File.createTempFile("board-", file.getOriginalFilename());
+                file.transferTo(tempFile);
+                String s3Key = awsS3Service.uploadFile(tempFile);
 
-            File tempFile = File.createTempFile("board-", file.getOriginalFilename());
-            file.transferTo(tempFile);
-            String s3Key = awsS3Service.uploadFile(tempFile);
+                PostMedia postMedia = PostMedia.builder()
+                        .metadata(file.getOriginalFilename())
+                        .s3Key(s3Key)
+                        .mediaType(MediaType.IMAGE)
+                        .post(post)
+                        .build();
 
-            PostMedia postMedia = PostMedia.builder()
-                    .metadata(file.getOriginalFilename())
-                    .s3Key(s3Key)
-                    .mediaType(MediaType.IMAGE)
-                    .post(post)
-                    .build();
-
-            existingMedia.add(postMedia);
+                postMediaRepository.save(postMedia);
+            }
         }
-        post.setPostMedia(existingMedia);
-
     }
 
     @Transactional
