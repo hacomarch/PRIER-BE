@@ -23,7 +23,7 @@ public class PostController {
     // 모든 게시글 조회하기 & 검색 키워드 게시글 조회하기
     @GetMapping("/posts")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostListResponseDto> allOrSearchPosts(@RequestHeader("Authorization") String authorizationHeader,
+    public PostListResponseDto allOrSearchPosts(@RequestHeader("Authorization") String authorizationHeader,
                                                       @RequestParam(name = "search", required = false) String keyword) {
         String token = authorizationHeader.replace("Bearer ", "");
         if (keyword == null || keyword.isEmpty()) {
@@ -43,7 +43,7 @@ public class PostController {
     // 내가 작성한 게시글 모두 조회하기
     @GetMapping("/posts/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostListResponseDto> myPostList(@RequestHeader("Authorization") String authorizationHeader) {
+    public PostListResponseDto myPostList(@RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "");
         return postService.myPostList(token);
     }
@@ -51,7 +51,7 @@ public class PostController {
     // 내가 좋아요 누른 게시글 모두 조회하기
     @GetMapping("/posts/like/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostListResponseDto> pushLikePost(@RequestHeader("Authorization") String authorizationHeader) {
+    public PostListResponseDto pushLikePost(@RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "");
         return postService.pushLikePost(token);
     }

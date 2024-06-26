@@ -1,5 +1,6 @@
 package cocodas.prier.board.post.post;
 
+import cocodas.prier.aws.AwsS3Service;
 import cocodas.prier.board.comment.PostCommentService;
 import cocodas.prier.board.post.like.Likes;
 import cocodas.prier.board.post.like.LikeRepository;
@@ -13,7 +14,6 @@ import cocodas.prier.user.UserService;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import cocodas.prier.user.response.ProfileImgDto;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,6 +45,8 @@ public class PostService {
 
     private final UserService userService;
 
+    private final AwsS3Service awsS3Service;
+
     // jwt 로 userId 찾기
     private Long findUserIdByJwt(String token) {
         return jwtTokenProvider.getUserIdFromJwt(token);
@@ -57,28 +59,17 @@ public class PostService {
     }
 
     // 전체 게시글 조회하기
-    public List<PostListResponseDto> allPostList(String token) {
+    public PostListResponseDto allPostList(String token) {
         Long userId = findUserIdByJwt(token);
 
-        ProfileImgDto profile = userService.getProfile(userId);
+        List<PostResponseDto> postResponseDtos = getPostResponseDtoList(postRepository.findAll(), userId);
 
-        return postRepository.findAll().stream()
-                .map(post -> new PostListResponseDto(
-                        post.getPostId(),
-                        post.getUsers().getUserId(),
-                        post.getTitle(),
-                        post.getContent(),
-                        post.getUsers().getNickname(),
-                        post.getCategory().name(),
-                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
-                        postMediaService.getPostMediaDetail(post),
-                        post.getViews(),
-                        post.getLikes().size(),
-                        post.getCreatedAt(),
-                        post.getUpdatedAt(),
-                        profile
-                ))
-                .collect(Collectors.toList());
+        ProfileImgDto myProfile = userService.getProfile(userId);
+
+        return new PostListResponseDto(
+                postResponseDtos,
+                myProfile
+        );
     }
 
     // postId로 게시글 조회하기(특정 글 조회하기)
@@ -110,7 +101,7 @@ public class PostService {
     }
 
     // 검색어에 맞춰 게시글 조회하기
-    public List<PostListResponseDto> searchPostsByKeyword(String token, String keyword) {
+    public PostListResponseDto searchPostsByKeyword(String token, String keyword) {
         Long userId = findUserIdByJwt(token);
         List<Post> postsByTitle = postRepository.findByTitleContaining(keyword);
         List<Post> postsByContent = postRepository.findByContentContaining(keyword);
@@ -119,57 +110,36 @@ public class PostService {
                 .distinct()
                 .toList();
 
-        ProfileImgDto profile = userService.getProfile(userId);
+        List<PostResponseDto> postResponseDtos = getPostResponseDtoList(combinedPosts, userId);
 
-        return combinedPosts.stream()
-                .map(post -> new PostListResponseDto(
-                        post.getPostId(),
-                        post.getUsers().getUserId(),
-                        post.getTitle(),
-                        post.getContent(),
-                        post.getUsers().getNickname(),
-                        post.getCategory().name(),
-                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
-                        postMediaService.getPostMediaDetail(post),
-                        post.getViews(),
-                        post.getLikes().size(),
-                        post.getCreatedAt(),
-                        post.getUpdatedAt(),
-                        profile
-                ))
-                .collect(Collectors.toList());
+        ProfileImgDto myProfile = userService.getProfile(userId);
+
+        return new PostListResponseDto(
+                postResponseDtos,
+                myProfile
+        );
     }
 
     // 내가 작성한 글 조회하기
-    public List<PostListResponseDto> myPostList(String token) {
+    public PostListResponseDto myPostList(String token) {
         Long userId = findUserIdByJwt(token);
 
         Users findUser = findUserObject(userId);
 
         List<Post> findUserPosts = postRepository.findByUsers(findUser);
 
-        ProfileImgDto profile = userService.getProfile(userId);
+        List<PostResponseDto> postResponseDtos = getPostResponseDtoList(findUserPosts, userId);
 
-        return findUserPosts.stream()
-                .map(post -> new PostListResponseDto(
-                        post.getPostId(),
-                        post.getUsers().getUserId(),
-                        post.getTitle(),
-                        post.getContent(),
-                        post.getUsers().getNickname(),
-                        post.getCategory().name(),
-                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
-                        postMediaService.getPostMediaDetail(post),
-                        post.getViews(),
-                        post.getLikes().size(),
-                        post.getCreatedAt(),
-                        post.getUpdatedAt(),
-                        profile
-                )).collect(Collectors.toList());
+        ProfileImgDto myProfile = userService.getProfile(userId);
+
+        return new PostListResponseDto(
+                postResponseDtos,
+                myProfile
+        );
     }
 
     // 좋아요한 글 조회하기
-    public List<PostListResponseDto> pushLikePost(String token) {
+    public PostListResponseDto pushLikePost(String token) {
         Long userId = findUserIdByJwt(token);
 
         Users findUser = findUserObject(userId);
@@ -185,25 +155,14 @@ public class PostService {
         // 게시글 ID로 게시글 조회
         List<Post> posts = postRepository.findAllById(postIds);
 
-        ProfileImgDto profile = userService.getProfile(userId);
+        List<PostResponseDto> postResponseDtos = getPostResponseDtoList(posts, userId);
 
-        // Post 엔티티를 PostResponseDto 로 변환하여 반환
-        return posts.stream()
-                .map(post -> new PostListResponseDto(
-                        post.getPostId(),
-                        post.getUsers().getUserId(),
-                        post.getTitle(),
-                        post.getContent(),
-                        post.getUsers().getNickname(),
-                        post.getCategory().name(),
-                        post.getLikes().stream().anyMatch(l -> l.getUsers().getUserId().equals(userId)),
-                        postMediaService.getPostMediaDetail(post),
-                        post.getViews(),
-                        post.getLikes().size(),
-                        post.getCreatedAt(),
-                        post.getUpdatedAt(),
-                        profile
-                )).collect(Collectors.toList());
+        ProfileImgDto myProfile = userService.getProfile(userId);
+
+        return new PostListResponseDto(
+                postResponseDtos,
+                myProfile
+        );
     }
 
     // 게시글 작성하기
@@ -282,5 +241,25 @@ public class PostService {
     private Post findById(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 postId를 가진 Post가 없습니다."));
+    }
+
+    private List<PostResponseDto> getPostResponseDtoList(List<Post> combinedPosts, Long userId) {
+        return combinedPosts.stream()
+                .map(post -> new PostResponseDto(
+                        post.getPostId(),
+                        post.getUsers().getUserId(),
+                        awsS3Service.getPublicUrl(post.getUsers().getS3Key()),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getUsers().getNickname(),
+                        post.getCategory().name(),
+                        post.getLikes().stream().anyMatch(likes -> likes.getUsers().getUserId().equals(userId)),
+                        postMediaService.getPostMediaDetail(post),
+                        post.getViews(),
+                        post.getLikes().size(),
+                        post.getCreatedAt(),
+                        post.getUpdatedAt()
+                ))
+                .toList();
     }
 }

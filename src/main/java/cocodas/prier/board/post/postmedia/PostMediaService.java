@@ -76,7 +76,6 @@ public class PostMediaService {
 
         if (postMediaIds != null) {
             for (Long mediaId : postMediaIds) {
-                System.out.println("post media id ------> " + mediaId);
                 PostMedia postMedia = postMediaRepository.findById(mediaId).orElseThrow(() -> new RuntimeException("해당 게시글에 알맞는 사진이 없습니다."));
                 awsS3Service.deleteFile(postMedia.getS3Key());
                 postMediaRepository.delete(postMedia);

@@ -1,24 +1,27 @@
 package cocodas.prier.board.post.post.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 public class PostResponseDto {
-    private Long boardId;
+    private Long postId;
+    private Long writerId;
+    private String writerProfileUrl;
     private String title;
+    private String content;
+    private String nickname;
+    private String category;
+    private Boolean isLikedByMe;
+    private List<PostMediaDto> media;
+    private int views;
+    private int likes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    @Builder
-    public PostResponseDto(Long boardId, String title, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.boardId = boardId;
-        this.title = title;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
 }
