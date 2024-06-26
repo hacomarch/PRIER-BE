@@ -95,7 +95,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/profile/img")
     public void newProfileImg(@RequestHeader("Authorization") String authorizationHeader,
-                              @RequestParam(name = "media", required = false) MultipartFile media) throws IOException {
+                              @RequestParam(name = "media") MultipartFile media) throws IOException {
         String token = authorizationHeader.replace("Bearer ", "");
         userService.newProfileImg(token, media);
     }
