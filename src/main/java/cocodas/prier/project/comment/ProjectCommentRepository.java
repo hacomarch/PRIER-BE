@@ -22,4 +22,6 @@ public interface ProjectCommentRepository extends JpaRepository<ProjectComment, 
             "WHERE p.users.userId = :userId " +
             "AND pc.createdAt > :lastLoginAt")
     long countProjectCommentsForUserAfterLastLogin(@Param("userId") Long userId, @Param("lastLoginAt") LocalDateTime lastLoginAt);
+
+    List<ProjectComment> findByUsers_UserId(Long userId);
 }
