@@ -1,6 +1,6 @@
 package cocodas.prier.quest;
 
-import cocodas.prier.board.comment.PostCommentRepository;
+import cocodas.prier.project.comment.ProjectCommentRepository;
 import cocodas.prier.project.feedback.response.ResponseRepository;
 import cocodas.prier.user.Users;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,8 @@ import java.time.ZoneId;
 @Transactional(readOnly = true)
 public class QuestService {
     private final QuestRepository questRepository;
-    private final PostCommentRepository postCommentRepository;
     private final ResponseRepository responseRepository;
+    private final ProjectCommentRepository projectCommentRepository;
 
     @Transactional
     public void createQuest(Users users) {
@@ -69,7 +69,7 @@ public class QuestService {
     }
 
     private boolean isHasTodayComment(Long userId) {
-        return postCommentRepository.findByUsers_UserId(userId)
+        return projectCommentRepository.findByUsers_UserId(userId)
                 .stream()
                 .anyMatch(comment -> isToday(comment.getCreatedAt()));
     }

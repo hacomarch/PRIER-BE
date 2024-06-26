@@ -86,7 +86,7 @@ public class UserService {
         Float score = null;
         String percentageStr = null;
         List<KeyWordResponseDto> keywordByProjectId = null;
-        List<MyPageCommentDto> projectComments = null;
+        List<MyPageCommentDto> projectComments = projectCommentService.getProjectComments(userId);
 
         if (nowProject != null) {
             projectId = nowProject.getProjectId();
@@ -99,8 +99,6 @@ public class UserService {
             percentageStr = String.format("%.2f", percentage);
 
             keywordByProjectId = keywordsService.getKeywordByProjectId(projectId);
-
-            projectComments = projectCommentService.getProjectComments(userId);
         }
 
         return new MyPageResponseDto(
@@ -195,15 +193,6 @@ public class UserService {
                 projectComments,
                 profile
         );
-    }
-
-    // 이메일 수정하기
-    @Transactional
-    public void newEmail(String token, String newEmail) {
-        Long userId = findUserIdByJwt(token);
-        Users user = findUserExist(userId);
-
-        user.updateEmail(newEmail);
     }
 
     // 닉네임 수정하기

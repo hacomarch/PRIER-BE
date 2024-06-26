@@ -36,14 +36,6 @@ public class UserController {
 
     // 마이페이지 수정하기 Controller
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/users/email")
-    public void newEmail(@RequestHeader("Authorization") String authorizationHeader,
-                         @RequestBody EmailRequestDto emailRequestDto) {
-        String token = authorizationHeader.replace("Bearer ", "");
-        userService.newEmail(token, emailRequestDto.getEmail());
-    }
-
-    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/nickname")
     public void newNickName(@RequestHeader("Authorization") String authorizationHeader,
                             @RequestBody NickNameRequestDto nickNameRequestDto) {
