@@ -97,13 +97,13 @@ public class ResponseService {
                 .collect(Collectors.toList());
     }
 
-//    public List<ResponseDto> getResponsesByQuestion(Long questionId) {
-//        List<Response> responses = responseRepository.findAllByQuestionQuestionId(questionId);
-//
-//        return responses.stream()
-//                .map(this::mapToDto)
-//                .collect(Collectors.toList());
-//    }
+    public List<ResponseDto> getResponsesByQuestion(Long questionId) {
+        List<Response> responses = responseRepository.findAllByQuestionQuestionId(questionId);
+
+        return responses.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
 
     public List<ResponseDto> getResponsesByProject(Long projectId) {
         List<Response> responses = responseRepository.findAllByQuestionProjectProjectId(projectId);

@@ -71,4 +71,17 @@ public class ResponseController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(projectDtos);
     }
+
+    // 질문별 응답 조회
+    @GetMapping("/{projectId}/{questionId}/responses")
+    public ResponseEntity<List<ResponseDto>> getResponsesByQuestion(@PathVariable Long projectId,
+                                                                    @PathVariable Long questionId) {
+        List<ResponseDto> responses = responseService.getResponsesByQuestion(questionId);
+        return ResponseEntity.ok(responses);
+    }
+
+
+
+
+
 }
