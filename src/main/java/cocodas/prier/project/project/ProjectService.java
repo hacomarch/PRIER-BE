@@ -248,7 +248,8 @@ public class ProjectService {
                 projectMediaService.getProjectDetailMedia(project),
                 projectTagService.getProjectTags(project),
                 calculateScore(project),
-                getFeedbackAmount(project)
+                getFeedbackAmount(project),
+                userProfileService.getProfile(project.getUsers().getUserId()).getS3Key()
         );
     }
 
