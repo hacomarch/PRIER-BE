@@ -1,5 +1,5 @@
 # 1단계: 빌드 이미지 설정
-FROM openjdk:17-jdk-slim AS builder
+FROM openjdk:21-jdk-slim AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
