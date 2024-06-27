@@ -7,6 +7,7 @@ import cocodas.prier.project.feedback.question.QuestionService;
 import cocodas.prier.project.media.ProjectMediaService;
 import cocodas.prier.project.project.dto.*;
 import cocodas.prier.project.tag.projecttag.ProjectTagService;
+import cocodas.prier.user.UserProfileService;
 import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
@@ -42,6 +43,7 @@ public class ProjectService {
     private final QuestionService questionService;
     private final ProjectMediaService projectMediaService;
     private final PointTransactionService pointTransactionService;
+    private final UserProfileService userProfileService;
 
     @Transactional
     public Long createProject(ProjectForm form,
@@ -246,7 +248,8 @@ public class ProjectService {
                 projectMediaService.getProjectDetailMedia(project),
                 projectTagService.getProjectTags(project),
                 calculateScore(project),
-                getFeedbackAmount(project)
+                getFeedbackAmount(project),
+                userProfileService.getProfile(project.getUsers().getUserId()).getS3Key()
         );
     }
 
@@ -290,7 +293,8 @@ public class ProjectService {
                     project.getStatus(),
                     project.getLink(),
                     projectTagService.getProjectTags(project),
-                    score
+                    score,
+                    userProfileService.getProfile(project.getUsers().getUserId()).getS3Key()
             );
         });
     }
@@ -330,7 +334,8 @@ public class ProjectService {
                 project.getStatus(),
                 project.getLink(),
                 projectTagService.getProjectTags(project),
-                calculateScore(project)
+                calculateScore(project),
+                userProfileService.getProfile(project.getUsers().getUserId()).getS3Key()
         ));
     }
 
@@ -375,7 +380,8 @@ public class ProjectService {
                     project.getStatus(),
                     project.getLink(),
                     projectTagService.getProjectTags(project),
-                    calculateScore(project)
+                    calculateScore(project),
+                    userProfileService.getProfile(project.getUsers().getUserId()).getS3Key()
             );
         });
     }
@@ -413,7 +419,8 @@ public class ProjectService {
                         project.getStatus(),
                         project.getLink(),
                         projectTagService.getProjectTags(project),
-                        calculateScore(project)
+                        calculateScore(project),
+                        userProfileService.getProfile(project.getUsers().getUserId()).getS3Key()
                 ));
     }
 

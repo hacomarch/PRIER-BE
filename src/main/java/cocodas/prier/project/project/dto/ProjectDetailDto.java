@@ -32,5 +32,6 @@ public class ProjectDetailDto {
     private List<TagDto> tags;
     private Float score;
     private int[] amount;
+    private String profileImageUrl;
 }
 

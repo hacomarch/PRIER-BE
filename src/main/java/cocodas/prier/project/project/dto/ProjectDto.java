@@ -20,4 +20,5 @@ public class ProjectDto {
     private String link;
     private List<TagDto> tags;
     private Float score;
+    private String profileImageUrl;
 }
