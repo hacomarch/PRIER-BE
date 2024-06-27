@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   app:
-    image: popeye0618/prier:latest  # Docker Hub에 푸시한 이미지 또는 로컬에서 빌드한 이미지
+    image: kimseonhee126/prier:latest  # Docker Hub에 푸시한 이미지 또는 로컬에서 빌드한 이미지
     ports:
       - "8080:8080"
     depends_on:

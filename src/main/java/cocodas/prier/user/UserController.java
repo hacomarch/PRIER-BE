@@ -2,6 +2,7 @@ package cocodas.prier.user;
 
 import cocodas.prier.user.dto.request.*;
 import cocodas.prier.user.response.MyPageResponseDto;
+import cocodas.prier.user.response.OhterMyPageResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,8 @@ public class UserController {
 
     // 다른 사람의 마이페이지 보기
     @GetMapping("/mypage/{userId}")
-    public MyPageResponseDto viewOtherPage(@PathVariable(name = "userId") Long userId,
-            @RequestHeader("Authorization") String authorizationHeader) {
+    public OhterMyPageResponseDto viewOtherPage(@PathVariable(name = "userId") Long userId,
+                                                @RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "");
         return userService.viewOtherMyPage(token, userId);
     }
