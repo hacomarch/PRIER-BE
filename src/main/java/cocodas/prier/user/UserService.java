@@ -13,6 +13,7 @@ import cocodas.prier.statics.keywordAi.dto.response.KeyWordResponseDto;
 import cocodas.prier.statics.objective.ObjectiveResponseService;
 import cocodas.prier.user.kakao.jwt.JwtTokenProvider;
 import cocodas.prier.user.response.MyPageResponseDto;
+import cocodas.prier.user.response.OhterMyPageResponseDto;
 import cocodas.prier.user.response.ProfileImgDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,7 +128,7 @@ public class UserService {
     }
 
     // 다른 사람의 마이페이지 보기
-    public MyPageResponseDto viewOtherMyPage(String token, Long otherUserId) {
+    public OhterMyPageResponseDto viewOtherMyPage(String token, Long otherUserId) {
         Long myUserId = findUserIdByJwt(token);
 
         Users myUsers = findUserExist(myUserId);
@@ -140,6 +141,8 @@ public class UserService {
                 .filter(quest -> quest.getCreatedAt().equals(LocalDate.now()))
                 .findFirst()
                 .orElse(null);
+
+        // ======================= 여기까지가 나에 대한 정보 =======================
 
         // 프로필
         ProfileImgDto profile = userProfileService.getProfile(myUserId);
@@ -170,7 +173,7 @@ public class UserService {
             projectComments = projectCommentService.getProjectComments(otherUserId);
         }
 
-        return new MyPageResponseDto(
+        return new OhterMyPageResponseDto(
                 otherUsers.getNickname(),
                 otherUsers.getBelonging(),
                 otherUsers.getTier(),
@@ -180,6 +183,7 @@ public class UserService {
                 otherUsers.getFigmaUrl(),
                 otherUsers.getEmail(),
                 otherUsers.getIntro(),
+                awsS3Service.getPublicUrl(otherUsers.getS3Key()),
                 quests.getFirst(),
                 quests.getSecond(),
                 quests.getThird(),
