@@ -212,11 +212,11 @@ public class ResponseService {
         return projectIds;
     }
 
-    public long countFeedbackForUserProjectsAfterLastLogin(Long userId) {
-        LocalDateTime lastLoginAt = userRepository.findById(userId)
+    public long countFeedbackForUserProjectsAfterLastLogout(Long userId) {
+        LocalDateTime lastLogoutAt = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(INVALID_USER_ID_MESSAGE + userId))
-                .getLastLoginAt();
-        long feedbackCount = responseRepository.countFeedbackForUserProjectsAfterLastLogin(userId, lastLoginAt);
+                .getLastLogoutAt();
+        long feedbackCount = responseRepository.countFeedbackForUserProjectsAfterLastLogout(userId, lastLogoutAt);
         log.info("Feedback count after last login for user ID: {} is {}", userId, feedbackCount);
         return feedbackCount;
     }
@@ -235,7 +235,7 @@ public class ResponseService {
     public NotificationDto noticeAmount(String token) {
         Long userId = findUserIdByJwt(token);
 
-        long responseAmount = countFeedbackForUserProjectsAfterLastLogin(userId);
+        long responseAmount = countFeedbackForUserProjectsAfterLastLogout(userId);
         long commentAmount = projectCommentService.commentCountsForLogin(userId);
 
         return NotificationDto.builder()

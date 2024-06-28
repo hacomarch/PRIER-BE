@@ -169,6 +169,6 @@ public class ProjectCommentService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저"));
 
-        return projectCommentRepository.countProjectCommentsForUserAfterLastLogin(userId, user.getLastLoginAt());
+        return projectCommentRepository.countProjectCommentsForUserAfterLastLogout(userId, user.getLastLogoutAt());
     }
 }

@@ -38,7 +38,7 @@ public class Users {
     private String notionUrl;
     private String metadata = "userProfile.svg";
     private String s3Key = "0af06fa9-a078-4fe3-9df8-0c1e85368fba";
-    private LocalDateTime lastLoginAt;
+    private LocalDateTime lastLogoutAt;
     private Integer balance;
 
     // 카카오 로그인을 사용할 때 필요한 Builder
@@ -48,12 +48,6 @@ public class Users {
         this.nickname = nickname;
         this.tier = Rank.ROOKIE;
         this.balance = 0;
-        this.lastLoginAt = LocalDateTime.now();
-    }
-
-    // 마이페이지 수정을 위한 Setter
-    public void updateEmail(String email) {
-        this.email = email;
     }
 
     public void updateNickName(String nickname) {
@@ -92,8 +86,8 @@ public class Users {
         this.s3Key = s3Key;
     }
 
-    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
+    public void updateLastLogoutAt(LocalDateTime lastLogoutAt) {
+        this.lastLogoutAt = lastLogoutAt;
     }
 
     public void updateBalance(int amount) {

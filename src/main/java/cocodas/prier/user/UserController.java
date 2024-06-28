@@ -109,4 +109,12 @@ public class UserController {
         userService.deleteProfileImg(token);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/logout")
+    public void updateLastLogoutAt(@RequestHeader("Authorization") String authorizationHeader,
+                                   @RequestBody LogoutRequest logoutRequest) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        userService.updateLastLogoutAt(token, logoutRequest.getLastLogoutAt());
+    }
+
 }

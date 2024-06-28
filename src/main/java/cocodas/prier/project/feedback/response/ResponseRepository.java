@@ -25,8 +25,8 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
             "JOIN r.question q " +
             "JOIN q.project p " +
             "WHERE p.users.userId = :userId " +
-            "AND r.createdAt > :lastLoginAt")
-    long countFeedbackForUserProjectsAfterLastLogin(@Param("userId") Long userId, @Param("lastLoginAt") LocalDateTime lastLoginAt);
+            "AND r.createdAt > :lastLogoutAt")
+    long countFeedbackForUserProjectsAfterLastLogout(@Param("userId") Long userId, @Param("lastLogoutAt") LocalDateTime lastLogoutAt);
 
 
 }
