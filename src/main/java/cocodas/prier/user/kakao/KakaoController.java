@@ -38,7 +38,7 @@ public class KakaoController {
 
     @GetMapping("/kakao/callback")
     public ResponseEntity<LoginSuccessResponse> callback(@RequestParam("code") String code) {
-        log.info("kakaoController ===> callback 요청 들어옴");
+//        log.info("kakaoController ===> callback 요청 들어옴");
         try {
             LoginSuccessResponse userResponse = kakaoService.kakaoLogin(code);
             return ResponseEntity.ok().body(userResponse);

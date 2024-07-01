@@ -47,7 +47,7 @@ public class KakaoPayController {
                                     @RequestParam("pg_token") String pgToken) {
         try {
             PayApproveResDto kakaoApprove = kakaoPayService.getApprove(pgToken, id);
-            response.sendRedirect("http://localhost:3000/store");
+            response.sendRedirect("http://54.180.134.29/store");
 
 
         } catch (Exception e) {
