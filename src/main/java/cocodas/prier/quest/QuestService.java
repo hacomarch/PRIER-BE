@@ -1,7 +1,10 @@
 package cocodas.prier.quest;
 
+import cocodas.prier.point.pointTransaction.PointTransactionService;
+import cocodas.prier.point.pointTransaction.TransactionType;
 import cocodas.prier.project.comment.ProjectCommentRepository;
 import cocodas.prier.project.feedback.response.ResponseRepository;
+import cocodas.prier.user.UserRepository;
 import cocodas.prier.user.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,8 +19,10 @@ import java.time.ZoneId;
 @Transactional(readOnly = true)
 public class QuestService {
     private final QuestRepository questRepository;
+    private final UserRepository userRepository;
     private final ResponseRepository responseRepository;
     private final ProjectCommentRepository projectCommentRepository;
+    private final PointTransactionService pointTransactionService;
 
     @Transactional
     public void createQuest(Users users) {
@@ -34,17 +39,21 @@ public class QuestService {
 
     @Transactional
     public String updateQuest(LocalDate createdAt, Long userId, int sequence) {
+        Users users = findUsersById(userId);
         try {
             Quest quest = findByCreatedAtAndUserId(createdAt, userId);
             switch (sequence) {
                 case 1:
                     quest.updateFirst(true);
+                    pointTransactionService.increasePoints(users, 1, TransactionType.QUEST_REWARD, null);
                     break;
                 case 2:
                     validateAndUpdateSecondQuest(userId, quest);
+                    pointTransactionService.increasePoints(users, 2, TransactionType.QUEST_REWARD, null);
                     break;
                 case 3:
                     validateAndUpdateThirdQuest(userId, quest);
+                    pointTransactionService.increasePoints(users, 3, TransactionType.QUEST_REWARD, null);
                     break;
                 default:
                     return "지원하지 않는 퀘스트 번호입니다.";
@@ -53,6 +62,11 @@ public class QuestService {
         } catch (RuntimeException e) {
             return e.getMessage();
         }
+    }
+
+    private Users findUsersById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Not found User"));
     }
 
     public Quest findByCreatedAtAndUserId(LocalDate createdAt, Long userId) {
