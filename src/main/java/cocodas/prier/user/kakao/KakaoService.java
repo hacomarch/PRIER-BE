@@ -48,7 +48,7 @@ public class KakaoService {
 
     @Transactional
     public LoginSuccessResponse kakaoLogin(String code) {
-        log.info("kakaoService 에서 출력되는 code ===> {}", code);
+//        log.info("kakaoService 에서 출력되는 code ===> {}", code);
         String accessToken = getAccessToken(code);
         KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
         Long userId = getUserByEmail(userInfo.getKakaoAccount().email).getUserId();
@@ -72,7 +72,7 @@ public class KakaoService {
                 .block();
 
         String accessToken = kakaoTokenResponseDto.getAccessToken();
-        log.info("kakaoService에서 출력되는 accessToken ===> {}", accessToken);
+//        log.info("kakaoService에서 출력되는 accessToken ===> {}", accessToken);
         return accessToken;
     }
 
