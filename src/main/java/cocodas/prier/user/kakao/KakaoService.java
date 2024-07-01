@@ -15,6 +15,7 @@ import cocodas.prier.user.kakao.jwt.UserAuthentication;
 import cocodas.prier.user.response.ProfileImgDto;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
@@ -46,6 +48,7 @@ public class KakaoService {
 
     @Transactional
     public LoginSuccessResponse kakaoLogin(String code) {
+//        log.info("kakaoService 에서 출력되는 code ===> {}", code);
         String accessToken = getAccessToken(code);
         KakaoUserInfoResponseDto userInfo = getUserInfo(accessToken);
         Long userId = getUserByEmail(userInfo.getKakaoAccount().email).getUserId();
@@ -68,7 +71,9 @@ public class KakaoService {
                 .bodyToMono(KakaoTokenResponseDto.class)
                 .block();
 
-        return kakaoTokenResponseDto.getAccessToken();
+        String accessToken = kakaoTokenResponseDto.getAccessToken();
+//        log.info("kakaoService에서 출력되는 accessToken ===> {}", accessToken);
+        return accessToken;
     }
 
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {

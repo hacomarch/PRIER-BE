@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://54.180.134.29:3000/")
+@CrossOrigin(origins = "http://54.180.134.29")
 public class KakaoController {
 
     private final KakaoService kakaoService;
@@ -38,6 +38,7 @@ public class KakaoController {
 
     @GetMapping("/kakao/callback")
     public ResponseEntity<LoginSuccessResponse> callback(@RequestParam("code") String code) {
+//        log.info("kakaoController ===> callback 요청 들어옴");
         try {
             LoginSuccessResponse userResponse = kakaoService.kakaoLogin(code);
             return ResponseEntity.ok().body(userResponse);

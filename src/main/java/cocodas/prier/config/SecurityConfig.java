@@ -36,7 +36,9 @@ public class SecurityConfig {
             "/manifest.json",
             "/",
             "localhost:3000",
-            "http://54.180.134.29:3000",
+            "http://54.180.134.29",
+            "54.180.134.29",
+            "http://3.35.18.26:8080",
             "/kakao/login",
             "/kakao/callback",
             "/kakao/callback/**",
@@ -76,7 +78,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://54.180.134.29:3000")); // 허용할 도메인 설정
+        configuration.setAllowedOrigins(List.of("http://54.180.134.29", "http://3.35.18.26")); // 허용할 도메인 설정
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
