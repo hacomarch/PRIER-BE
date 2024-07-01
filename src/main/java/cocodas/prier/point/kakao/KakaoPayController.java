@@ -58,16 +58,27 @@ public class KakaoPayController {
     }
 
     @GetMapping("/cancel")
-    public ResponseEntity<?> cancel() {
-        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
-                .body(new BaseResponse<>(HttpStatus.EXPECTATION_FAILED.value(),"사용자가 결제를 취소하였습니다."));
+    public void cancel(HttpServletResponse response) {
+        try {
+            response.sendRedirect("http://54.180.134.29/store");
+        } catch (Exception e) {
+            log.info("에러 발생");
+        }
+//        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+//                .body(new BaseResponse<>(HttpStatus.EXPECTATION_FAILED.value(),"사용자가 결제를 취소하였습니다."));
     }
 
     @GetMapping("/fail")
-    public ResponseEntity<?> fail() {
+    public void fail(HttpServletResponse response) {
 
-        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
-                .body(new BaseResponse<>(HttpStatus.EXPECTATION_FAILED.value(),"결제가 실패하였습니다."));
+        try {
+            response.sendRedirect("http://54.180.134.29/store");
+        } catch (Exception e) {
+            log.info("에러 발생");
+        }
+
+//        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+//                .body(new BaseResponse<>(HttpStatus.EXPECTATION_FAILED.value(),"결제가 실패하였습니다."));
 
     }
 
