@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://54.180.134.29:3000/")
+@CrossOrigin(origins = "http://54.180.134.29")
 public class KakaoController {
 
     private final KakaoService kakaoService;
 
-    @Value("${kakao.get_cod e_path}")
+    @Value("${kakao.get_code_path}")
     private String getCodePath;
     @Value("${kakao.client_id}")
     private String client_id;
