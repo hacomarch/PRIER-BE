@@ -127,7 +127,7 @@ public class KakaoService {
         NotificationDto notificationDto = responseService.noticeAmount(accessToken);
 
         Users users = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Not Found User"));
-        users.updateLastLoginAt(LocalDateTime.now());
+        users.updateLastLogoutAt(LocalDateTime.now());
 
         return new LoginSuccessResponse(userId, accessToken, kakaoAccessToken, profile, notificationDto);
     }

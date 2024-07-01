@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -295,6 +297,15 @@ public class UserService {
 
         users.updateMetadata("basic_profile.png");
         users.updateS3Key(defaultProfileS3Key);
+    }
+
+    @Transactional
+    public void updateLastLogoutAt(String token, String logoutAt) {
+        Long userId = findUserIdByJwt(token);
+        Users users = findUserExist(userId);
+
+        LocalDateTime lastLogoutAt = LocalDateTime.parse(logoutAt, DateTimeFormatter.ISO_DATE_TIME);
+        users.updateLastLogoutAt(lastLogoutAt);
     }
 
     // $$ 천승환, 이소은 -> 사용자 프로필 사진 가져가라
