@@ -10,6 +10,11 @@
 
 <br>
 
+## 팀원
+김선희, 윤하은, 이소은, 천승환, 문규리, 박은진, 이인지
+
+<br>
+
 ## 사용 스택
 <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=SpringBoot&logoColor=white"> <img src="https://img.shields.io/badge/SpringSecurity-6DB33F?style=for-the-badge&logo=SpringSecurity&logoColor=white"> <img src="https://img.shields.io/badge/JPA-6DB33F?style=for-the-badge&logo=&logoColor=white">
 
